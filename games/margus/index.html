@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>Margus — porgandid vs jänes</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="branding">
+        <span class="logo">🥕</span>
+        <div>
+          <h1>Põllumäng (mitte põllumajandus)</h1>
+          <p class="tagline" id="tagline">Laadimine…</p>
+        </div>
+      </div>
+      <a class="back" href="../../index.html">← dashboard</a>
+    </header>
+
+    <div class="hud">
+      <div class="stat">
+        <span class="label">Õnnelikud porgandid</span>
+        <strong id="score">0</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Jänese närv</span>
+        <strong id="rabbitRage">0%</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Rekord</span>
+        <strong id="best">0</strong>
+      </div>
+    </div>
+
+    <div class="tools" role="toolbar" aria-label="Tööriistad">
+      <button type="button" class="tool tool--active" id="btnPlant" data-mode="plant" title="Kliki põllule">
+        🥕 porgand põllule
+      </button>
+      <button type="button" class="tool" id="btnRock" data-mode="rock" title="Kliki suunas kuhu kivi lendab">
+        🪨 kivi jänesele
+      </button>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="game" aria-label="Mänguväli"></canvas>
+      <div class="overlay hidden" id="gameOver">
+        <h2 id="goTitle">Mäng läbi</h2>
+        <p id="goText"></p>
+        <button type="button" class="bigbtn" id="btnRestart">Uuesti (jah palun)</button>
+      </div>
+    </div>
+
+    <p class="hint">
+      <strong>1:</strong> porgandid kasvavad, kui neid ei sööda ära.
+      <strong>2:</strong> jänes on ahnus. <strong>3:</strong> kivi jänesele ei ole loomade väärkohtlemine, see on mänguloogika.
+      Tulemus salvestatakse brauserisse.
+    </p>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+</html>

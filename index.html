@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Ühine mängude dashboard — vali mängija ja ava tema mäng." />
+  <title>Mängude terminal — ITS126</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/dashboard.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="shell">
+    <header class="site-header">
+      <p class="eyebrow">SYS.LINK // ITS126.GAMES</p>
+      <h1 class="site-title">Mängude terminal</h1>
+      <p class="lead">Vali mängija kaart — avaneb tema projekti kaust.</p>
+    </header>
+
+    <main class="site-main">
+      <div id="card-grid" class="card-grid" role="list"></div>
+    </main>
+
+    <footer class="site-footer">
+      <p>Staatiline leht — iga õpilane arendab oma sisu kaustas <code>games/&lt;slug&gt;/</code>.</p>
+    </footer>
+  </div>
+
+  <script src="assets/js/players.js"></script>
+  <script src="assets/js/dashboard.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Bruno (Vite / npm)
+games/bruno/node_modules/
+games/bruno/dist/
+games/bruno/.vite/
+games/bruno/coverage/
+games/bruno/.eslintcache
+games/bruno/*.log
+games/bruno/npm-debug.log*
+games/bruno/.env
+games/bruno/.env.local
+games/bruno/.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
