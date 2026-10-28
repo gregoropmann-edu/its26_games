@@ -3,14 +3,16 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.1.0/firebase
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signOut, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { 
   getFirestore, 
   collection, 
-  addDoc, 
+  doc,
+  setDoc,
   onSnapshot, 
   query, 
   orderBy, 
@@ -33,6 +35,11 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+
+// Catch redirect authentication outcome on page load
+getRedirectResult(auth).catch((error) => {
+  console.error("Redirect sisselogimise viga:", error);
+});
 
 // --- STATE VARIABLES ---
 let currentUser = null;
@@ -94,7 +101,7 @@ const player = {
 let bullets = [], enemyBullets = [], enemies = [], powerUps = [], particles = [], stars = [];
 const keys = { left: false, right: false, shoot: false };
 
-// Start screen: lock the name to the Google account when logged in
+// Start screen UI sync
 function updateStartAuthUI() {
   const input = document.getElementById('playerNameInput');
   const hint = document.getElementById('authHint');
@@ -105,17 +112,17 @@ function updateStartAuthUI() {
     input.readOnly = true;
     hint.textContent = 'Sisse logitud – tulemus salvestatakse edetabelisse.';
     hint.className = 'text-[11px] text-emerald-400';
-    loginBtn.classList.add('hidden');
+    if (loginBtn) loginBtn.classList.add('hidden');
   } else {
     input.readOnly = false;
     hint.textContent = 'Edetabelisse pääsemiseks logi sisse.';
     hint.className = 'text-[11px] text-slate-500';
-    loginBtn.classList.remove('hidden');
+    if (loginBtn) loginBtn.classList.remove('hidden');
   }
 }
 
 document.getElementById('startLoginBtn').addEventListener('click', () => {
-  signInWithPopup(auth, googleProvider).catch((err) => console.error("Sisselogimise viga:", err));
+  signInWithRedirect(auth, googleProvider).catch((err) => console.error("Sisselogimise viga:", err));
 });
 updateStartAuthUI();
 
@@ -151,7 +158,7 @@ onAuthStateChanged(auth, (user) => {
           <i class="fa-brands fa-google"></i> Logi sisse (@voco.ee)
         </button>`;
       document.getElementById('loginBtn').addEventListener('click', () => {
-        signInWithPopup(auth, googleProvider).catch((err) => {
+        signInWithRedirect(auth, googleProvider).catch((err) => {
           console.error("Sisselogimise viga:", err);
         });
       });
@@ -262,12 +269,24 @@ function renderLeaderboard(filter = "") {
   const totalBadge = document.getElementById('totalPlayersBadge');
   const avgBadge = document.getElementById('avgScoreVal');
 
-  const filtered = firestoreLeaderboard.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
-  totalBadge.innerText = `${firestoreLeaderboard.length} Mängijat`;
+  // Filter out duplicate user entries to present only the highest score per user
+  const uniqueUsersMap = new Map();
+  firestoreLeaderboard.forEach(item => {
+    const key = item.uid || item.name;
+    if (!uniqueUsersMap.has(key) || item.kills > uniqueUsersMap.get(key).kills) {
+      uniqueUsersMap.set(key, item);
+    }
+  });
 
-  if (firestoreLeaderboard.length > 0) {
-    const sum = firestoreLeaderboard.reduce((a, b) => a + (b.kills || 0), 0);
-    avgBadge.innerText = Math.round(sum / firestoreLeaderboard.length);
+  const uniqueLeaderboard = Array.from(uniqueUsersMap.values())
+    .sort((a, b) => b.kills - a.kills);
+
+  const filtered = uniqueLeaderboard.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
+  totalBadge.innerText = `${uniqueLeaderboard.length} Mängijat`;
+
+  if (uniqueLeaderboard.length > 0) {
+    const sum = uniqueLeaderboard.reduce((a, b) => a + (b.kills || 0), 0);
+    avgBadge.innerText = Math.round(sum / uniqueLeaderboard.length);
   } else {
     avgBadge.innerText = "0";
   }
@@ -304,15 +323,26 @@ function renderLeaderboard(filter = "") {
 
 async function saveScoreToFirestore(name, totalKillsCount, elapsedTimeInSeconds) {
   if (!currentUser) return;
+  if (totalKillsCount < 1) return; // At least 1 kill required
   if (elapsedTimeInSeconds <= 5.0) return; // Strict Firestore rule match: time > 5.0
 
   try {
-    await addDoc(collection(db, "leaderboard"), {
+    const userDocRef = doc(db, "leaderboard", currentUser.uid);
+
+    // Only update document if new kill score is higher than existing local entry
+    const existingEntry = firestoreLeaderboard.find(item => item.uid === currentUser.uid);
+    if (existingEntry && totalKillsCount <= existingEntry.kills) {
+      console.log("Uus skoor ei ole kõrgem kui varasem parim tulemus.");
+      return;
+    }
+
+    await setDoc(userDocRef, {
       uid: currentUser.uid,
       name: name,
       kills: totalKillsCount,
       time: elapsedTimeInSeconds
-    });
+    }, { merge: true });
+
   } catch (e) {
     console.error("Viga tulemuse salvestamisel Firestore'i: ", e);
   }
