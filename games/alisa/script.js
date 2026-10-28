@@ -3,8 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.1.0/firebase
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup, 
   signOut, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
@@ -35,11 +34,6 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
-
-// Catch redirect authentication outcome on page load
-getRedirectResult(auth).catch((error) => {
-  console.error("Redirect sisselogimise viga:", error);
-});
 
 // --- STATE VARIABLES ---
 let currentUser = null;
@@ -101,7 +95,7 @@ const player = {
 let bullets = [], enemyBullets = [], enemies = [], powerUps = [], particles = [], stars = [];
 const keys = { left: false, right: false, shoot: false };
 
-// Start screen UI sync
+// Start screen: lock the name to the Google account when logged in
 function updateStartAuthUI() {
   const input = document.getElementById('playerNameInput');
   const hint = document.getElementById('authHint');
@@ -122,7 +116,7 @@ function updateStartAuthUI() {
 }
 
 document.getElementById('startLoginBtn').addEventListener('click', () => {
-  signInWithRedirect(auth, googleProvider).catch((err) => console.error("Sisselogimise viga:", err));
+  signInWithPopup(auth, googleProvider).catch((err) => console.error("Sisselogimise viga:", err));
 });
 updateStartAuthUI();
 
@@ -158,7 +152,7 @@ onAuthStateChanged(auth, (user) => {
           <i class="fa-brands fa-google"></i> Logi sisse (@voco.ee)
         </button>`;
       document.getElementById('loginBtn').addEventListener('click', () => {
-        signInWithRedirect(auth, googleProvider).catch((err) => {
+        signInWithPopup(auth, googleProvider).catch((err) => {
           console.error("Sisselogimise viga:", err);
         });
       });
@@ -269,7 +263,7 @@ function renderLeaderboard(filter = "") {
   const totalBadge = document.getElementById('totalPlayersBadge');
   const avgBadge = document.getElementById('avgScoreVal');
 
-  // Filter out duplicate user entries to present only the highest score per user
+  // Filter out duplicate user entries so each player displays their highest score only
   const uniqueUsersMap = new Map();
   firestoreLeaderboard.forEach(item => {
     const key = item.uid || item.name;
@@ -329,7 +323,7 @@ async function saveScoreToFirestore(name, totalKillsCount, elapsedTimeInSeconds)
   try {
     const userDocRef = doc(db, "leaderboard", currentUser.uid);
 
-    // Only update document if new kill score is higher than existing local entry
+    // Only update if new kill score is strictly higher than existing entry
     const existingEntry = firestoreLeaderboard.find(item => item.uid === currentUser.uid);
     if (existingEntry && totalKillsCount <= existingEntry.kills) {
       console.log("Uus skoor ei ole kõrgem kui varasem parim tulemus.");
