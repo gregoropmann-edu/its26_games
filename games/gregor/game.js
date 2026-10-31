@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getAuth, signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDCl5gu6Xavdsi8ImqZxQjdpy9EHZBUeiU",
@@ -112,12 +113,13 @@ onAuthStateChanged(auth, async (user) => {
 
 async function handleGoogleLogin() {
     try {
-        // Always try popup mode first (keeps login scoped inside the browser window)
-        await signInWithPopup(auth, googleProvider);
+        if (isMobileDevice) {
+            await signInWithRedirect(auth, googleProvider);
+        } else {
+            await signInWithPopup(auth, googleProvider);
+        }
     } catch (error) {
-        console.warn("Popup blocked or failed, fallback to redirect:", error);
-        
-        // Fallback to redirect only if popups are strictly blocked by browser settings
+        console.warn("Auth mode failed, using fallback:", error);
         if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
             await signInWithRedirect(auth, googleProvider);
         }
@@ -449,7 +451,6 @@ class Player {
 
         this.moveWithCollision(dx * moveSpeed, dy * moveSpeed);
 
-        // Aiming Logic: Auto-lock only on Mobile, manual mouse aim on Desktop
         if (isMobileDevice) {
             let closestGuard = null;
             let minDistance = 280;
@@ -474,7 +475,6 @@ class Player {
                 worldMouseY = this.y + dy * 150;
             }
         } else {
-            // Strictly manual aiming via mouse position on Desktop
             this.angle = Math.atan2(worldMouseY - this.y, worldMouseX - this.x);
         }
 
@@ -1392,7 +1392,6 @@ window.addEventListener('mousedown', (e) => {
     }
 });
 
-// Left Touch D-Pad Binding
 const bindTouchBtn = (id, keyName) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -1634,8 +1633,6 @@ function loadHighScores() {
     fetchLeaderboard();
 }
 
-// --- Firebase Leaderboard Integration Functions ---
-
 async function fetchLeaderboard() {
     const listElem = document.getElementById('leaderboard-list');
     if (!listElem) return;
@@ -1757,7 +1754,6 @@ function triggerVictory() {
         localStorage.setItem('shadow_castle_v3_kills', guardKills.toString());
     }
 
-    // Refresh user state UI directly on trigger
     updateAuthUI(currentUser);
 
     document.getElementById('modal-victory').classList.remove('hidden');
