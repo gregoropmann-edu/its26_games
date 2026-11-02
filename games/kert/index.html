@@ -968,7 +968,7 @@ window.__drawWarnTri = function (c, cx, cy, w) {
 
     <div id="gameArea">
       <canvas id="gameCanvas" width="1050" height="500"></canvas>
-      <div class="nf-dark"></div><div class="nf-glow"></div>
+      <div class="nf-dark"></div><div class="nf-glow"></div><div class="amb-sun"></div><div class="amb-vig"></div>
       <button id="skipTutBtn" class="skip-tut" style="display:none" onclick="skipTutorial()">Jäta tutorial vahele ⏭</button>
       <div id="dayNight" title="Päike = rahu, kuu = laine ründab"><div class="dn-sky day"></div><div class="dn-sky nite"></div><div class="dn-stars"></div><div class="dn-orbit"><div class="dn-body dn-sun"></div><div class="dn-body dn-moon"></div></div></div>
       <div id="tutPanel"></div>
@@ -1072,18 +1072,28 @@ window.__drawWarnTri = function (c, cx, cy, w) {
 
       <!-- Game Over Modal -->
       <div id="gameOverScreen" class="overlay-screen hidden">
-        <h2 style="color: var(--danger);">Baas Hävitatud</h2>
-        <p>Vastu pidasid <span id="finalWave">0</span> lainet.</p>
-        <div class="stat-grid">
-          <div><b id="statKills">0</b><span>Tapmisi</span></div>
-          <div><b id="statBosses">0</b><span>Bosse</span></div>
-          <div><b id="statTime">0:00</b><span>Aeg</span></div>
-          <div><b id="statBuilt">0</b><span>Ehitisi</span></div>
-          <div><b id="statFleets">0</b><span>Fleet kutseid</span></div>
+        <div class="go-embers" aria-hidden="true"></div>
+        <div class="go-card">
+          <div class="go-kicker" style="--d:0s">⚠ Side katkes · Ironwatch Outpost</div>
+          <h2 class="go-title">Baas hävitatud</h2>
+          <div class="go-hero" style="--d:.35s">
+            <div class="go-wave"><b id="finalWave">0</b><span>lainet vastu peetud</span></div>
+            <div class="go-sep"></div>
+            <div class="go-rank"><small>Auaste</small><b id="goRank">Rekruut</b></div>
+          </div>
+          <div class="stat-grid go-stats">
+            <div style="--d:.55s"><i>⚔</i><b id="statKills">0</b><span>Tapmisi</span></div>
+            <div style="--d:.65s"><i>💀</i><b id="statBosses">0</b><span>Bosse</span></div>
+            <div style="--d:.75s"><i>⏱</i><b id="statTime">0:00</b><span>Aeg</span></div>
+            <div style="--d:.85s"><i>🏗</i><b id="statBuilt">0</b><span>Ehitisi</span></div>
+            <div style="--d:.95s"><i>★</i><b id="statFleets">0</b><span>Fleet kutseid</span></div>
+          </div>
+          <div id="statRecord" style="--d:1.15s"></div>
+          <div class="go-actions" style="--d:1.3s">
+            <button class="go-retry" onclick="restartGame()">⟲ Proovi uuesti <kbd>R</kbd></button>
+            <a id="feedbackLink" href="https://forms.gle/FmzCWB6JTiSTguLWA" target="_blank" rel="noopener noreferrer">📝 Anna tagasisidet</a>
+          </div>
         </div>
-        <div id="statRecord" style="font-size:15px; font-weight:bold; letter-spacing:.04em;"></div>
-        <a id="feedbackLink" href="https://forms.gle/FmzCWB6JTiSTguLWA" target="_blank" rel="noopener noreferrer" style="display:inline-block; margin:6px 0 2px; padding:8px 16px; border:1px solid var(--amber, #ffaa00); border-radius:6px; color:var(--amber, #ffaa00); font-size:14px; font-weight:bold; text-decoration:none; letter-spacing:.03em;">📝 Anna tagasisidet</a>
-        <button onclick="restartGame()">Proovi Uuesti</button>
       </div>
     </div>
 
@@ -2558,6 +2568,15 @@ function __stuckTick(q, dt, tx, ty) {
     const C = void 0 !== A[V] ? A[V] : q;
     return { x: E + Math.cos(C) * I, y: Q + Math.sin(C) * I - S / M };
   }
+  function __bOff(k) {
+    const q = mA.q || {},
+      on = [q.bunkerTurret, q.bunkerFlame, q.bunkerGrenade],
+      n = on.filter(Boolean).length;
+    if (n < 2) return 0;
+    let i = 0;
+    for (let j = 0; j < k; j++) on[j] && i++;
+    return n === 2 ? (i ? 12 : -12) : [-16, 0, 16][i];
+  }
   function SA(A, V, q, E) {
     const Q = 2 * Math.PI,
       I = V + "t",
@@ -2873,8 +2892,20 @@ function __stuckTick(q, dt, tx, ty) {
           zshoot: 0.1,
           zdie: 0.04,
           summon: 0.3,
+          buildPlace: 0.25,
+          deposit: 0.1,
+          rise: 0.3,
+          spawn: 0.12,
+          weld: 0.09,
+          hammer: 0.14,
+          hatch: 0.08,
+          uiClick: 0.04,
+          uiHover: 0.06,
         },
         l = {
+          buildPlace: 1,
+          hatch: 1,
+          uiClick: 1,
           tank: 1,
           bossDie: 1,
           waveStart: 1,
@@ -3110,12 +3141,12 @@ function __stuckTick(q, dt, tx, ty) {
           tank(A, V) {
             const q = !!V,
               E = q ? 0.75 : 0.5;
-            (z("sine", q ? 120 : 150, q ? 28 : 36, A, E, q ? 0.75 : 0.6, 0.006),
+            (z("sine", q ? 120 : 150, q ? 28 : 36, A, E, q ? 0.5 : 0.4, 0.006),
               z("sawtooth", 90, 30, A, 0.7 * E, 0.12),
               n(
                 A,
                 0.8 * E,
-                q ? 0.5 : 0.4,
+                q ? 0.32 : 0.26,
                 "lowpass",
                 q ? 1400 : 1e3,
                 90,
@@ -3125,15 +3156,15 @@ function __stuckTick(q, dt, tx, ty) {
               n(A, 0.04, 0.2, "highpass", 1500, 1500));
           },
           grenade(A) {
-            (z("sine", 170, 46, A, 0.3, 0.32),
-              n(A, 0.22, 0.28, "lowpass", 1500, 220, 0.8, 0.003),
-              z("square", 620, 190, A, 0.07, 0.09),
-              n(A + 0.05, 0.1, 0.1, "bandpass", 2400, 900, 1));
+            (z("sine", 170, 46, A, 0.3, 0.14),
+              n(A, 0.22, 0.12, "lowpass", 1500, 220, 0.8, 0.003),
+              z("square", 620, 190, A, 0.07, 0.04),
+              n(A + 0.05, 0.1, 0.05, "bandpass", 2400, 900, 1));
           },
           explosion(A, V) {
             const q = V || 0.7;
-            (z("sine", 110, 32, A, 0.4, 0.4 * q),
-              n(A, 0.4, 0.35 * q, "lowpass", 1800, 120, 0.7, 0.004));
+            (z("sine", 110, 32, A, 0.4, 0.2 * q),
+              n(A, 0.4, 0.17 * q, "lowpass", 1800, 120, 0.7, 0.004));
           },
           flame(A) {
             (n(A, 0.38, 0.22, "bandpass", 900, 350, 0.9, 0.06),
@@ -3181,8 +3212,52 @@ function __stuckTick(q, dt, tx, ty) {
             });
           },
           built(A) {
-            (z("sine", 660, 660, A, 0.12, 0.12),
-              z("sine", 990, 990, A + 0.1, 0.16, 0.12));
+            (z("sine", 90, 38, A, 0.4, 0.38, 0.005),
+              n(A, 0.35, 0.22, "lowpass", 800, 90, 0.7, 0.01),
+              z("sine", 660, 660, A + 0.14, 0.12, 0.12),
+              z("sine", 990, 990, A + 0.24, 0.16, 0.12));
+          },
+          rise(A) {
+            (z("sine", 75, 38, A, 0.9, 0.3, 0.05),
+              n(A, 0.9, 0.2, "lowpass", 500, 90, 0.7, 0.05),
+              z("sine", 110, 55, A + 0.55, 0.3, 0.22, 0.01));
+          },
+          deposit(A) {
+            (z("sine", 1320, 1320, A, 0.09, 0.07, 0.002),
+              z("sine", 1980, 1980, A + 0.05, 0.12, 0.06, 0.002),
+              n(A, 0.04, 0.08, "highpass", 5000, 5000));
+          },
+          spawn(A) {
+            (z("sine", 200, 90, A, 0.14, 0.14, 0.004),
+              n(A, 0.1, 0.1, "lowpass", 900, 250, 0.8, 0.003));
+          },
+          buildPlace(A) {
+            (z("sine", 140, 48, A, 0.28, 0.32, 0.005),
+              n(A, 0.18, 0.2, "lowpass", 900, 160, 0.8, 0.004),
+              z("square", 520, 260, A + 0.02, 0.07, 0.1),
+              n(A + 0.05, 0.1, 0.12, "bandpass", 2200, 1200, 2));
+          },
+          weld(A) {
+            for (let V = 0; V < 4; V++) n(A + p(0, 0.16), 0.02, 0.1, "highpass", 4200, 4200);
+            z("sawtooth", 2400, 1100, A, 0.12, 0.04, 0.01);
+          },
+          hammer(A) {
+            (z("square", p(780, 980), 520, A, 0.05, 0.1, 0.002),
+              n(A, 0.05, 0.14, "bandpass", 2600, 2600, 3, 0.001),
+              z("sine", 180, 120, A, 0.06, 0.12));
+          },
+          hatch(A) {
+            (z("square", 310, 150, A, 0.09, 0.12, 0.003),
+              n(A, 0.07, 0.16, "bandpass", 1800, 900, 1.6, 0.002),
+              z("sine", 120, 70, A + 0.07, 0.14, 0.2, 0.004),
+              n(A + 0.07, 0.12, 0.1, "lowpass", 700, 200, 0.7));
+          },
+          uiClick(A) {
+            (z("square", 1500, 950, A, 0.035, 0.05, 0.001),
+              z("sine", 640, 520, A, 0.05, 0.05, 0.001));
+          },
+          uiHover(A) {
+            z("sine", 1900, 1900, A, 0.025, 0.02, 0.002);
           },
           trained(A) {
             z("sine", 780, 1170, A, 0.14, 0.1);
@@ -3382,6 +3457,22 @@ function __stuckTick(q, dt, tx, ty) {
             Q.connect(V));
         } else C.connect(V);
         return (2 === Q ? S.start(I + 0.005, 0.035) : S.start(I + 0.005), !0);
+      }
+      let GBT = 0;
+      function GB(q) {
+        if (!qA) return (JA(q, 2), !1);
+        const t = A.currentTime;
+        if (t < GBT) return !0;
+        GBT = t + 0.15;
+        const S = A.createBufferSource();
+        ((S.buffer = qA), (S.playbackRate.value = 0.94 + 0.12 * Math.random()));
+        const C = A.createGain();
+        (C.gain.setValueAtTime(M ? 0.4 : 0.55, t), C.gain.linearRampToValueAtTime(0, t + 1.1), S.connect(C));
+        if (A.createStereoPanner) {
+          const P = A.createStereoPanner();
+          ((P.pan.value = "number" == typeof q ? Math.max(-0.8, Math.min(0.8, (q / E) * 1.6 - 0.8)) : 0), C.connect(P), P.connect(V));
+        } else C.connect(V);
+        return (S.start(t + 0.005, 0.035), S.stop(t + 1.15), !0);
       }
       let YA = 0,
         GA = 0,
@@ -3703,6 +3794,9 @@ function __stuckTick(q, dt, tx, ty) {
             Q = "missile";
           } else if ("yamato" === Q) {
             if (JA(I)) return;
+          } else if ("grenadeBoom" === Q) {
+            if (GB(I)) return;
+            ((Q = "explosion"), (S = 0.45));
           } else if ("fleetWarp" === Q) {
             if (JA(I, 2)) return;
             Q = "fleetBomb";
@@ -3885,6 +3979,17 @@ function __stuckTick(q, dt, tx, ty) {
             (N = setTimeout(() => {
               y && y.pause();
             }, 700)));
+        },
+        ensureMusic: function () {
+          try {
+            if (!A) w();
+            if (!A) return !1;
+            "suspended" === A.state && A.resume().catch(() => {});
+            G && y && !m && y.paused && y.src && y.play().catch(() => {});
+            return !!(G && y && !y.paused && !y.ended && "running" === A.state);
+          } catch (e) {
+            return !1;
+          }
         },
         resumeMusic: function () {
           if (!G || !A) return;
@@ -4418,6 +4523,32 @@ function __stuckTick(q, dt, tx, ty) {
       "spawning" !== mA.waveState &&
         ((mA.waveState = "spawning"), (mA.spawnTimer = 0)));
   }
+  document.addEventListener(
+    "click",
+    (e) => {
+      const b = e.target && e.target.closest ? e.target.closest("button, [role=button]") : null;
+      if (!b || b.disabled || b.getAttribute("data-locked") === "1") return;
+      iA("uiClick");
+    },
+    !0,
+  );
+  let __uiHv = null;
+  (document.addEventListener(
+    "mouseover",
+    (e) => {
+      const b = e.target && e.target.closest ? e.target.closest("button") : null;
+      if (!b || b === __uiHv || b.disabled) return;
+      ((__uiHv = b), iA("uiHover"));
+    },
+    !0,
+  ),
+    document.addEventListener(
+      "mouseout",
+      (e) => {
+        __uiHv && !__uiHv.contains(e.relatedTarget) && (__uiHv = null);
+      },
+      !0,
+    ));
   (document.addEventListener("pointerdown", () => BA.init()),
     document.addEventListener("keydown", (A) => {
       (BA.init(), ("m" !== A.key && "M" !== A.key) || BA.toggleMusicMute());
@@ -4815,10 +4946,10 @@ function __stuckTick(q, dt, tx, ty) {
       EARLY_MAX_WAVE: 10, // juhuslik varajane Mega Knight laines 1..N (üks kord mängu kohta). 0 = välja
       FLEET_BELOW_WAVE: 25, // kui ta tuleb enne seda lainet, kutsutakse fleet automaatselt
       HP_EARLY: 2200, // elud varajases laines (korrutatakse laine tugevusega)
-      HP_FULL_BASE: 80000, // elud laines 25 (NB: ei skaleeru enam laine tugevusega V, see läks 75. laines ~13 miljonini)
-      HP_FULL_PER_WAVE: 3600, // + nii palju elusid iga laine kohta pärast 25. (laine 50: 170k, 75: 260k, 100: 350k)
-      HP_FIRST_BASE: 40000, // ESIMENE Mega Knight (elite fleet'iga): elud = BASE + PER_WAVE * laine nr
-      HP_FIRST_PER_WAVE: 7000,
+      HP_FULL_BASE: 30000, // elud laines 25 (NB: ei skaleeru enam laine tugevusega V, see läks 75. laines ~13 miljonini)
+      HP_FULL_PER_WAVE: 1500, // + nii palju elusid iga laine kohta pärast 25. (laine 50: 170k, 75: 260k, 100: 350k)
+      HP_FIRST_BASE: 9000, // ESIMENE Mega Knight (elite fleet'iga): elud = BASE + PER_WAVE * laine nr
+      HP_FIRST_PER_WAVE: 1200,
       FLEET_KILL_MIN: 8, // esimene Mega Knight: elite fleet tapab ta VÄHEMALT nii mitme sekundiga
       FLEET_KILL_MAX: 14, // ...ja HILJEMALT nii mitme sekundiga
       SAY_TEXT: "Parem oleks, et seda rohkem ei juhtu.", // fleet'i jutumull (ainult esimesel korral)
@@ -5504,6 +5635,7 @@ function __stuckTick(q, dt, tx, ty) {
           s.z = 0;
           s.st = "intro";
           s.t = 0;
+          try { window.__craterAdd && window.__craterAdd(q.x, q.y); } catch (er) {}
           dmgArea(q.x, q.y, 110, q.dmg * CFG.LAND_MULT, 0.5);
           fx.push({ k: "ring", x: q.x, y: q.y, R: 230, t: 0, T: 1.1 });
           dust(q.x, q.y, 28);
@@ -6172,6 +6304,7 @@ function __stuckTick(q, dt, tx, ty) {
           turretDmg: 0,
           bunkerTurret: 0,
           bunkerFlame: 0,
+          bunkerGrenade: 0,
           structureArmor: 0,
           unitArmor: 0,
           turretRange: 0,
@@ -6363,6 +6496,12 @@ function __stuckTick(q, dt, tx, ty) {
         key: "bunkerFlame",
         max: 1,
         cost: (A) => 200,
+        voice: "research",
+      },
+      upgBunkerGrenade: {
+        key: "bunkerGrenade",
+        max: 1,
+        cost: (A) => 250,
         voice: "research",
       },
       upgFleetYamato: {
@@ -6568,6 +6707,7 @@ function __stuckTick(q, dt, tx, ty) {
             mA.units.push(M));
         }),
           iA("trained", A.x + A.w / 2),
+          __bfxSpawn(A),
           VV());
       } else if ("trainMarine" === A) IV("barracks", "marine");
       else if ("trainHellbat" === A) IV("barracks", "hellbat");
@@ -6990,7 +7130,11 @@ function __stuckTick(q, dt, tx, ty) {
           mA.q &&
             mA.q.bunkerFlame &&
             (Q +=
-              '<br><span style="font-size:11px; color:#ff9a2e; font-weight:bold;">🔥 Flamethrower aktiivne</span>'));
+              '<br><span style="font-size:11px; color:#ff9a2e; font-weight:bold;">🔥 Flamethrower aktiivne</span>'),
+          mA.q &&
+            mA.q.bunkerGrenade &&
+            (Q +=
+              '<br><span style="font-size:11px; color:#9dff7a; font-weight:bold;">💣 Grenade Launcher aktiivne</span>'));
       } else if ("missileTurret" === V.type || "flakTurret" === V.type)
         Q +=
           '<span style="font-size:13px; color:var(--amber); font-weight:bold;">Õhutõrje valmis!</span>';
@@ -7018,10 +7162,11 @@ function __stuckTick(q, dt, tx, ty) {
         const I = (A) => 100 + 60 * A;
         ((Q += `<button data-cost="${I(A.liberatorDmg)}" ${A.liberatorDmg >= 5 ? 'data-locked="1"' : ""} onclick="handleAction('upgLiberator')">Raven Dmg Lv${A.liberatorDmg + 1} (${I(A.liberatorDmg)})</button>`),
           (Q +=
-            '<br><span style="font-size:11px; color:var(--text-dim);">Damage: +2 marine, +3 firebat, +8 tank, +5 turret (Grenade Launcher +7), +8 raven. Max Lv5.<br>Armor: -3 damage per level for structures / units. Range: +18 per level for turrets.<br>Auto Turret / Flamethrower: bunkers fire on their own (flame = ground only, AoE). Turret Dmg/Range apply to Flame Turret too.</span>'));
+            '<br><span style="font-size:11px; color:var(--text-dim);">Damage: +2 marine, +3 firebat, +8 tank, +5 turret (Grenade Launcher +7), +8 raven. Max Lv5.<br>Armor: -3 damage per level for structures / units. Range: +18 per level for turrets.<br>Auto Turret / Flamethrower / Grenade Launcher: bunkers fire on their own (flame and grenades = ground only, AoE). Turret Dmg/Range apply to Flame and Grenade turrets too.</span>'));
         Q += '<br><span style="font-size:11px; color:var(--text-dim);">Bunker ja Fleet uuringud:</span>';
         (Q += `<button data-cost="150" ${A.bunkerTurret >= 1 ? 'data-locked="1"' : ""} onclick="handleAction('upgBunkerTurret')">${A.bunkerTurret ? "✅ Auto Turret unlocked" : "Bunker Auto Turret (150)"}</button>`);
         (Q += `<button data-cost="200" ${A.bunkerFlame >= 1 ? 'data-locked="1"' : ""} data-tooltip="Bunker saab leegiheitja (maapealsed, AoE, lühike ulatus). Töötab koos Auto Turretiga." onclick="handleAction('upgBunkerFlame')">${A.bunkerFlame ? "✅ Bunker Flamethrower unlocked" : "Bunker Flamethrower (200)"}</button>`);
+        (Q += `<button data-cost="250" ${A.bunkerGrenade >= 1 ? 'data-locked="1"' : ""} data-tooltip="Bunker saab granaadiheitja (maapealsed, AoE splash). Töötab koos Auto Turreti ja Flamethroweriga." onclick="handleAction('upgBunkerGrenade')">${A.bunkerGrenade ? "✅ Bunker Grenade Launcher unlocked" : "Bunker Grenade Launcher (250)"}</button>`);
         (Q += `<button data-cost="1500" ${A.fleetYamato >= 1 || A.fleetElite >= 1 ? 'data-locked="1"' : ""} data-tooltip="Fleet saab Yamato kahuri juba Lv1 peal (harva). Elite ja Max annavad Yamato ilma selleta, tihedamini." onclick="handleAction('upgFleetYamato')">${A.fleetYamato || A.fleetElite ? "✅ Fleet Yamato Gun" : "Fleet Yamato Gun (1500)"}</button>`);
         (Q += `<button data-cost="3000" ${A.fleetElite >= 1 ? 'data-locked="1"' : ""} data-tooltip="Fleet: ~5.5x damage võrreldes Lv1-ga (laserid, Yamato, pommid)" onclick="handleAction('upgFleetElite')">${A.fleetElite ? "✅ Fleet Level: ELITE" : "★ Fleet Level Elite (3000)"}</button>`);
         (Q += `<button data-cost="10000" ${A.fleetMax >= 1 || !A.fleetElite ? 'data-locked="1"' : ""} data-tooltip="Fleet: ~11x damage võrreldes Lv1-ga (vajab Fleet Elite'i)" onclick="handleAction('upgFleetMax')">${A.fleetMax ? "✅ Fleet Level: MAX" : "★★ Fleet Level Max (10000)"}</button>`);
@@ -7094,6 +7239,7 @@ function __stuckTick(q, dt, tx, ty) {
       upgTurret: "u",
       upgBunkerTurret: "b",
       upgBunkerFlame: "n",
+      upgBunkerGrenade: "j",
       upgFleetYamato: "y",
       upgFleetElite: "f",
       upgFleetMax: "g",
@@ -8309,7 +8455,8 @@ function __stuckTick(q, dt, tx, ty) {
             I = Math.max(q.y, Math.min(E.y, q.y + q.h)),
             S = A(Q - E.x, I - E.y);
           S <= 12
-            ? ((mA.V += E.cargo),
+            ? (__bfxDeposit(q, E.x, E.y),
+              (mA.V += E.cargo),
               (E.got += E.cargo),
               mA.effects.push({
                 type: "floatText",
@@ -8641,7 +8788,8 @@ function __stuckTick(q, dt, tx, ty) {
             const E = Math.max(C.x, Math.min(q.x, C.x + C.w)),
               Q = Math.max(C.y, Math.min(q.y, C.y + C.h));
             if (A(q.x - E, q.y - Q) <= q.radius + 10)
-              ((mA.V += q.cargo || 0),
+              (__bfxDeposit(C, q.x, q.y),
+                (mA.V += q.cargo || 0),
                 mA.effects.push({
                   type: "floatText",
                   x: q.x,
@@ -8753,7 +8901,8 @@ function __stuckTick(q, dt, tx, ty) {
               ((Q.constructing = !1),
                 (Q.hp = Q.maxHp),
                 mA.stats.built++,
-                iA("built", Q.x + Q.w / 2));
+                iA("built", Q.x + Q.w / 2),
+                __bfxBurst(Q, 14, 2));
               const A = Q.builder;
               ((A.buildTarget = null), (A.path = null), (Q.builder = null));
               const V = [
@@ -8810,7 +8959,7 @@ function __stuckTick(q, dt, tx, ty) {
             Q.queue.length > 0 &&
             ((Q.queue[0].timeLeft -= V), Q.queue[0].timeLeft <= 0))
         ) {
-          (pV(Q.queue.shift().unitType, Q), iA("trained", Q.x + Q.w / 2), VV());
+          (pV(Q.queue.shift().unitType, Q), iA("trained", Q.x + Q.w / 2), __bfxSpawn(Q), VV());
         }
         if (
           "bunker" === Q.type &&
@@ -8837,10 +8986,55 @@ function __stuckTick(q, dt, tx, ty) {
               flameStrike(
                 Q,
                 fT,
-                flameTip(Q, "_fa", 60, mA.q.bunkerTurret ? 12 : 0, -8),
+                flameTip(Q, "_fa", 60, __bOff(1), -8),
                 4 + 2 * fL,
               ));
           } else Q._fT = 0.1;
+        }
+        if (
+          "bunker" === Q.type &&
+          !Q.constructing &&
+          mA.q &&
+          mA.q.bunkerGrenade &&
+          ((Q._gT = (Q._gT || 0) - V), Q._gT <= 0)
+        ) {
+          const gbx = Q.x + Q.w / 2,
+            gby = Q.y + Q.h / 2,
+            gbS = (typeof UA !== "undefined" && UA.grenadeTurret) || { dmg: 34, splash: 56, atkSpeed: 0.75 };
+          let gbT = null,
+            gbD = Q.range;
+          for (const ge of mA.enemies) {
+            if (ge.isFlying) continue;
+            const gd = Math.hypot(ge.x - gbx, ge.y - gby);
+            gd <= gbD && ((gbT = ge), (gbD = gd));
+          }
+          if (gbT) {
+            const gbL = Q.finalGuard ? Math.max(mA.q.turretDmg, 7) : mA.q.turretDmg;
+            ((Q.fireAngle = Math.atan2(gbT.y - gby, gbT.x - gbx)), (Q._lastFire = performance.now()));
+            const gbm = IA(Q, "_ga", Q.fireAngle, gbx + __bOff(2), gby, 26, 7);
+            (mA.projectiles.push({
+              x: gbm.x,
+              y: gbm.y,
+              startX: gbm.x,
+              startY: gbm.y,
+              targetX: gbT.x,
+              targetY: gbT.y,
+              speed: 300,
+              dmg: gbS.dmg + 7 * gbL,
+              splash: gbS.splash || 56,
+              isGrenade: !0,
+            }),
+              mA.effects.push({
+                type: "muzzleFlash",
+                x: gbm.x,
+                y: gbm.y,
+                angle: Q.fireAngle,
+                life: 0.1,
+                maxLife: 0.1,
+              }),
+              iA("grenade", gbx));
+            Q._gT = 1 / (gbS.atkSpeed || 0.75);
+          } else Q._gT = 0.15;
         }
         if (
           Q.range &&
@@ -9231,6 +9425,7 @@ function __stuckTick(q, dt, tx, ty) {
               !Q.target.flight
                 ? (Q.target.garrison.push({ type: Q.type, dmg: Q.dmg }),
                   (Q.hp = 0),
+                  __bfxEnter(Q.target),
                   VV())
                 : MV(Q) || ((Q.state = "idle"), (Q.target = null)));
         }
@@ -9504,7 +9699,7 @@ function __stuckTick(q, dt, tx, ty) {
               ((mA._grenCombo = 1),
               window.tutToast &&
                 window.tutToast("\u{1F4A5} \u00d7" + gh + " COMBO!", "Üks granaat, mitu vaenlast korraga: splash on Grenade Launcheri trump.", "")),
-            iA("explosion", E.targetX, 0.95));
+            iA("grenadeBoom", E.targetX, 0.95));
         } else if (E.isFleet) {
           for (const V of mA.enemies)
             A(V.x - E.targetX, V.y - E.targetY) <= E.splash && (V.hp -= E.dmg);
@@ -9567,6 +9762,10 @@ function __stuckTick(q, dt, tx, ty) {
     for (const q of mA.enemies) {
       if (q.isMegaKnight) {
         MK.update(q, V);
+        continue;
+      }
+      if (q.rise > 0) {
+        __riseTick(q, V);
         continue;
       }
       let E = null,
@@ -10225,6 +10424,7 @@ function __stuckTick(q, dt, tx, ty) {
           phase: Math.random() * Math.PI * 2,
         }),
           A.isMegaKnight && MK.onSpawn(mA.enemies[mA.enemies.length - 1]),
+          __maybeRise(mA.enemies[mA.enemies.length - 1]),
           (mA.spawnTimer = A.boss ? 1.5 : 0.5));
       }
       0 === mA.spawnQueue.length && (mA.waveState = "active");
@@ -10343,6 +10543,169 @@ function __stuckTick(q, dt, tx, ty) {
     E._bp = c;
     return E;
   }
+
+  /* ===== ehituse/hoone efektid: sädemed, tolmupilved, sisenemine ===== */
+  function fxBDust(e, a) {
+    const k = 1 - a,
+      ez = k * (2 - k),
+      x = e.x + e.dx * ez,
+      y = e.y + e.dy * ez - e.rise * ez,
+      r = e.r * (1.2 + 2.2 * ez);
+    q.save();
+    q.translate(x, y);
+    q.scale(1, 1 / M);
+    q.globalAlpha = Math.min(1, k * 5 + 0.2) * a * 0.7;
+    q.drawImage(__ambSpr("bdust", "228,212,184", 64), -r, -r, 2 * r, 2 * r);
+    q.restore();
+  }
+  function fxBSpark(e, a) {
+    q.save();
+    q.globalCompositeOperation = "lighter";
+    q.strokeStyle = `rgba(255,${(190 + 60 * a) | 0},${(70 + 130 * a * a) | 0},${a.toFixed(3)})`;
+    q.lineWidth = 1.8;
+    q.lineCap = "round";
+    q.beginPath();
+    q.moveTo(e.x, e.y);
+    q.lineTo(e.x - e.vx * 0.05, e.y - e.vy * 0.05);
+    q.stroke();
+    q.globalAlpha = 0.7 * a;
+    q.drawImage(__ambSpr("bspark", "255,200,90", 16), e.x - 4, e.y - 4, 8, 8);
+    q.restore();
+  }
+  function __bfxDust(x, y, dx, dy, rise, r, life) {
+    mA.effects.push({ type: "bdust", x, y, dx, dy, rise, r, c: "176,150,112", life, maxLife: life });
+  }
+  function __bfxSparks(x, y, n, spread) {
+    for (let i = 0; i < n; i++) {
+      const life = 0.4 + 0.45 * Math.random();
+      mA.effects.push({
+        type: "bspark",
+        x: x + (Math.random() - 0.5) * spread,
+        y,
+        vx: (Math.random() - 0.5) * 120,
+        vy: -(70 + 90 * Math.random()),
+        life,
+        maxLife: life,
+      });
+    }
+  }
+  /* tolmupilved hoone jalajälje ümber (kind 1 = ehituse algus, 2 = valmimine) */
+  function __bfxBurst(b, n, kind) {
+    try {
+      const cx = b.x + b.w / 2,
+        cy = b.y + b.h / 2;
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * 6.283 + Math.random() * 0.5,
+          ex = Math.cos(a),
+          ey = Math.sin(a),
+          rx = b.w * 0.5,
+          ry = b.h * 0.5,
+          big = kind === 2;
+        __bfxDust(cx + ex * rx * 0.85, cy + ey * ry * 0.85 + ry * 0.3, ex * (big ? 26 + 22 * Math.random() : 14 + 14 * Math.random()), ey * (big ? 12 + 10 * Math.random() : 7 + 7 * Math.random()), (big ? 8 : 4) + 8 * Math.random(), (big ? 6 : 4) + 4 * Math.random(), (big ? 1.1 : 0.8) + 0.6 * Math.random());
+      }
+      if (kind === 2) __bfxSparks(cx, cy + b.h * 0.3, 8, b.w * 0.7);
+    } catch (e) {}
+  }
+  /* üksus siseneb bunkrisse: luuk + väike tolmupahvak */
+  function __bfxEnter(b) {
+    try {
+      iA("hatch", b.x + b.w / 2);
+      for (let i = 0; i < 3; i++) __bfxDust(b.x + b.w / 2 + (Math.random() - 0.5) * 12, b.y + b.h - 1, (Math.random() - 0.5) * 24, 2 + 4 * Math.random(), 4 + 4 * Math.random(), 3 + 2 * Math.random(), 0.5 + 0.3 * Math.random());
+    } catch (e) {}
+  }
+  /* mineraalide mahalaadimine baasis: kolksatus + väike sädemete/tolmu pahvak */
+  function __bfxDeposit(b, x, y) {
+    try {
+      iA("deposit", b.x + b.w / 2);
+      __bfxSparks(x, y, 3, 10);
+      __bfxDust(x, y, (Math.random() - 0.5) * 16, 2 + 3 * Math.random(), 3 + 3 * Math.random(), 2.5 + 1.5 * Math.random(), 0.4 + 0.2 * Math.random());
+    } catch (e) {}
+  }
+  /* treenitud üksus väljub hoonest: luuk + tolmupahvak ukse juures */
+  function __bfxSpawn(b) {
+    try {
+      iA("spawn", b.x + b.w / 2);
+      for (let i = 0; i < 4; i++) __bfxDust(b.x + b.w / 2 + (Math.random() - 0.5) * b.w * 0.6, b.y + b.h - 1, (Math.random() - 0.5) * 30, 2 + 4 * Math.random(), 4 + 5 * Math.random(), 3 + 2 * Math.random(), 0.5 + 0.4 * Math.random());
+    } catch (e) {}
+  }
+  /* mõned maapealsed vaenlased ilmuvad maa seest: kõigepealt mügin + mätas, siis tõusevad */
+  function __maybeRise(e) {
+    try {
+      if (!e || e.isFlying || e.boss || e.isSuperBoss || e.isMegaKnight || e.isHeliBoss || e.isAirplane || mA.wave < 2 || Math.random() > 0.2) return;
+      for (let i = 0; i < 30; i++) {
+        const x = 560 + 380 * Math.random(),
+          y = 40 + 420 * Math.random();
+        if (!TERR.blocked(x, y) && TERR.lvl(x, y) === 0) {
+          ((e.x = x), (e.y = y), (e.rise = e.riseMax = 1.7), (e._rz = 0));
+          iA("rise", x);
+          const g = e.heavy ? 13 : 9;
+          for (let k2 = 0; k2 < 6; k2++) __bfxDust(x + (Math.random() - 0.5) * 16, y + g, (Math.random() - 0.5) * 36, 3 + 4 * Math.random(), 4 + 5 * Math.random(), 3 + 2 * Math.random(), 0.6 + 0.5 * Math.random());
+          return;
+        }
+      }
+    } catch (er) {}
+  }
+  function __riseTick(e, dt) {
+    e.rise -= dt;
+    e._rz = (e._rz || 0) - dt;
+    const g = e.heavy ? 13 : 9;
+    if (e._rz <= 0 && e.rise > 0) {
+      e._rz = 0.13;
+      __bfxDust(e.x + (Math.random() - 0.5) * 16, e.y + g, (Math.random() - 0.5) * 24, 2 + 3 * Math.random(), 3 + 4 * Math.random(), 2.5 + 2 * Math.random(), 0.5 + 0.4 * Math.random());
+    }
+    if (e.rise <= 0) {
+      e.rise = 0;
+      for (let k2 = 0; k2 < 5; k2++) __bfxDust(e.x + (Math.random() - 0.5) * 18, e.y + g, (Math.random() - 0.5) * 40, 2 + 4 * Math.random(), 4 + 4 * Math.random(), 3 + 2 * Math.random(), 0.5 + 0.4 * Math.random());
+    }
+  }
+  function __riseDraw(e, V) {
+    if (!(e.rise > 0)) return xV(e, V);
+    const p0 = 1 - e.rise / e.riseMax,
+      g = e.heavy ? 13 : 9,
+      mp = Math.min(1, p0 * 3);
+    q.save();
+    q.fillStyle = "rgba(58,44,30,0.8)";
+    q.beginPath();
+    q.ellipse(e.x, e.y + g, 5 + 13 * mp, 2 + 5 * mp, 0, 0, 6.283);
+    q.fill();
+    q.restore();
+    if (p0 < 0.25) return;
+    const pp = (p0 - 0.25) / 0.75,
+      ez = pp * pp * (3 - 2 * pp);
+    q.save();
+    q.beginPath();
+    q.rect(e.x - 60, e.y - 200, 120, 200 + g + 2);
+    q.clip();
+    q.translate(Math.sin(V / 25) * (1 - pp) * 1.2, (1 - ez) * 36);
+    xV(e, V);
+    q.restore();
+  }
+  /* ehitusplatsi pidev efekt (kutsutakse __drawBuild seest) */
+  function __bfxBuilding(A, V, started, p, yEdge, wx) {
+    try {
+      if (nV || !started) return;
+      const b = A._bfx || (A._bfx = { sp: 0, du: 0, sn: 0 }),
+        cx = A.x + A.w / 2;
+      if (!b.start) {
+        b.start = 1;
+        __bfxBurst(A, 9, 1);
+        iA("buildPlace", cx);
+      }
+      if (p >= 0.985) return;
+      if (V - b.sp > 85) {
+        b.sp = V;
+        __bfxSparks(cx + (Math.random() - 0.5) * wx, A.y + A.h / 2 - (A.alt || 0) / M + yEdge / M, 2 + (Math.random() < 0.5 ? 1 : 0), wx);
+      }
+      if (V - b.du > 420) {
+        b.du = V;
+        __bfxDust(A.x + Math.random() * A.w, A.y + A.h - 1 + 3 * Math.random(), (Math.random() - 0.5) * 30, 3 + 3 * Math.random(), 4 + 6 * Math.random(), 3 + 3 * Math.random(), 0.7 + 0.5 * Math.random());
+      }
+      if (V - b.sn > 520) {
+        b.sn = V;
+        iA(Math.random() < 0.5 ? "hammer" : "weld", cx);
+      }
+    } catch (e) {}
+  }
   function __drawBuild(A, V) {
     const key = AA[A.type],
       E = key && $[key];
@@ -10449,6 +10812,7 @@ function __stuckTick(q, dt, tx, ty) {
       q.stroke();
     }
     q.restore();
+    __bfxBuilding(A, V, started, p, yEdge, Math.min(0.5 * w, 0.3 * sz));
     return !0;
   }
   function sV(A, V) {
@@ -10649,7 +11013,7 @@ function __stuckTick(q, dt, tx, ty) {
               Math.floor(Q / E.cols) * E.cell,
               E.cell,
               E.cell,
-              -I / 2 + (mA.q.bunkerFlame ? -12 : 0),
+              -I / 2 + __bOff(0),
               -8 - I * E.gy,
               I,
               I,
@@ -10672,7 +11036,7 @@ function __stuckTick(q, dt, tx, ty) {
         const fE = $.flameTurret,
           fI = SA(A, "_fa", fE, V),
           fS = 60,
-          fX = mA.q.bunkerTurret ? 12 : 0;
+          fX = __bOff(1);
         (q.save(),
           q.translate(A.w / 2, A.h / 2),
           q.scale(1, 1 / M),
@@ -10688,6 +11052,29 @@ function __stuckTick(q, dt, tx, ty) {
             -8 - fS * fE.gy,
             fS,
             fS,
+          ),
+          q.restore());
+      }
+      if (mA.q && mA.q.bunkerGrenade && $.grenadeTurret.ok) {
+        const gE = $.grenadeTurret,
+          gI = SA(A, "_ga", gE, V),
+          gS = 62,
+          gX = __bOff(2);
+        (q.save(),
+          q.translate(A.w / 2, A.h / 2),
+          q.scale(1, 1 / M),
+          (q.imageSmoothingEnabled = !0),
+          (q.imageSmoothingQuality = "high"),
+          q.drawImage(
+            gE.img,
+            (gI % gE.cols) * gE.cell,
+            Math.floor(gI / gE.cols) * gE.cell,
+            gE.cell,
+            gE.cell,
+            -gS / 2 + gX,
+            -8 - gS * gE.gy,
+            gS,
+            gS,
           ),
           q.restore());
       }
@@ -11932,6 +12319,7 @@ function __stuckTick(q, dt, tx, ty) {
         }
       }
     }
+    try { __settleLights(t); } catch (e) {}
     /* kaevandamise sädemed (SCV ja MULE): väike valguspunkt AINULT sädeme kohal, vilgub sädemega sünkroonis */
     {
       const flash = ((t * 1000) / 70) | 0;
@@ -12094,6 +12482,756 @@ function __stuckTick(q, dt, tx, ty) {
     }
     q.restore();
   }
+
+
+  /* ===== maailma elu: tuules liikuv rohi, asula, vilkuvad hooned, Mega Knighti kraater ===== */
+  var __GP = { n: 0, x: null, y: null, ang: null, len: null, col: null, sw: null };
+  function __grassPrep() {
+    const g = window.__GT || [],
+      n = g.length >> 1;
+    if (__GP.n === n) return;
+    const B = 5;
+    ((__GP.n = n), (__GP.x = new Float32Array(n)), (__GP.y = new Float32Array(n)), (__GP.sw = new Float32Array(n)));
+    ((__GP.ang = new Float32Array(n * B)), (__GP.len = new Float32Array(n * B)), (__GP.col = new Uint8Array(n * B)));
+    let s = 424242;
+    const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < n; i++) {
+      ((__GP.x[i] = g[2 * i]), (__GP.y[i] = g[2 * i + 1]));
+      for (let b = 0; b < B; b++) {
+        ((__GP.ang[i * B + b] = -Math.PI / 2 + (r() - 0.5) * 1.1), (__GP.len[i * B + b] = 3.2 + 4.4 * r()));
+      }
+      __GP.col[i] = (r() * 3) | 0;
+    }
+  }
+  var __GCOL = ["rgba(150,128,82,0.92)", "rgba(198,170,114,0.92)", "rgba(118,106,68,0.92)"];
+  function __grassDraw() {
+    try {
+      __grassPrep();
+      const n = __GP.n;
+      if (!n) return;
+      const t = performance.now() / 1000,
+        B = 5,
+        lvl = typeof k !== "undefined" ? k.level : 0,
+        x0 = Math.max(0, -U.x / U.z) - 10,
+        x1 = Math.min(E, (I - U.x) / U.z) + 10,
+        y0 = Math.max(0, -U.y / U.z) - 10,
+        y1 = Math.min(Q, (S - U.y) / U.z) + 10,
+        step = lvl >= 3 ? 2 : 1;
+      for (let i = 0; i < n; i += step) {
+        const px = __GP.x[i],
+          py = __GP.y[i];
+        __GP.sw[i] = px < x0 || px > x1 || py < y0 || py > y1 ? 9 : lvl >= 3 ? 0 : 0.24 * Math.sin(px * 0.011 + py * 0.007 - t * 1.7) + 0.07 * Math.sin(t * 0.9 + px * 0.05);
+      }
+      q.save();
+      ((q.lineWidth = 0.75), (q.lineCap = "round"));
+      for (let c = 0; c < 3; c++) {
+        q.beginPath();
+        for (let i = 0; i < n; i += step) {
+          const sw = __GP.sw[i];
+          if (sw === 9 || __GP.col[i] !== c) continue;
+          const px = __GP.x[i],
+            py = __GP.y[i];
+          for (let b = 0; b < B; b++) {
+            const j = i * B + b,
+              a = __GP.ang[j] + sw,
+              l = __GP.len[j],
+              bx = px + (b - 2) * 0.5;
+            (q.moveTo(bx, py), q.lineTo(bx + Math.cos(a) * l, py + Math.sin(a) * l));
+          }
+        }
+        ((q.strokeStyle = __GCOL[c]), q.stroke());
+      }
+      q.restore();
+    } catch (e) {}
+  }
+
+  /* --- asula baasi ümber: lõkked, telgid, kastid, valguskett, töölised --- */
+  var __FIRES = [[118, 326], [172, 60]];
+  var __TENTS = [[42, 322], [176, 330], [214, 74]];
+  var __CRATES = [[146, 318], [154, 323], [86, 322], [150, 68], [144, 76]];
+  var __SW = { t: 0, w: null, m: null };
+  var __WAYP = [[118, 312], [150, 338], [70, 338], [100, 296], [182, 72], [196, 92], [118, 356]];
+  function __settleInit() {
+    const cols = ["#e8892b", "#4aa3df", "#c94a4a", "#8fbf5a", "#d6c44a"];
+    __SW.w = [];
+    for (let i = 0; i < 5; i++) {
+      const p = __WAYP[(i * 2) % __WAYP.length];
+      __SW.w.push({ x: p[0], y: p[1], tx: p[0], ty: p[1], sp: 12 + 6 * Math.random(), wait: Math.random() * 3, ph: Math.random() * 6, col: cols[i % cols.length], dir: 1, st: "work", tent: 0, out: 0, panic: 0, brave: i === 1 || i === 3, bz: i === 1 ? 340 : 270, gLeft: 2, arm: 0, thr: 0 });
+    }
+    __SW.m = typeof mA !== "undefined" ? mA : null;
+  }
+  function __settleLights(t) {
+    if (__NL.lvl < 0.004) return;
+    for (const f of __FIRES) {
+      const fl = 0.86 + 0.14 * Math.sin(t * 11 + f[0]) + 0.07 * Math.sin(t * 23 + f[1]);
+      __nlAdd(f[0], f[1] - 8 / M, 150, 0.95 * fl, "y");
+    }
+    __nlAdd(110, 326 - 16 / M, 70, 0.5, "y");
+  }
+  function __fireDraw(x, y, t, seed) {
+    q.save();
+    q.translate(x, y);
+    /* maapealne kivirõngas */
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * 6.283 + seed;
+      q.fillStyle = i % 2 ? "rgb(112,106,98)" : "rgb(84,80,76)";
+      q.beginPath();
+      q.ellipse(Math.cos(a) * 7.5, Math.sin(a) * 7.5, 2.1, 1.5, a, 0, 6.283);
+      q.fill();
+    }
+    q.fillStyle = "rgba(10,6,4,0.55)";
+    q.beginPath();
+    q.arc(0, 0, 6, 0, 6.283);
+    q.fill();
+    q.scale(1, 1 / M);
+    q.strokeStyle = "#4a2f1a";
+    q.lineWidth = 2.2;
+    q.lineCap = "round";
+    q.beginPath();
+    (q.moveTo(-5, 0), q.lineTo(5, -2), q.moveTo(-5, -2), q.lineTo(5, 0));
+    q.stroke();
+    const fl = [
+      [-3, 6, "rgba(255,105,20,0.92)", 0],
+      [3, 6, "rgba(255,105,20,0.92)", 1.7],
+      [0, 7.5, "rgba(255,105,20,0.95)", 3.1],
+      [0, 5, "rgba(255,172,52,0.95)", 4.2],
+      [0, 2.6, "rgba(255,238,160,0.95)", 5.3],
+    ];
+    for (const [fx0, w, col, ph] of fl) {
+      const h = 9 + 4 * Math.sin(t * 9 + seed + ph) + 3 * Math.sin(t * 15 + ph * 2) + (w < 4 ? -3 : 0),
+        sx = 1.6 * Math.sin(t * 6 + ph + seed);
+      q.fillStyle = col;
+      q.beginPath();
+      q.moveTo(fx0 - w * 0.55, -0.5);
+      q.quadraticCurveTo(fx0 - w * 0.5, -h * 0.55, fx0 + sx, -h);
+      q.quadraticCurveTo(fx0 + w * 0.5, -h * 0.55, fx0 + w * 0.55, -0.5);
+      q.closePath();
+      q.fill();
+    }
+    const lvl = typeof k !== "undefined" ? k.level : 0;
+    if (lvl < 3) {
+      q.globalCompositeOperation = "lighter";
+      const gs = __ambSpr("fire", "255,150,50", 64),
+        gz = 66 + 8 * Math.sin(t * 10 + seed);
+      q.globalAlpha = 0.34 + 0.1 * Math.sin(t * 13 + seed);
+      q.drawImage(gs, -gz / 2, -9 - gz / 2, gz, gz);
+      q.globalAlpha = 1;
+      q.fillStyle = "#ffcf70";
+      for (let i = 0; i < 4; i++) {
+        const p = (t * 0.9 + i * 0.27 + seed) % 1;
+        q.globalAlpha = (1 - p) * 0.9;
+        q.fillRect(Math.sin(p * 6 + i * 2 + seed) * 6 + p * 7, -6 - p * 30, 1.3, 1.3);
+      }
+      q.globalAlpha = 1;
+      q.globalCompositeOperation = "source-over";
+    }
+    q.restore();
+  }
+  function __tentDraw(x, y, n) {
+    q.save();
+    q.translate(x, y);
+    q.fillStyle = "rgba(0,0,0,0.3)";
+    q.beginPath();
+    q.ellipse(6, 1.5, 15, 4.2, 0, 0, 6.283);
+    q.fill();
+    q.scale(1, 1 / M);
+    q.fillStyle = "#566342";
+    q.beginPath();
+    (q.moveTo(-12, 0), q.lineTo(0, -17), q.lineTo(0, 0));
+    q.closePath();
+    q.fill();
+    q.fillStyle = "#74845a";
+    q.beginPath();
+    (q.moveTo(0, -17), q.lineTo(12, 0), q.lineTo(0, 0));
+    q.closePath();
+    q.fill();
+    q.fillStyle = "#1d2218";
+    q.beginPath();
+    (q.moveTo(-3.6, 0), q.lineTo(0, -9.5), q.lineTo(3.6, 0));
+    q.closePath();
+    q.fill();
+    q.strokeStyle = "rgba(0,0,0,0.35)";
+    q.lineWidth = 0.7;
+    q.beginPath();
+    (q.moveTo(0, -17), q.lineTo(0, -9.5));
+    q.stroke();
+    q.fillStyle = "#c9b26a";
+    q.fillRect(-0.6, -19.5, 1.2, 3);
+    if (n > 0) {
+      const bl = Math.sin(performance.now() / 1000 * 2.3 + x) > 0.93 ? 0.15 : 1;
+      for (let j = 0; j < Math.min(n, 2); j++) {
+        const ey = -2.5 - j * 3.2;
+        q.fillStyle = "#fff";
+        q.beginPath();
+        (q.ellipse(-0.65, ey, 0.62, 0.75 * bl, 0, 0, 6.283), q.moveTo(1.27, ey), q.ellipse(0.65, ey, 0.62, 0.75 * bl, 0, 0, 6.283));
+        q.fill();
+        q.fillStyle = "#111";
+        q.beginPath();
+        (q.arc(-0.5, ey, 0.3, 0, 6.283), q.moveTo(0.8, ey), q.arc(0.8, ey, 0.3, 0, 6.283));
+        q.fill();
+      }
+    }
+    q.restore();
+  }
+  function __crateDraw(x, y) {
+    q.save();
+    q.translate(x, y);
+    q.fillStyle = "rgba(0,0,0,0.28)";
+    q.beginPath();
+    q.ellipse(2, 1, 6.5, 2, 0, 0, 6.283);
+    q.fill();
+    q.scale(1, 1 / M);
+    q.fillStyle = "#7a5a33";
+    q.fillRect(-4.5, -7.5, 9, 7.5);
+    q.fillStyle = "#a07d4b";
+    q.fillRect(-4.5, -9.5, 9, 2);
+    q.fillStyle = "rgba(0,0,0,0.3)";
+    q.fillRect(-4.5, -4, 9, 0.9);
+    q.fillRect(-0.4, -7.5, 0.8, 7.5);
+    q.restore();
+  }
+  function __stringLights(x1, y1, x2, y2, t, night) {
+    const n = 8,
+      cols = ["255,224,150", "255,190,90", "255,236,190", "255,160,70"],
+      sp = __ambSpr("bulb", "255,215,140", 24);
+    q.save();
+    q.scale(1, 1 / M);
+    const bx = [],
+      by = [];
+    for (let i = 0; i <= n; i++) {
+      const u = i / n;
+      (bx.push(x1 + (x2 - x1) * u), by.push((y1 + (y2 - y1) * u) * M - 17 + 5 * Math.sin(Math.PI * u)));
+    }
+    q.restore();
+    q.save();
+    q.scale(1, 1 / M);
+    q.strokeStyle = "rgba(20,16,12,0.7)";
+    q.lineWidth = 0.7;
+    q.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const yy = by[i] - 0 * M;
+      i ? q.lineTo(bx[i], yy) : q.moveTo(bx[i], yy);
+    }
+    q.stroke();
+    for (let i = 1; i < n; i++) {
+      const tw = 0.65 + 0.35 * Math.sin(t * 3 + i * 1.7);
+      q.fillStyle = "rgb(" + cols[i % 4] + ")";
+      q.fillRect(bx[i] - 1, by[i] - 1, 2, 2.4);
+      q.globalCompositeOperation = "lighter";
+      q.globalAlpha = (night ? 0.8 : 0.3) * tw;
+      q.drawImage(sp, bx[i] - 6, by[i] - 6, 12, 12);
+      q.globalAlpha = 1;
+      q.globalCompositeOperation = "source-over";
+    }
+    q.restore();
+  }
+  function __workerDraw(wk, t) {
+    const sc = wk.st === "flee";
+    q.save();
+    q.translate(wk.x, wk.y);
+    q.fillStyle = "rgba(0,0,0,0.3)";
+    q.beginPath();
+    q.ellipse(0, 0.5, 3.6, 1.2, 0, 0, 6.283);
+    q.fill();
+    q.scale(wk.dir, 1 / M);
+    const mv = sc || wk.wait <= 0,
+      sw = mv ? Math.sin(wk.ph) : 0,
+      bob = mv ? Math.abs(Math.sin(wk.ph)) * (sc ? 1.3 : 0.8) : 0;
+    q.strokeStyle = "#2b2f38";
+    q.lineWidth = 1.3;
+    q.lineCap = "round";
+    q.beginPath();
+    (q.moveTo(-0.8, -3.6 - bob), q.lineTo(-0.8 + sw * (sc ? 2.4 : 1.8), 0), q.moveTo(0.8, -3.6 - bob), q.lineTo(0.8 - sw * (sc ? 2.4 : 1.8), 0));
+    q.stroke();
+    if (sc) {
+      const af = Math.sin(t * 22 + wk.ph);
+      q.strokeStyle = wk.col;
+      q.lineWidth = 1;
+      q.beginPath();
+      (q.moveTo(-1.9, -7.4 - bob), q.lineTo(-3.4, -11.2 - bob + af * 1.1), q.moveTo(1.9, -7.4 - bob), q.lineTo(3.4, -11.2 - bob - af * 1.1));
+      q.stroke();
+    }
+    q.fillStyle = wk.col;
+    q.fillRect(-1.9, -8.2 - bob, 3.8, 4.8);
+    q.fillStyle = "#e3b88c";
+    q.beginPath();
+    q.arc(0, -9.6 - bob, 1.7, 0, 6.283);
+    q.fill();
+    q.fillStyle = "#e8e8e8";
+    q.fillRect(-1.8, -11.3 - bob, 3.6, 1);
+    if (wk.brave) {
+      q.fillStyle = "#c0392b";
+      q.fillRect(-1.9, -10.5 - bob, 3.8, 0.8);
+    }
+    if (wk.brave && (wk.st === "brave" || wk.arm > 0)) {
+      q.strokeStyle = wk.col;
+      q.lineWidth = 1;
+      q.beginPath();
+      q.moveTo(1.9, -7.4 - bob);
+      if (wk.arm > 0) q.lineTo(5.2, -12.6 - bob);
+      else q.lineTo(-1.6, -12.4 - bob);
+      q.stroke();
+      if (wk.arm <= 0) {
+        q.fillStyle = "#1d2a1a";
+        q.beginPath();
+        q.arc(-1.6, -13 - bob, 1.1, 0, 6.283);
+        q.fill();
+      }
+    }
+    if (sc) {
+      /* hirmunud nägu: suured silmad + lahtine suu + higipiisk */
+      q.fillStyle = "#fff";
+      q.beginPath();
+      (q.arc(-0.65, -9.9 - bob, 0.62, 0, 6.283), q.moveTo(1.27, -9.9 - bob), q.arc(0.65, -9.9 - bob, 0.62, 0, 6.283));
+      q.fill();
+      q.fillStyle = "#111";
+      q.beginPath();
+      (q.arc(-0.55, -9.9 - bob, 0.28, 0, 6.283), q.moveTo(0.73, -9.9 - bob), q.arc(0.73, -9.9 - bob, 0.28, 0, 6.283));
+      q.fill();
+      q.fillStyle = "#3a0d0d";
+      q.beginPath();
+      q.ellipse(0, -8.6 - bob, 0.55, 0.78 + 0.2 * Math.abs(Math.sin(t * 16 + wk.ph)), 0, 0, 6.283);
+      q.fill();
+      q.fillStyle = "rgba(130,210,255,0.95)";
+      q.beginPath();
+      q.arc(2.7, -11.2 - bob + ((t * 8 + wk.ph) % 2), 0.5, 0, 6.283);
+      q.fill();
+    }
+    q.restore();
+    if (sc) {
+      q.save();
+      q.translate(wk.x, wk.y);
+      q.scale(1, 1 / M);
+      const bp = Math.sin(t * 14 + wk.ph) * 0.8;
+      q.fillStyle = "rgba(255,255,255,0.93)";
+      q.beginPath();
+      q.arc(0, -17.5 + bp, 3, 0, 6.283);
+      q.fill();
+      q.fillStyle = "#e2231a";
+      q.font = "bold 5.6px sans-serif";
+      q.textAlign = "center";
+      q.textBaseline = "middle";
+      q.fillText("!", 0, -17.2 + bp);
+      q.restore();
+    }
+  }
+  function __settleDraw(now, dt) {
+    if (!__SW.w || __SW.m !== mA) __settleInit();
+    const t = now / 1000,
+      lvl = typeof k !== "undefined" ? k.level : 0,
+      night = typeof __NL !== "undefined" && __NL && __NL.lvl > 0.5;
+    const items = [];
+    for (const c of __CRATES) items.push([c[1], () => __crateDraw(c[0], c[1])]);
+    for (let ti = 0; ti < __TENTS.length; ti++) {
+      const c = __TENTS[ti];
+      items.push([c[1], () => __tentDraw(c[0], c[1], __SW.occ ? __SW.occ[ti] : 0)]);
+    }
+    for (let i = 0; i < __FIRES.length; i++) {
+      const f = __FIRES[i];
+      items.push([f[1], () => __fireDraw(f[0], f[1], t, i * 1.9)]);
+    }
+    if (lvl < 3) {
+      let danger = !1;
+      try {
+        for (const e of mA.enemies)
+          if (e.hp > 0 && !e.isFlying && Math.hypot(e.x - 110, e.y - 320) < 520) {
+            danger = !0;
+            break;
+          }
+      } catch (er) {}
+      __SW.calm = danger ? 0 : (__SW.calm || 0) + dt;
+      __SW.occ = [0, 0, 0];
+      for (const wk of __SW.w) {
+        if (wk.arm > 0) wk.arm -= dt;
+        if (!danger && __SW.calm > 8) wk.gLeft = 2;
+        if (danger && wk.st !== "hidden" && wk.st !== "flee" && wk.st !== "brave") {
+          wk.st = "flee";
+          wk.wait = 0;
+          wk.panic = 0.1 + 0.35 * Math.random();
+          let bi = -1,
+            bd = 1e9;
+          for (let i = 0; i < __TENTS.length; i++) {
+            let cnt = 0;
+            for (const o of __SW.w) if (o !== wk && (o.st === "flee" || o.st === "hidden") && o.tent === i) cnt++;
+            const d = Math.hypot(__TENTS[i][0] - wk.x, __TENTS[i][1] - wk.y) + (cnt >= 2 ? 1000 : 0);
+            if (d < bd) ((bd = d), (bi = i));
+          }
+          wk.tent = bi;
+        }
+        if (wk.st === "flee") {
+          const T = __TENTS[wk.tent];
+          if (wk.panic > 0) wk.panic -= dt;
+          else {
+            const dx = T[0] - wk.x,
+              dy = T[1] + 1.5 - wk.y,
+              d = Math.hypot(dx, dy);
+            if (d < 2.2) {
+              wk.st = "hidden";
+              wk.out = 0.05 + 0.3 * Math.random();
+            } else {
+              const st = Math.min(d, wk.sp * 3 * dt);
+              ((wk.x += (dx / d) * st), (wk.y += (dy / d) * st), (wk.ph += dt * 20));
+              if (Math.abs(dx) > 1) wk.dir = dx > 0 ? 1 : -1;
+            }
+          }
+          if (!danger && wk.st === "flee") ((wk.st = "work"), (wk.wait = 0.1));
+        } else if (wk.st === "brave") {
+          /* julge töötaja: astub telgist välja ja viskab granaate lähenevate vaenlaste pihta */
+          let be = null,
+            bd = 480;
+          for (const e of mA.enemies)
+            if (e.hp > 0 && !e.isFlying && !(e.rise > 0)) {
+              const d = Math.hypot(e.x - wk.x, e.y - wk.y);
+              if (d < bd) ((bd = d), (be = e));
+            }
+          if (!danger || !be || bd < 55 || (wk.gLeft <= 0 && wk.arm <= 0)) {
+            ((wk.st = "flee"), (wk.panic = 0.05), (wk.thr = 0));
+          } else {
+            wk.dir = be.x > wk.x ? 1 : -1;
+            if (!nV) {
+              wk.thr -= dt;
+              if (wk.thr <= 0 && wk.gLeft > 0) {
+                wk.gLeft--;
+                wk.arm = 0.3;
+                wk.thr = 1 + 0.4 * Math.random();
+                mA.projectiles.push({ x: wk.x + wk.dir * 2, y: wk.y - 4, startX: wk.x + wk.dir * 2, startY: wk.y - 4, targetX: be.x, targetY: be.y, speed: 260, dmg: 45, splash: 52, isGrenade: !0 });
+                iA("grenade", wk.x);
+              }
+            }
+          }
+        } else if (wk.st === "hidden") {
+          __SW.occ[wk.tent]++;
+          if (danger && wk.brave && wk.gLeft > 0 && !nV) {
+            const T0 = __TENTS[wk.tent];
+            let be = null,
+              bd = wk.bz;
+            for (const e of mA.enemies)
+              if (e.hp > 0 && !e.isFlying && !(e.rise > 0)) {
+                const d = Math.hypot(e.x - T0[0], e.y - T0[1]);
+                if (d < bd) ((bd = d), (be = e));
+              }
+            if (be) ((wk.st = "brave"), (wk.thr = 0.4), (wk.x = T0[0] + 5), (wk.y = T0[1] + 4), (wk.dir = be.x > wk.x ? 1 : -1));
+          }
+          if (!danger && __SW.calm > wk.out) {
+            const nx = __WAYP[(Math.random() * __WAYP.length) | 0];
+            ((wk.st = "work"), (wk.wait = 0.2), (wk.tx = nx[0]), (wk.ty = nx[1]), (wk.x = __TENTS[wk.tent][0]), (wk.y = __TENTS[wk.tent][1] + 2));
+          }
+        } else if (wk.wait > 0) wk.wait -= dt;
+        else {
+          const dx = wk.tx - wk.x,
+            dy = wk.ty - wk.y,
+            d = Math.hypot(dx, dy);
+          if (d < 2) {
+            const nx = __WAYP[(Math.random() * __WAYP.length) | 0];
+            ((wk.tx = nx[0]), (wk.ty = nx[1]), (wk.wait = 1.5 + 3 * Math.random()));
+          } else {
+            const st = Math.min(d, wk.sp * dt);
+            ((wk.x += (dx / d) * st), (wk.y += (dy / d) * st), (wk.ph += dt * 9));
+            if (Math.abs(dx) > 1) wk.dir = dx > 0 ? 1 : -1;
+          }
+        }
+        if (wk.st !== "hidden") items.push([wk.y, () => __workerDraw(wk, t)]);
+      }
+    }
+    items.sort((a, b) => a[0] - b[0]);
+    for (const it of items) it[1]();
+    if (lvl < 3) __stringLights(__TENTS[0][0], __TENTS[0][1], __TENTS[1][0], __TENTS[1][1], t, night);
+  }
+
+  /* --- Mega Knighti kraater --- */
+  var __CR = { list: [], m: null, t: 0 };
+  window.__craterAdd = function (x, y) {
+    try {
+      if (typeof mA === "undefined" || !mA) return;
+      if (__CR.m !== mA) ((__CR.list = []), (__CR.m = mA));
+      let s = ((x * 73856093) ^ (y * 19349663) ^ 0x5bd1e995) >>> 0 || 7;
+      const r = () => (s = (s * 16807) % 2147483647) / 2147483647,
+        R = 44,
+        half = R + 28,
+        cv = document.createElement("canvas");
+      cv.width = cv.height = half * 4;
+      const c = cv.getContext("2d");
+      c.scale(2, 2);
+      c.translate(half, half);
+      let g = c.createRadialGradient(0, 0, 0, 0, 0, half);
+      (g.addColorStop(0, "rgba(16,9,5,0.7)"), g.addColorStop(0.55, "rgba(28,18,12,0.5)"), g.addColorStop(1, "rgba(30,20,14,0)"), (c.fillStyle = g), c.beginPath(), c.arc(0, 0, half, 0, 6.283), c.fill());
+      c.lineCap = "round";
+      for (let i = 0; i < 16; i++) {
+        const a = r() * 6.283,
+          r0 = R * 0.85,
+          r1 = R * (1.25 + 0.6 * r());
+        ((c.strokeStyle = "rgba(20,12,8," + (0.14 + 0.16 * r()).toFixed(2) + ")"), (c.lineWidth = 0.8 + 2.4 * r()), c.beginPath(), c.moveTo(Math.cos(a) * r0, Math.sin(a) * r0), c.lineTo(Math.cos(a) * r1, Math.sin(a) * r1), c.stroke());
+      }
+      const ph1 = r() * 6.28,
+        ph2 = r() * 6.28,
+        ph3 = r() * 6.28,
+        rr = (a, kk) => R * kk * (1 + 0.07 * Math.sin(3 * a + ph1) + 0.05 * Math.sin(5 * a + ph2) + 0.03 * Math.sin(9 * a + ph3)),
+        blob = (kk) => {
+          c.beginPath();
+          for (let i = 0; i <= 48; i++) {
+            const a = (i / 48) * 6.283;
+            i ? c.lineTo(Math.cos(a) * rr(a, kk), Math.sin(a) * rr(a, kk)) : c.moveTo(Math.cos(a) * rr(a, kk), Math.sin(a) * rr(a, kk));
+          }
+          c.closePath();
+        };
+      blob(1.04);
+      ((c.fillStyle = "rgba(150,120,86,0.5)"), (c.shadowColor = "rgba(90,64,42,0.75)"), (c.shadowBlur = 9), c.fill(), (c.shadowBlur = 0));
+      g = c.createRadialGradient(-4, -4, 0, 0, 0, R * 0.95);
+      (g.addColorStop(0, "rgba(5,2,1,0.97)"), g.addColorStop(0.7, "rgba(30,19,12,0.93)"), g.addColorStop(1, "rgba(70,50,34,0.9)"));
+      (blob(0.88), (c.fillStyle = g), c.fill());
+      for (let i = 0; i < 9; i++) {
+        const a = r() * 6.283,
+          l = R * (0.35 + 0.55 * r());
+        ((c.strokeStyle = "rgba(0,0,0,0.55)"), (c.lineWidth = 0.7 + r()), c.beginPath(), c.moveTo(0, 0), c.quadraticCurveTo(Math.cos(a + 0.3) * l * 0.5, Math.sin(a + 0.3) * l * 0.5, Math.cos(a) * l, Math.sin(a) * l), c.stroke());
+      }
+      const arcR = (a0, a1, kk) => {
+        c.beginPath();
+        for (let i = 0; i <= 16; i++) {
+          const a = a0 + ((a1 - a0) * i) / 16;
+          i ? c.lineTo(Math.cos(a) * rr(a, kk), Math.sin(a) * rr(a, kk)) : c.moveTo(Math.cos(a) * rr(a, kk), Math.sin(a) * rr(a, kk));
+        }
+        c.stroke();
+      };
+      ((c.strokeStyle = "rgba(235,205,150,0.34)"), (c.lineWidth = 2.2), arcR(-1.3, 0.1, 0.94));
+      ((c.strokeStyle = "rgba(10,6,3,0.45)"), arcR(1.9, 3.3, 0.94));
+      for (let i = 0; i < 12; i++) {
+        const a = r() * 6.283,
+          d = R * (0.98 + 0.4 * r()),
+          sz = 1.2 + 2.6 * r(),
+          m = (80 + 70 * r()) | 0;
+        ((c.fillStyle = "rgba(0,0,0,0.35)"), c.beginPath(), c.ellipse(Math.cos(a) * d + 0.8, Math.sin(a) * d + 0.7, sz * 1.1, sz * 0.7, 0, 0, 6.283), c.fill());
+        ((c.fillStyle = "rgb(" + (m + 16) + "," + (m + 4) + "," + (m - 10) + ")"), c.beginPath(), c.ellipse(Math.cos(a) * d, Math.sin(a) * d, sz, sz * 0.75, 0, 0, 6.283), c.fill());
+      }
+      (__CR.list.push({ x, y, cv, half, t0: performance.now(), life: 42 }), __CR.list.length > 6 && __CR.list.shift());
+    } catch (e) {}
+  };
+  function __craterDraw(now, dt) {
+    if (!__CR.list.length) return;
+    if (__CR.m !== mA) return void (__CR.list = []);
+    const em = __ambSpr("ember", "255,120,40", 64);
+    for (let i = __CR.list.length - 1; i >= 0; i--) {
+      const c = __CR.list[i],
+        age = (now - c.t0) / 1000;
+      if (age > c.life) {
+        __CR.list.splice(i, 1);
+        continue;
+      }
+      q.globalAlpha = Math.min(1, age / 0.25) * (age > c.life - 8 ? (c.life - age) / 8 : 1);
+      q.drawImage(c.cv, c.x - c.half, c.y - c.half, 2 * c.half, 2 * c.half);
+      if (age < 10) {
+        const f = 1 - age / 10;
+        q.globalCompositeOperation = "lighter";
+        q.globalAlpha = 0.55 * f * (0.8 + 0.2 * Math.sin(now / 90 + i));
+        q.drawImage(em, c.x - 36, c.y - 36, 72, 72);
+        q.globalCompositeOperation = "source-over";
+        if (mA.effects && Math.random() < 3.5 * dt * f)
+          mA.effects.push({ type: "smoke", x: c.x + (Math.random() - 0.5) * 36, y: c.y + (Math.random() - 0.5) * 20, vx: 6 * (Math.random() - 0.5), vy: -14 - 10 * Math.random(), r: 5 + 4 * Math.random(), life: 1.4 + 0.8 * Math.random(), maxLife: 2.2 });
+      }
+    }
+    q.globalAlpha = 1;
+  }
+  function __groundLife() {
+    try {
+      if (typeof mA === "undefined" || !mA) return;
+      const now = performance.now(),
+        dt = Math.min(0.1, Math.max(0, (now - (__CR.t || now)) / 1000));
+      __CR.t = now;
+      q.save();
+      __craterDraw(now, dt);
+      __settleDraw(now, dt);
+      q.restore();
+    } catch (e) {
+      try { q.restore(); } catch (e2) {}
+    }
+  }
+  /* hoonete vilkuvad märgutuled */
+  function __bldBlink(b, V) {
+    try {
+      if (b.constructing || b.hp <= 0 || typeof k === "undefined" || k.level >= 3) return;
+      const t = V / 1000,
+        T = b.type,
+        C = T === "commandCenter" ? ["255,60,60", "70,255,130"] : T === "barracks" ? ["70,255,130", "255,210,80"] : T === "factory" ? ["255,160,30", "255,60,60"] : T === "bunker" ? ["255,60,60", "255,60,60"] : T === "armory" ? ["79,195,255", "255,210,80"] : ["70,255,130", "255,160,30"],
+        ph = (b.x * 0.013 + b.y * 0.007) % 1,
+        gl = __ambSpr("led", "255,255,255", 16),
+        lift = 8 + 0.45 * b.h;
+      for (let i = 0; i < 2; i++) {
+        const per = i ? 2.3 : 1.6,
+          on = (t / per + ph + i * 0.37) % 1 < (i ? 0.22 : 0.32);
+        q.save();
+        q.translate(b.x + b.w * (i ? 0.78 : 0.22), b.y + b.h * 0.2);
+        q.scale(1, 1 / M);
+        q.translate(0, -lift);
+        if (on) {
+          q.fillStyle = "rgb(" + C[i] + ")";
+          q.fillRect(-1.1, -1.1, 2.2, 2.2);
+          q.globalCompositeOperation = "lighter";
+          q.globalAlpha = 0.7;
+          q.fillStyle = "rgb(" + C[i] + ")";
+          q.beginPath();
+          q.arc(0, 0, 4.2, 0, 6.283);
+          q.globalAlpha = 0.22;
+          q.fill();
+          q.globalAlpha = 0.8;
+          q.drawImage(gl, -3, -3, 6, 6);
+        } else {
+          q.fillStyle = "rgba(40,16,16,0.7)";
+          q.fillRect(-0.8, -0.8, 1.6, 1.6);
+        }
+        q.restore();
+      }
+    } catch (e) {}
+  }
+
+  /* ===== atmosfäär: pilvevarjud, tolm, jaanimardikad, udu, päikesehelk, vinjett ===== */
+  var __AMB = { t: 0, init: 0, dust: [], fly: [], cloud: [], spr: {} };
+  function __ambSpr(key, rgb, size) {
+    if (__AMB.spr[key]) return __AMB.spr[key];
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = size;
+    const g = cv.getContext("2d"),
+      r = size / 2,
+      gr = g.createRadialGradient(r, r, 0, r, r, r);
+    (gr.addColorStop(0, `rgba(${rgb},1)`), gr.addColorStop(0.4, `rgba(${rgb},0.35)`), gr.addColorStop(1, `rgba(${rgb},0)`), (g.fillStyle = gr), g.fillRect(0, 0, size, size));
+    return (__AMB.spr[key] = cv);
+  }
+  function __ambInit() {
+    const rn = (a, b) => a + Math.random() * (b - a);
+    __AMB.dust = [];
+    for (let i = 0; i < 30; i++) __AMB.dust.push({ x: rn(0, I), y: rn(0, S), z: rn(0.4, 1), ph: rn(0, 6.28), s: rn(3, 7) });
+    __AMB.fly = [];
+    for (let i = 0; i < 24; i++) __AMB.fly.push({ x: rn(0, I), y: rn(0.25 * S, S), h: rn(0, 6.28), turn: 0, tt: 0, v: 15, ph: rn(0, 6.28), br: rn(1.4, 2.6), g: 0, tr: [], trT: 0 });
+    __AMB.cloud = [];
+    for (let i = 0; i < 3; i++) __AMB.cloud.push({ x: rn(-200, I), y: rn(0, S), w: rn(260, 480), h: rn(110, 200), v: rn(9, 18) });
+    __AMB.init = 1;
+  }
+  function __ambientFx() {
+    try {
+      if (typeof mA === "undefined" || !mA || typeof k === "undefined" || k.level >= 3) return;
+      const now = performance.now(),
+        dt = Math.min(0.1, Math.max(0, (now - (__AMB.t || now)) / 1000));
+      __AMB.t = now;
+      if (!__AMB.init) __ambInit();
+      const t = now / 1000,
+        lv = typeof __NL !== "undefined" && __NL ? __NL.lvl : 0,
+        nt = lv * lv * (3 - 2 * lv),
+        dy = 1 - nt,
+        qk = k.level === 0 ? 1 : k.level === 1 ? 0.6 : 0.3,
+        wind = 10 + 6 * Math.sin(t * 0.13) + 4 * Math.sin(t * 0.37);
+      q.save();
+      /* pilvede varjud (päeval) */
+      if (dy > 0.02) {
+        const cs = __ambSpr("cloud", "6,16,30", 128);
+        q.globalAlpha = 0.16 * dy;
+        for (const c of __AMB.cloud) {
+          c.x += c.v * dt;
+          if (c.x > I + 40) {
+            c.x = -c.w;
+            c.y = Math.random() * S - 0.3 * c.h;
+          }
+          q.drawImage(cs, c.x, c.y, c.w, c.h);
+        }
+      }
+      /* tolm ja õietolm tuule käes */
+      if (dy > 0.02) {
+        const ds = __ambSpr("dust", "255,240,205", 16),
+          nD = Math.round(__AMB.dust.length * qk);
+        for (let i = 0; i < nD; i++) {
+          const p = __AMB.dust[i];
+          p.x += (wind * p.z + 4 * Math.sin(t * 0.8 + p.ph)) * dt;
+          p.y += (5 * Math.sin(t * 0.6 + p.ph * 1.7) - 1.5) * dt;
+          if (p.x > I + 10) p.x = -10;
+          if (p.x < -10) p.x = I + 10;
+          if (p.y < -10) p.y = S + 10;
+          if (p.y > S + 10) p.y = -10;
+          const fl = 0.5 + 0.5 * Math.sin(t * 1.7 + p.ph);
+          q.globalAlpha = dy * (0.1 + 0.28 * fl) * p.z;
+          q.drawImage(ds, p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
+        }
+      }
+      /* öö: udu ja jaanimardikad */
+      if (nt > 0.03) {
+        const ms = __ambSpr("mist", "150,170,230", 128),
+          fs = __ambSpr("fly", "190,255,120", 32);
+        for (let i = 0; i < 2; i++) {
+          const mx = ((t * (6 + 3 * i) + i * 380) % (I + 520)) - 260;
+          q.globalAlpha = 0.1 * nt;
+          q.drawImage(ms, mx, S * (0.55 + 0.2 * i) + 8 * Math.sin(t * 0.3 + i), 520, 130);
+        }
+        const nF = Math.round(__AMB.fly.length * qk),
+          hs = __ambSpr("flyHalo", "205,255,110", 64),
+          cs2 = __ambSpr("flyCore", "255,255,205", 16);
+        for (let i = 0; i < nF; i++) {
+          const p = __AMB.fly[i];
+          p.tt -= dt;
+          if (p.tt <= 0) {
+            p.tt = 0.5 + Math.random() * 1.3;
+            p.turn = (Math.random() - 0.5) * 3.2;
+            p.v = Math.random() < 0.25 ? 3 + 5 * Math.random() : 12 + 22 * Math.random();
+          }
+          p.h += p.turn * dt;
+          p.g = Math.pow(Math.max(0, Math.sin(t * p.br + p.ph)), 3);
+          const sp = p.v * (0.55 + 0.45 * p.g);
+          p.x += Math.cos(p.h) * sp * dt;
+          p.y += (Math.sin(p.h) * sp * 0.7 + Math.sin(t * 1.7 + p.ph) * 5) * dt;
+          if (p.x > I + 20) p.x = -20;
+          else if (p.x < -20) p.x = I + 20;
+          if (p.y < 0.2 * S) p.h = Math.abs(p.h % 3.14);
+          else if (p.y > S + 10) p.h = -Math.abs(p.h % 3.14);
+          p.trT -= dt;
+          if (p.trT <= 0) {
+            p.trT = 0.06;
+            p.tr.push(p.x, p.y);
+            if (p.tr.length > 14) p.tr.splice(0, 2);
+          }
+        }
+        /* 1) hele: jälg + hõõgus (additiivne) */
+        q.globalCompositeOperation = "lighter";
+        for (let i = 0; i < nF; i++) {
+          const p = __AMB.fly[i],
+            ax = p.x - Math.cos(p.h) * 1.6,
+            ay = p.y - Math.sin(p.h) * 1.6,
+            n = p.tr.length / 2;
+          for (let j = 0; j < p.tr.length; j += 2) {
+            q.globalAlpha = nt * p.g * 0.4 * ((j / 2 + 1) / (n + 1));
+            q.drawImage(cs2, p.tr[j] - 3, p.tr[j + 1] - 3, 6, 6);
+          }
+          const hsz = 30 + 22 * p.g;
+          q.globalAlpha = nt * (0.05 + 0.75 * p.g);
+          q.drawImage(hs, ax - hsz / 2, ay - hsz / 2, hsz, hsz);
+        }
+        /* 2) keha ja tiivad (tume siluett, lehvivad tiivad) */
+        q.globalCompositeOperation = "source-over";
+        for (let i = 0; i < nF; i++) {
+          const p = __AMB.fly[i],
+            flap = 0.4 + 1.6 * Math.abs(Math.sin(t * 45 + p.ph));
+          q.save();
+          q.translate(p.x, p.y);
+          q.rotate(p.h);
+          q.globalAlpha = nt * 0.85;
+          q.fillStyle = "#14120a";
+          q.beginPath();
+          q.ellipse(0, 0, 2.3, 1, 0, 0, 6.283);
+          q.fill();
+          q.globalAlpha = nt * 0.3;
+          q.fillStyle = "#dff0ff";
+          q.beginPath();
+          q.ellipse(0.2, -1.2, 2.5, flap * 0.55, 0.3, 0, 6.283);
+          q.ellipse(0.2, 1.2, 2.5, flap * 0.55, -0.3, 0, 6.283);
+          q.fill();
+          q.restore();
+        }
+        /* 3) hõõguv tagakeha (särav tuum) */
+        q.globalCompositeOperation = "lighter";
+        for (let i = 0; i < nF; i++) {
+          const p = __AMB.fly[i];
+          q.globalAlpha = nt * (0.18 + 0.82 * p.g);
+          q.drawImage(cs2, p.x - Math.cos(p.h) * 1.6 - 3.5, p.y - Math.sin(p.h) * 1.6 - 3.5, 7, 7);
+        }
+      }
+      q.restore();
+    } catch (e) {}
+  }
+
   function __nightLight() {
     if (typeof __NL === "undefined" || !__NL || typeof mA === "undefined" || !mA || !mA.effects) return;
     const now = performance.now(),
@@ -13411,6 +14549,7 @@ function __stuckTick(q, dt, tx, ty) {
     const cv = document.createElement("canvas");
     cv.width = WW; cv.height = HH;
     const c = cv.getContext("2d");
+    window.__GT = [];
     let seed = 20240917;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
     const NT = new Float32Array(65536);
@@ -13740,14 +14879,9 @@ function __stuckTick(q, dt, tx, ty) {
       c.restore();
     };
     const grassTuft = (x, y) => {
-      c.save(); c.translate(x, y); c.lineCap = "round";
-      for (let i = 0; i < 6; i++) {
-        const a = -Math.PI / 2 + (rnd() - 0.5) * 1.1, l = 3 + 4 * rnd();
-        const m = (120 + 60 * rnd()) | 0;
-        c.strokeStyle = "rgba(" + (m + 40) + "," + (m + 14) + "," + (m - 20) + ",0.9)"; c.lineWidth = 0.6;
-        c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(a) * l, Math.sin(a) * l); c.stroke();
-      }
-      c.restore();
+      /* rohututid joonistatakse nüüd dünaamiliselt (tuul); siin ainult asukoht + sama juhuarvude kulu, et kaart jääks samaks */
+      window.__GT.push(x, y);
+      for (let i = 0; i < 18; i++) rnd();
     };
     const barrel = (x, y, col) => {
       c.fillStyle = "rgba(0,0,0,0.3)"; c.beginPath(); c.ellipse(x + 3, y + 1, 6, 2.3, 0, 0, 6.283); c.fill();
@@ -13833,6 +14967,17 @@ function __stuckTick(q, dt, tx, ty) {
       const x = 20 + rnd() * 1010, y = 40 + rnd() * 440;
       if (inRamp(x, y) || (y > 145 && y < 395 && x > 20 && x < 700 && rnd() < 0.9)) continue;
       add(y, () => grassTuft(x, y));
+    }
+    // lisarohi (eraldi juhugeneraator, ei muuda kaardi ülejäänud osa)
+    {
+      let s2 = 918273645;
+      const r2 = () => (s2 = (s2 * 16807) % 2147483647) / 2147483647;
+      for (let k = 0; k < 560; k++) {
+        const x = 20 + r2() * 1010, y = 38 + r2() * 446;
+        if (!(onTP(x, y) || onBP(x, y) || y < 52 || y > 462) || inRamp(x, y) || onRoad(x, y)) continue;
+        const n = 1 + ((r2() * 3) | 0);
+        for (let j = 0; j < n; j++) window.__GT.push(x + (r2() - 0.5) * 10, y + (r2() - 0.5) * 5);
+      }
     }
     // flat grey rocks on platform margins
     for (let k = 0; k < 36; k++) {
@@ -14043,10 +15188,12 @@ function __stuckTick(q, dt, tx, ty) {
           H - r,
         );
     }
+    __grassDraw();
     (q.save(),
       q.translate(0, Z),
       q.scale(1, M),
       __baseOverlay(),
+      __groundLife(),
       q.save());
 
     const B = q.createLinearGradient(910, 0, E, 0);
@@ -14264,7 +15411,7 @@ function __stuckTick(q, dt, tx, ty) {
         y: cA.y + cA.h + (cA.alt ? 3e3 : 0),
         f: () => {
           const A = (qA(cA) ? (VA[cA.type] || 0) / M : 0) + (cA.alt || 0) / M;
-          if (((cA.constructing && __drawBuild(cA, V)) || sV(cA, V), !cA.constructing && cA.hp < 0.6 * cA.maxHp)) {
+          if (((cA.constructing && __drawBuild(cA, V)) || sV(cA, V), __bldBlink(cA, V), !cA.constructing && cA.hp < 0.6 * cA.maxHp)) {
             const A = cA.hp / cA.maxHp,
               V = A < 0.3 ? 0.35 : 0.12;
             (Math.random() < V &&
@@ -14492,7 +15639,7 @@ function __stuckTick(q, dt, tx, ty) {
     for (const nA of mA.enemies)
       nA.x < R ||
         nA.x > J ||
-        (xV(nA, V),
+        (__riseDraw(nA, V),
         nA.isMegaKnight
           ? 0
           : nA.isSuperBoss
@@ -14513,7 +15660,9 @@ function __stuckTick(q, dt, tx, ty) {
     __flameCnt = 0;
     for (const $A of mA.effects) {
       const _A = $A.life / $A.maxLife;
-      if ("tracer" === $A.type) fxBullet($A, _A);
+      if ("bdust" === $A.type) fxBDust($A, _A);
+      else if ("bspark" === $A.type) fxBSpark($A, _A);
+      else if ("tracer" === $A.type) fxBullet($A, _A);
       else if ("flame" === $A.type) fxFlame($A, _A);
       else if ("explosion" === $A.type) fxBoom($A, _A, !1);
       else if ("flakExplosion" === $A.type) fxBoom($A, _A, !0);
@@ -15504,6 +16653,7 @@ function __stuckTick(q, dt, tx, ty) {
     (q.restore(),
       q.restore(),
       __nightLight(),
+      __ambientFx(),
       (function (A) {
         if (!mA.alarmUntil || A > mA.alarmUntil) return;
         const V = mA.alarmUntil - A,
@@ -15841,5 +16991,363 @@ body.hud-hidden #hudToggle span { transform: rotate(180deg); }
 })();
 </script>
 
+
+<style>
+.amb-vig, .amb-sun { position:absolute; inset:0; pointer-events:none; z-index:5; }
+.amb-vig { background: radial-gradient(ellipse 78% 82% at 50% 50%, rgba(0,4,12,0) 0%, rgba(0,4,12,.06) 58%, rgba(0,4,12,.5) 100%); }
+.amb-sun { opacity:1; transition:opacity 2.4s ease-in-out; background: radial-gradient(ellipse 85% 100% at 90% -15%, rgba(255,226,160,.18) 0%, rgba(255,200,120,.05) 50%, rgba(255,190,100,0) 100%); }
+body.night-mode .amb-sun { opacity:0; }
+#tutorialScreen > canvas.sc-fx, #modeScreen > canvas.sc-fx { position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; z-index:0; pointer-events:none; border:0; border-radius:0; box-shadow:none; background:transparent; cursor:default; }
+@keyframes scLogoGlow { 0%,100% { filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(255,170,0,.15)); } 50% { filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 28px rgba(255,190,60,.55)); } }
+@keyframes scLogoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes scShine { 0%,55% { left:-70%; } 100% { left:140%; } }
+#tutorialScreen .title-logo { animation: scLogoGlow 4.2s ease-in-out infinite, scLogoFloat 7s ease-in-out infinite; }
+#tutorialScreen .sc-btn.primary button { position:relative; overflow:hidden; }
+#tutorialScreen .sc-btn.primary button::after { content:""; position:absolute; top:0; left:-70%; width:35%; height:100%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.32),transparent); transform:skewX(-20deg); animation:scShine 3.8s ease-in-out infinite; pointer-events:none; }
+</style>
+<script>
+(function () {
+  function mount(id) {
+    var root = document.getElementById(id);
+    if (!root) return;
+    var cv = document.createElement("canvas");
+    cv.className = "sc-fx";
+    cv.setAttribute("aria-hidden", "true");
+    root.insertBefore(cv, root.firstChild);
+    var cx = cv.getContext("2d"), W = 0, H = 0, DPR = 1, raf = 0, last = 0;
+    var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var stars = [], embers = [], ridgeA = [], ridgeB = [], streak = null, nextStreak = 2.5, spr = {};
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function sprite(key, rgb, size) {
+      if (spr[key]) return spr[key];
+      var c = document.createElement("canvas"); c.width = c.height = size;
+      var g = c.getContext("2d"), r = size / 2, gr = g.createRadialGradient(r, r, 0, r, r, r);
+      gr.addColorStop(0, "rgba(" + rgb + ",1)"); gr.addColorStop(0.4, "rgba(" + rgb + ",0.35)"); gr.addColorStop(1, "rgba(" + rgb + ",0)");
+      g.fillStyle = gr; g.fillRect(0, 0, size, size);
+      return (spr[key] = c);
+    }
+    function mkEmber(init) { return { x: rnd(0, W), y: init ? rnd(0, H) : H + 10, vy: rnd(14, 44), sw: rnd(0.6, 1.8), ph: rnd(0, 6.28), r: rnd(6, 16), a: rnd(0.35, 0.9) }; }
+    function mkRidge(seed, w) {
+      var pts = [], n = Math.ceil(w / 12) + 2;
+      for (var i = 0; i <= n; i++) pts.push(Math.sin(i * 0.07 * seed) * 0.5 + Math.sin(i * 0.19 + seed) * 0.3 + Math.sin(i * 0.41 + seed * 2) * 0.2);
+      return pts;
+    }
+    function resize() {
+      var r = root.getBoundingClientRect();
+      DPR = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(2, Math.floor(r.width)); H = Math.max(2, Math.floor(r.height));
+      cv.width = Math.floor(W * DPR); cv.height = Math.floor(H * DPR);
+      cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      stars = [];
+      for (var i = 0, n = Math.round((W * H) / 5200); i < n; i++) stars.push({ x: rnd(0, W), y: rnd(0, H * 0.82), z: Math.random(), tw: rnd(0, 6.28), s: rnd(0.5, 1.6) });
+      embers = [];
+      for (i = 0, n = Math.round(W / 22); i < n; i++) embers.push(mkEmber(true));
+      ridgeA = mkRidge(1.7, W); ridgeB = mkRidge(2.9, W);
+    }
+    function ridge(pts, base, amp, fill, rim) {
+      cx.beginPath(); cx.moveTo(0, H);
+      for (var i = 0; i < pts.length; i++) cx.lineTo(i * 12, H * (base - amp * (pts[i] * 0.5 + 0.5)));
+      cx.lineTo(W + 24, H); cx.closePath();
+      var g = cx.createLinearGradient(0, H * (base - amp), 0, H);
+      g.addColorStop(0, fill[0]); g.addColorStop(1, fill[1]);
+      cx.fillStyle = g; cx.fill();
+      if (rim) {
+        cx.beginPath();
+        for (i = 0; i < pts.length; i++) { var y = H * (base - amp * (pts[i] * 0.5 + 0.5)); i ? cx.lineTo(i * 12, y) : cx.moveTo(0, y); }
+        cx.strokeStyle = rim; cx.lineWidth = 1.2; cx.stroke();
+      }
+    }
+    function beam(x0, ang, len, wTip, a, rgb) {
+      var x1 = x0 + Math.cos(ang) * len, y1 = H + Math.sin(ang) * len, nx = -Math.sin(ang), ny = Math.cos(ang);
+      var g = cx.createLinearGradient(x0, H, x1, y1);
+      g.addColorStop(0, "rgba(" + rgb + "," + a + ")"); g.addColorStop(1, "rgba(" + rgb + ",0)");
+      cx.fillStyle = g; cx.beginPath();
+      cx.moveTo(x0 - 3, H); cx.lineTo(x0 + 3, H);
+      cx.lineTo(x1 + nx * wTip, y1 + ny * wTip); cx.lineTo(x1 - nx * wTip, y1 - ny * wTip);
+      cx.closePath(); cx.fill();
+    }
+    function draw(t, dt) {
+      cx.clearRect(0, 0, W, H);
+      var big = Math.max(W, H);
+      cx.globalCompositeOperation = "lighter";
+      var neb = [["63,193,255", 0.22, 0.30, 0.50, 0.11, 0.07], ["245,168,0", 0.78, 0.62, 0.42, 0.09, 0.05], ["120,70,200", 0.55, 0.22, 0.46, 0.08, 0.06], ["40,200,170", 0.18, 0.78, 0.38, 0.06, 0.04]];
+      for (var i = 0; i < neb.length; i++) {
+        var n = neb[i], nx = (n[1] + 0.06 * Math.sin(t * n[5] * 3 + i)) * W, ny = (n[2] + 0.05 * Math.cos(t * n[5] * 2.3 + i * 2)) * H, nr = n[3] * big;
+        var g = cx.createRadialGradient(nx, ny, 0, nx, ny, nr);
+        g.addColorStop(0, "rgba(" + n[0] + "," + n[4] + ")"); g.addColorStop(1, "rgba(" + n[0] + ",0)");
+        cx.fillStyle = g; cx.fillRect(nx - nr, ny - nr, 2 * nr, 2 * nr);
+      }
+      for (i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        s.x -= (0.6 + s.z * 3.2) * dt * 2; if (s.x < -2) { s.x = W + 2; s.y = rnd(0, H * 0.82); }
+        var a = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * 1.5 + s.tw)), sz = s.s * (0.7 + s.z);
+        cx.globalAlpha = a * (0.45 + 0.55 * s.z); cx.fillStyle = s.z > 0.8 ? "#cfe9ff" : "#ffffff";
+        cx.fillRect(s.x, s.y, sz, sz);
+        if (s.z > 0.94) { cx.globalAlpha = a * 0.35; cx.fillRect(s.x - 5, s.y + sz / 2 - 0.3, 10 + sz, 0.7); cx.fillRect(s.x + sz / 2 - 0.3, s.y - 5, 0.7, 10 + sz); }
+      }
+      cx.globalAlpha = 1;
+      var sw1 = -Math.PI / 2 + 0.38 * Math.sin(t * 0.35), sw2 = -Math.PI / 2 + 0.38 * Math.sin(t * 0.31 + 2.1);
+      beam(W * 0.16, sw1, H * 1.05, 70, 0.1, "150,215,255");
+      beam(W * 0.84, sw2, H * 1.05, 70, 0.08, "255,210,140");
+      cx.globalCompositeOperation = "source-over";
+      ridge(ridgeA, 0.80, 0.11, ["rgba(8,16,26,0.92)", "rgba(3,7,12,1)"], "rgba(110,190,255,0.22)");
+      ridge(ridgeB, 0.90, 0.08, ["rgba(4,9,15,0.98)", "rgba(2,4,8,1)"], "rgba(245,168,0,0.18)");
+      cx.globalCompositeOperation = "lighter";
+      var fg = sprite("fog", "140,170,210", 128);
+      for (i = 0; i < 3; i++) { var fx = ((t * (7 + 3 * i) + i * 420) % (W + 800)) - 400; cx.globalAlpha = 0.07; cx.drawImage(fg, fx, H * (0.72 + 0.07 * i), 800, 190); }
+      var em = sprite("ember", "255,175,60", 32);
+      for (i = 0; i < embers.length; i++) {
+        var e = embers[i];
+        e.y -= e.vy * dt; e.x += Math.sin(t * e.sw + e.ph) * 14 * dt;
+        if (e.y < -20) embers[i] = mkEmber(false);
+        var fl = 0.55 + 0.45 * Math.sin(t * 6 + e.ph * 3), fade = Math.min(1, e.y / (H * 0.35));
+        cx.globalAlpha = e.a * fl * Math.max(0, fade); cx.drawImage(em, e.x - e.r / 2, e.y - e.r / 2, e.r, e.r);
+      }
+      nextStreak -= dt;
+      if (!streak && nextStreak <= 0) { streak = { x: W + 40, y: rnd(0.08, 0.4) * H, vx: -rnd(520, 760), vy: rnd(40, 120), life: 0 }; nextStreak = rnd(4, 9); }
+      if (streak) {
+        streak.x += streak.vx * dt; streak.y += streak.vy * dt; streak.life += dt;
+        var tx = streak.x - streak.vx * 0.12, ty = streak.y - streak.vy * 0.12;
+        var sg = cx.createLinearGradient(streak.x, streak.y, tx, ty);
+        sg.addColorStop(0, "rgba(255,255,255,0.9)"); sg.addColorStop(1, "rgba(120,200,255,0)");
+        cx.globalAlpha = 1; cx.strokeStyle = sg; cx.lineWidth = 1.6; cx.beginPath(); cx.moveTo(streak.x, streak.y); cx.lineTo(tx, ty); cx.stroke();
+        if (streak.x < -200 || streak.life > 3) streak = null;
+      }
+      cx.globalAlpha = 1; cx.globalCompositeOperation = "source-over";
+    }
+    function visible() { return !root.classList.contains("hidden") && getComputedStyle(root).display !== "none" && !document.hidden; }
+    function frame(ts) {
+      raf = 0;
+      if (!visible()) return;
+      var r = root.getBoundingClientRect();
+      if (Math.abs(r.width - W) > 2 || Math.abs(r.height - H) > 2) resize();
+      draw(ts / 1000, Math.min(0.05, (ts - last) / 1000 || 0.016)); last = ts;
+      if (!reduce) raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf && visible()) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+    setInterval(kick, 400);
+    document.addEventListener("visibilitychange", kick);
+    window.addEventListener("resize", function () { if (visible()) resize(); });
+    if (window.MutationObserver) new MutationObserver(kick).observe(root, { attributes: true, attributeFilter: ["class", "style"] });
+    resize(); kick();
+  }
+  function go() { mount("tutorialScreen"); mount("modeScreen"); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+})();
+</script>
+
+<style id="uiPolish">
+/* ===== UI lihv: liikumine, sära, tagasiside ===== */
+#hud .hud-sweep { position:absolute; left:0; right:0; top:0; height:2px; pointer-events:none; overflow:hidden; z-index:3; }
+#hud .hud-sweep::before { content:''; position:absolute; top:0; bottom:0; left:-30%; width:30%;
+  background:linear-gradient(90deg, transparent, #9be9ff, transparent); filter:drop-shadow(0 0 5px #4fc3ff);
+  animation:hudSweep 6s ease-in-out infinite; }
+@keyframes hudSweep { 0% { left:-30%; } 55%,100% { left:100%; } }
+button:not(:disabled):not([data-locked="1"]):hover { transform:translateY(-1px); }
+button:not(:disabled):active { transform:translateY(1px) scale(.985) !important; }
+.cc-cmd button { transition:border-color .12s, box-shadow .12s, background .12s, transform .08s, border-left-width .12s; }
+.cc-cmd button:hover:not(:disabled):not([data-locked="1"]) { border-left-width:6px; }
+#contextMenu:not(.empty) { animation:cmIn .26s cubic-bezier(.2,.8,.2,1); }
+@keyframes cmIn { from { opacity:0; translate:0 18px; } to { opacity:1; translate:0 0; } }
+.cc-frame { transition:box-shadow .3s; }
+#contextMenu:not(.empty) .cc-frame { box-shadow:inset 0 0 18px rgba(0,0,0,.85), 0 0 14px rgba(79,195,255,.28); }
+.cc-hp i::after { content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(115deg, rgba(255,255,255,.2) 0 5px, transparent 5px 10px); background-size:20px 100%;
+  animation:hpStripe 1.1s linear infinite; }
+@keyframes hpStripe { to { background-position:20px 0; } }
+#mineralsVal.gain { animation:minGain .38s ease-out; }
+#mineralsVal.spend { animation:minSpend .38s ease-out; }
+@keyframes minGain { 0% { transform:scale(1.18); color:#b8ffd9; text-shadow:0 0 16px #55e0a2; } 100% { transform:scale(1); } }
+@keyframes minSpend { 0% { transform:scale(.9); color:#ff9d7a; text-shadow:0 0 14px #ff6a3a; } 100% { transform:scale(1); } }
+#mineralsVal, #waveVal { display:inline-block; transform-origin:left center; }
+#waveBanner { position:fixed; left:0; right:0; top:24%; z-index:60; pointer-events:none; display:flex; justify-content:center; opacity:0; }
+#waveBanner.show { animation:wbShow 2.6s ease-out forwards; }
+#waveBanner .wb-in { display:flex; flex-direction:column; align-items:center; gap:2px; padding:12px 90px;
+  background:linear-gradient(90deg, transparent, rgba(5,12,18,.8) 22%, rgba(5,12,18,.8) 78%, transparent);
+  border-top:1px solid rgba(255,194,74,.65); border-bottom:1px solid rgba(255,194,74,.65); }
+#waveBanner small { font:700 12px var(--ui); letter-spacing:.55em; color:#7fd6ff; text-transform:uppercase; }
+#waveBanner b { font:700 56px/1.05 var(--num); color:#ffc24a; text-shadow:0 0 20px rgba(245,168,0,.75); }
+#waveBanner i { font:700 14px var(--ui); letter-spacing:.32em; color:#ff7a4d; font-style:normal; min-height:1.2em; text-transform:uppercase; }
+#waveBanner.boss b { color:#ff5a3a; text-shadow:0 0 22px rgba(255,60,30,.8); }
+@keyframes wbShow { 0% { opacity:0; transform:scaleX(.55); } 12% { opacity:1; transform:scaleX(1); } 78% { opacity:1; } 100% { opacity:0; transform:scaleX(1.06); } }
+#lowHpVig { position:fixed; inset:0; pointer-events:none; z-index:15; opacity:0; transition:opacity .4s;
+  box-shadow:inset 0 0 140px 20px rgba(255,20,20,.55); }
+body.lowhp #lowHpVig { opacity:1; animation:hpVig 1.6s ease-in-out infinite; }
+body.lowhp.crit #lowHpVig { animation-duration:.8s; }
+@keyframes hpVig { 0%,100% { opacity:.35; } 50% { opacity:1; } }
+#musicHint { position:fixed; left:50%; bottom:34px; transform:translateX(-50%); z-index:99999; pointer-events:none;
+  font:700 13px var(--ui); letter-spacing:.2em; text-transform:uppercase; color:#bfe8ff;
+  padding:9px 18px; background:rgba(5,12,18,.72); border:1px solid rgba(79,195,255,.5);
+  box-shadow:0 0 14px rgba(79,195,255,.3); opacity:0; transition:opacity .5s; }
+#musicHint.on { opacity:1; animation:mhPulse 1.8s ease-in-out infinite; }
+@keyframes mhPulse { 0%,100% { box-shadow:0 0 8px rgba(79,195,255,.25); } 50% { box-shadow:0 0 20px rgba(79,195,255,.7); } }
+</style>
+<div id="lowHpVig"></div>
+<div id="waveBanner"><div class="wb-in"><small>Laine</small><b></b><i></i></div></div>
+<div id="musicHint">🔊 Klõpsa või vajuta klahvi, et muusika käima läheks</div>
+<script id="uiPolishJs">
+(function () {
+  function $(id) { return document.getElementById(id); }
+  /* HUD valgusjoon */
+  var hud = $("hud");
+  if (hud && !hud.querySelector(".hud-sweep")) { var sw = document.createElement("i"); sw.className = "hud-sweep"; hud.appendChild(sw); }
+  /* mineraalide vilgutus */
+  var mv = $("mineralsVal"), lastM = null;
+  function flash(el, cls) { el.classList.remove("gain", "spend"); void el.offsetWidth; el.classList.add(cls); }
+  if (mv) new MutationObserver(function () {
+    var n = parseInt(mv.textContent) || 0;
+    if (lastM !== null && n !== lastM) flash(mv, n > lastM ? "gain" : "spend");
+    lastM = n;
+  }).observe(mv, { childList: true, characterData: true, subtree: true });
+  /* laine bänner */
+  var wv = $("waveVal"), wb = $("waveBanner"), lastW = null, wt = 0;
+  if (wv && wb) new MutationObserver(function () {
+    var n = parseInt(wv.textContent) || 0;
+    if (lastW !== null && n > lastW && n > 0) {
+      wb.querySelector("b").textContent = n;
+      var boss = n % 10 === 0, sup = n % 25 === 0;
+      wb.classList.toggle("boss", boss);
+      wb.querySelector("i").textContent = sup ? "💀 Super boss" : boss ? "🔥 Mega laine" : n % 5 === 0 ? "⚠ Boss laine" : "Vaenlased lähenevad";
+      wb.classList.remove("show"); void wb.offsetWidth; wb.classList.add("show");
+    }
+    lastW = n;
+  }).observe(wv, { childList: true, characterData: true, subtree: true });
+  /* madal baasi HP: punane serv */
+  setInterval(function () {
+    try {
+      var st = window.__mm && window.__mm.st && window.__mm.st(); if (!st) return;
+      var cc = st.buildings.find(function (b) { return b.type === "commandCenter"; });
+      var r = cc && cc.maxHp ? cc.hp / cc.maxHp : 1;
+      document.body.classList.toggle("lowhp", !!cc && cc.hp > 0 && r < 0.35);
+      document.body.classList.toggle("crit", !!cc && cc.hp > 0 && r < 0.15);
+    } catch (e) {}
+  }, 400);
+  /* muusika: proovi kohe, muidu esimesel klõpsul/klahvil; vihje kuni mängib */
+  var hint = $("musicHint"), playing = false, evs = ["pointerdown", "mousedown", "keydown", "touchstart", "touchend", "click"];
+  function kick() {
+    try { if (window.SFX && SFX.ensureMusic && SFX.ensureMusic()) { done(); return true; } } catch (e) {}
+    return false;
+  }
+  function done() {
+    if (playing) return; playing = true;
+    if (hint) hint.classList.remove("on");
+    evs.forEach(function (e) { document.removeEventListener(e, onGesture, true); });
+  }
+  function onGesture() { kick(); setTimeout(kick, 250); setTimeout(kick, 900); }
+  evs.forEach(function (e) { document.addEventListener(e, onGesture, true); });
+  function boot() {
+    try { SFX.init(); } catch (e) {}
+    setTimeout(function () { if (!kick() && hint && !playing) hint.classList.add("on"); }, 700);
+    var t = setInterval(function () { if (playing) clearInterval(t); else kick(); }, 1500);
+  }
+  if (document.readyState === "complete") boot(); else window.addEventListener("load", boot);
+})();
+</script>
+
+<style id="goPolish">
+#gameOverScreen.overlay-screen {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 38%, rgba(120,18,12,.5) 0%, rgba(40,8,8,.35) 45%, rgba(3,5,8,.97) 100%),
+    repeating-linear-gradient(0deg, rgba(255,120,100,.035) 0 1px, transparent 1px 3px),
+    #05070a !important;
+  overflow:hidden;
+}
+#gameOverScreen:not(.hidden) { animation:goFade .6s ease-out; }
+@keyframes goFade { from { opacity:0; } to { opacity:1; } }
+#gameOverScreen .go-embers { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+#gameOverScreen .go-embers i { position:absolute; bottom:-12px; width:3px; height:3px; border-radius:50%;
+  background:#ff9a4a; box-shadow:0 0 8px 2px rgba(255,120,40,.8); opacity:0; animation:goEmber linear infinite; }
+@keyframes goEmber { 0% { transform:translate(0,0); opacity:0; } 10% { opacity:.9; } 100% { transform:translate(var(--dx,30px), -105vh); opacity:0; } }
+#gameOverScreen .go-card { position:relative; z-index:2; width:min(760px, 94vw); display:flex; flex-direction:column; align-items:center; gap:16px;
+  padding:30px 34px 28px;
+  background:linear-gradient(180deg, rgba(22,12,12,.78), rgba(8,10,14,.86));
+  border:1px solid rgba(255,90,70,.45); border-top:3px solid #ff4a3a;
+  clip-path:polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  box-shadow:0 0 60px rgba(255,50,30,.18), inset 0 0 40px rgba(0,0,0,.6);
+  backdrop-filter:blur(6px); }
+#gameOverScreen .go-kicker { font:700 13px var(--ui); letter-spacing:.42em; text-transform:uppercase; color:#ff8a7a; }
+#gameOverScreen h2.go-title { font-size:clamp(28px, 5.4vw, 52px); letter-spacing:.14em; white-space:nowrap; margin:0; padding-bottom:12px; color:#ff4a3a;
+  text-shadow:0 0 24px rgba(255,60,40,.7), 0 3px 0 #000; border-image:linear-gradient(90deg, transparent, #ff4a3a 30%, #ff4a3a 70%, transparent) 1; }
+#gameOverScreen.go-in .go-title { animation:goShake .7s cubic-bezier(.3,.7,.4,1), goFlick 3.2s 1s infinite; }
+@keyframes goShake { 0% { transform:scale(1.35); opacity:0; filter:blur(6px); } 35% { transform:scale(1) translateX(-5px); opacity:1; filter:none; }
+  50% { transform:translateX(5px); } 65% { transform:translateX(-3px); } 80% { transform:translateX(2px); } 100% { transform:none; } }
+@keyframes goFlick { 0%,92%,100% { opacity:1; } 94% { opacity:.6; } 96% { opacity:1; } 97% { opacity:.75; } }
+#gameOverScreen .go-hero { display:flex; align-items:center; justify-content:center; gap:30px; width:100%; }
+#gameOverScreen .go-wave, #gameOverScreen .go-rank { display:flex; flex-direction:column; align-items:center; gap:2px; }
+#gameOverScreen .go-wave b { font:700 84px/1 var(--num); color:#ffc24a; text-shadow:0 0 26px rgba(245,168,0,.65); }
+#gameOverScreen .go-wave span, #gameOverScreen .go-rank small { font:700 13px var(--ui); letter-spacing:.24em; text-transform:uppercase; color:#8fa8bb; }
+#gameOverScreen .go-rank b { font:700 30px var(--ui); letter-spacing:.14em; text-transform:uppercase; color:#7fd6ff; text-shadow:0 0 14px rgba(63,193,255,.6); }
+#gameOverScreen .go-sep { width:2px; height:74px; background:linear-gradient(180deg, transparent, rgba(255,194,74,.7), transparent); }
+#gameOverScreen .go-stats { gap:12px; margin:0; }
+#gameOverScreen .go-stats div { position:relative; min-width:118px; padding:12px 14px 10px; align-items:center; }
+#gameOverScreen .go-stats i { font-style:normal; font-size:17px; opacity:.85; }
+#gameOverScreen .go-stats b { font-size:30px; }
+#gameOverScreen .go-kicker, #gameOverScreen .go-hero, #gameOverScreen .go-stats div, #gameOverScreen #statRecord, #gameOverScreen .go-actions { opacity:0; }
+#gameOverScreen.go-in .go-kicker, #gameOverScreen.go-in .go-hero, #gameOverScreen.go-in .go-stats div, #gameOverScreen.go-in #statRecord, #gameOverScreen.go-in .go-actions {
+  animation:goUp .55s cubic-bezier(.2,.8,.2,1) var(--d, 0s) forwards; }
+@keyframes goUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+#gameOverScreen #statRecord { padding:7px 22px; border:1px solid rgba(127,166,199,.35); background:rgba(20,40,56,.45); }
+#gameOverScreen #statRecord.new { border-color:#ffd24a; background:rgba(255,200,60,.12); box-shadow:0 0 22px rgba(255,200,60,.35); }
+#gameOverScreen.go-in #statRecord.new { animation:goUp .55s cubic-bezier(.2,.8,.2,1) var(--d,0s) forwards, goGold 2s 1.8s ease-in-out infinite; }
+@keyframes goGold { 0%,100% { box-shadow:0 0 12px rgba(255,200,60,.25); } 50% { box-shadow:0 0 30px rgba(255,200,60,.75); } }
+#gameOverScreen .go-actions { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:4px; }
+#gameOverScreen .go-retry { font-size:20px; padding:14px 46px; letter-spacing:.2em; color:#10161b; font-weight:700;
+  background:linear-gradient(180deg, #ffd36e, #f5a800); border:1px solid #ffd36e; border-top-color:#fff0b8;
+  text-shadow:none; box-shadow:0 0 22px rgba(245,168,0,.5), inset 0 -3px 0 rgba(0,0,0,.25);
+  clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+#gameOverScreen .go-retry:hover:not(:disabled) { background:linear-gradient(180deg, #ffe08f, #ffb81a); box-shadow:0 0 36px rgba(245,168,0,.85); }
+#gameOverScreen .go-retry kbd { margin-left:10px; padding:1px 7px; font:700 13px var(--num); background:rgba(0,0,0,.28); border:1px solid rgba(0,0,0,.45); }
+#gameOverScreen #feedbackLink { display:inline-block; padding:6px 16px; border:1px solid rgba(245,168,0,.45); color:#e0a93a; text-decoration:none;
+  font-size:13px !important; letter-spacing:.16em !important; background:transparent; }
+@media (max-width:640px) { #gameOverScreen .go-hero { flex-direction:column; gap:12px; } #gameOverScreen .go-sep { display:none; } #gameOverScreen .go-stats div { min-width:96px; } }
+</style>
+<script id="goPolishJs">
+(function () {
+  var scr = document.getElementById("gameOverScreen"); if (!scr) return;
+  var emb = scr.querySelector(".go-embers");
+  for (var i = 0; i < 26; i++) {
+    var e = document.createElement("i");
+    e.style.left = (Math.random() * 100) + "%";
+    e.style.setProperty("--dx", (Math.random() * 120 - 60) + "px");
+    e.style.animationDuration = (5 + Math.random() * 7) + "s";
+    e.style.animationDelay = (-Math.random() * 10) + "s";
+    e.style.width = e.style.height = (2 + Math.random() * 3) + "px";
+    emb.appendChild(e);
+  }
+  var RANKS = [[0, "Uustulnuk"], [3, "Rekruut"], [6, "Kapral"], [10, "Veteran"], [15, "Kapten"], [20, "Major"], [30, "Kolonel"], [40, "Kindral"]];
+  function rank(w) { var r = RANKS[0][1]; for (var i = 0; i < RANKS.length; i++) if (w >= RANKS[i][0]) r = RANKS[i][1]; return r; }
+  function countUp(id, delay) {
+    var el = document.getElementById(id); if (!el) return;
+    var to = parseInt(el.textContent) || 0; if (to <= 0) return;
+    el.textContent = "0"; var t0 = performance.now() + delay * 1000, dur = 900;
+    (function step(now) {
+      var p = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e);
+      if (p < 1 && !scr.classList.contains("hidden")) requestAnimationFrame(step); else el.textContent = to;
+    })(performance.now());
+  }
+  function show() {
+    var w = parseInt(document.getElementById("finalWave").textContent) || 0;
+    document.getElementById("goRank").textContent = rank(w);
+    var rec = document.getElementById("statRecord"); rec.classList.toggle("new", /REKORD/.test(rec.textContent));
+    scr.classList.remove("go-in"); void scr.offsetWidth; scr.classList.add("go-in");
+    countUp("finalWave", 0.35); countUp("statKills", 0.55); countUp("statBosses", 0.65); countUp("statBuilt", 0.85); countUp("statFleets", 0.95);
+  }
+  var was = scr.classList.contains("hidden");
+  new MutationObserver(function () {
+    var h = scr.classList.contains("hidden");
+    if (was && !h) show();
+    if (h && scr.classList.contains("go-in")) scr.classList.remove("go-in");
+    was = h;
+  }).observe(scr, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("keydown", function (e) {
+    if (scr.classList.contains("hidden")) return;
+    if ((e.key === "r" || e.key === "R" || e.key === "Enter") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault(); e.stopPropagation();
+      if (typeof window.restartGame === "function") window.restartGame();
+    }
+  }, true);
+})();
+</script>
 </body>
 </html>
