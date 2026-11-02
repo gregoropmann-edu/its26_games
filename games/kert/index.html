@@ -554,9 +554,16 @@ function updFx(dt){
   }
 }
 // ---- network (PeerJS, lühike kood) ----
-let isHost=false,myId=0,nextId=0,peers=[],hostCh=null,srv=false;
+let isHost=false,myId=0,nextId=0,peers=[],hostCh=null,srv=false,srvOk=false;
 const others=new Map();
-function netInfo(){$("net").textContent="Võrk: "+(srv?"ühendatud serveriga (mängija ID "+myId+")":isHost?"HOST, mängijaid ühendatud: "+peers.length:hostCh?"ühendatud hostiga (ID "+myId+")":"pole ühendatud")}
+function netInfo(){
+  let s;
+  if(srv)s=srvOk?"ühendatud serveriga (mängija ID "+myId+")":"ühendan serveriga...";
+  else if(isHost)s="HOST, mängijaid ühendatud: "+peers.length;
+  else if(hostCh)s="ühendatud hostiga (ID "+myId+")";
+  else s="pole ühendatud (üksi mäng — mitmikmänguks vajad internetti)";
+  $("net").textContent="Võrk: "+s;
+}
 function send(m,except){const s=JSON.stringify(m);
   if(srv){if(myId)fetch("/send?id="+myId,{method:"POST",body:s}).catch(()=>{});return}if(isHost)peers.forEach(c=>c!==except&&c.readyState=="open"&&c.send(s));else if(hostCh&&hostCh.readyState=="open")hostCh.send(s)}
 function setupCh(ch){
@@ -623,14 +630,21 @@ $("joinBtn").onclick=()=>{
   peer.on("error",e=>{$("net").textContent="Võrk: viga ("+e.type+") – kontrolli koodi"});
 };
 setInterval(()=>send({t:"pos",id:myId,x:p.x,y:p.y,z:p.z,yaw:p.yaw}),50);
-// ---- server mode: kui leht avati aadressilt http://IP:3000, ühendub automaatselt ----
-if(location.protocol!="file:"){
+// ---- server mode: ainult kohalik server (nt node server.js port 3000), mitte tavaline staatiline server ----
+if(location.protocol!="file:"&&location.port==="3000"){
   srv=true;
   $("netset").style.display="none";
   const es=new EventSource("/events");
-  es.onmessage=e=>onMsg(JSON.parse(e.data));
-  es.onerror=()=>{$("net").textContent="Võrk: server ei vasta"};
-  $("net").textContent="Võrk: ühendan serveriga...";
+  es.onmessage=e=>{srvOk=true;onMsg(JSON.parse(e.data));netInfo()};
+  es.onerror=()=>{
+    if(!srvOk){
+      srv=false;
+      es.close();
+      $("netset").style.display="";
+      netInfo();
+    }else $("net").textContent="Võrk: server katkes";
+  };
+  netInfo();
 }
 // ---- loop ----
 let last=performance.now();
