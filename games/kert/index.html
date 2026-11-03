@@ -646,10 +646,10 @@ const worldMat=new THREE.MeshBasicMaterial({map:atlasTex,vertexColors:true,alpha
 const DIRS=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
 const SH=[.8,.8,1,.5,.7,.7];
 const FC=[[[1,0,1],[1,0,0],[1,1,0],[1,1,1]],[[0,0,0],[0,0,1],[0,1,1],[0,1,0]],[[0,1,1],[1,1,1],[1,1,0],[0,1,0]],[[0,0,0],[1,0,0],[1,0,1],[0,0,1]],[[0,0,1],[1,0,1],[1,1,1],[0,1,1]],[[1,0,0],[0,0,0],[0,1,0],[1,1,0]]];
-const CUT={9:1,10:1,31:1,32:1,35:1,36:1,38:1,41:1,43:1},TT=[0,0,2,3,4,5,6,8,9,11,12,13];
+const CUT={9:1,10:1,31:1,32:1,35:1,36:1,41:1,43:1},TT=[0,0,2,3,4,5,6,8,9,11,12,13];
 NB.forEach((_,i)=>{TT[12+i]=14+i});
 TT[44]=40;TT[45]=41;TT[46]=42;TT[47]=43;TT[48]=44;TT[49]=45;TT[50]=46;TT[51]=TT[52]=TT[53]=TT[54]=39;
-const tileOf=(b,f)=>b==30?(f==2?36:f==4?37:38):b==1?(f==2?0:f==3?2:1):b==6?((f==2||f==3)?7:6):b==8?((f==2||f==3)?10:9):b==32?4:b==33?(f==2?35:34):b==34?33:(b==35||b==36)?3:b==38?30:b==39?5:b==40?31:TT[b];
+const tileOf=(b,f)=>b==30?(f==2?36:f==4?37:38):b==1?(f==2?0:f==3?2:1):b==6?((f==2||f==3)?7:6):b==8?((f==2||f==3)?10:9):b==32?4:b==33?(f==2?35:34):b==34?33:(b==35||b==36)?3:b==38?47:b==39?5:b==40?31:TT[b];
 const CS=32,NCX=W/CS,NCZ=D/CS,chunkMesh=[],waterChunkMesh=[],lavaChunkMesh=[],doorVisualsByChunk=[],portalVisualsByChunk=[],bedVisualsByChunk=[],dirtyC=new Set();
 const chunkMaxY=new Uint8Array(NCX*NCZ),chunkBuilt=new Uint8Array(NCX*NCZ),decorByChunk=[],chestVisualsByChunk=[];
 let chunkQueue=[],lastPriorityChunk=-1,visibilityClock=0;
@@ -748,7 +748,7 @@ function buildChunk(cx,cz){
     if(b==36)continue;
     if(b==41||b==43){const bed=makeBedVisual(x,y,z,b==43);scene.add(bed);bedVisuals.push(bed);continue;}
     if(b==37){const key=x+","+y+","+z,axis=portalFaces.get(key)||"x",portal=new THREE.Group();portal.position.set(x+(axis=="z"?.505:.5),y+.5,z+(axis=="x"?.505:.5));if(axis=="z")portal.rotation.y=Math.PI/2;const mesh=new THREE.Mesh(portalGeo,portalMat);mesh.renderOrder=4;portal.add(mesh);scene.add(portal);portalVisuals.push(portal);continue;}
-    if(b==38){const lava=new THREE.Mesh(lavaGeo,lavaMat);lava.position.set(x+.5,y+.9,z+.5);scene.add(lava);lavaVisuals.push(lava);continue;}
+    
     const v=((x*73856093^y*19349663^z*83492791)&255)/255*.1-.05;
     if(b==31){
       const level=(waterLevels[idx(x,y,z)]||8)/8;
@@ -1695,9 +1695,10 @@ const RECIPES_ALL = [
   { out: 140, qty: 1, req: [4,4,190] },
   { out: 141, qty: 1, req: [11,11,190] },
   { out: 143, qty: 1, req: [13,13,190] },
-  { out: 145, qty: 1, req: [4,4,4,190,190] },
+  { out: 145, qty: 1, req: [4,4,190,190] },
   { out: 180, qty: 1, req: [4,4,4,190,190] },
   { out: 181, qty: 1, req: [11,11,11,190,190] },
+  { out: 146, qty: 1, req: [11,11,190,190] },
   { out: 185, qty: 1, req: [190,190,190] },
   { out: 186, qty: 4, req: [3,190,99] },
    { out: 187, qty: 1, req: [4,4,4,4,4] },
@@ -4399,12 +4400,12 @@ try{
       o.lungeCd=Math.max(0,(o.lungeCd||0)-dt);
       let mx=0,mz=0,spMul=1;o.wantJump=false;
       const fleeing=o.fleeT>0;if(fleeing)o.fleeT-=dt;
-      const angry=o.type=="g"&&o.angryUntil>now&&survival&&d<70;
+      const angry=o.type=="g"&&o.angryUntil>now&&d<90;
       const tall=o.type=="g"?3:(o.type=="sp"||o.type=="pig"||o.type=="chicken")?1:2;
       if(o.type=="g"){
         if(angry){
           o.yaw=Math.atan2(-dx,-dz);spMul=1.25;
-          if(d>1.9){const s=steer(o,p.x,p.z,dt,tall);mx=s[0];mz=s[1]}
+          if(d>2.4){const s=steer(o,p.x,p.z,dt,tall);mx=s[0];mz=s[1]}
           else if(o.cd<=0&&Math.abs(p.y-o.y)<2.8){o.cd=1.2;hurt(7+Math.floor(Math.random()*2),{x:o.x,z:o.z})}
         }else{
           let target=null,td=14;
@@ -4670,6 +4671,190 @@ addChat("V22: Minecrafti-laadsed mobid (zombie, skelett, creeper, ämblik, küla
 }catch(err){console.error("MineCraft V22 error:",err);try{addChat("V22 viga: "+String(err.message||err),"err")}catch(_e){}}
 })();
 
+</script>
+
+<script>
+/* V23: lava, obsidian, night mobs, LAN fly/time sync */
+(function(){
+try{
+  const c=document.createElement('canvas');c.width=c.height=TS;const g=c.getContext('2d');
+  const pal=['#ff7a00','#ff9a1a','#ffc23a','#e24a00','#ff5a00'];
+  for(let y=0;y<TS;y+=4)for(let x=0;x<TS;x+=4){g.fillStyle=pal[Math.floor(Math.random()*pal.length)];g.fillRect(x,y,4,4)}
+  g.fillStyle='#ffe27a';for(let i=0;i<10;i++)g.fillRect(Math.floor(Math.random()*8)*4,Math.floor(Math.random()*8)*4,4,4);
+  tiles[47]=c;atlas.getContext('2d').drawImage(c,47*TS,0);atlasTex.needsUpdate=true;
+  try{delete iconCache[38]}catch(e){}
+  HARD[16]=10;
+}catch(e){console.warn('V23 lava',e)}
+const _swv=setWaterVolume;
+setWaterVolume=function(x,y,z,amount,net){
+  if(amount>0&&inb(x,y,z)&&get(x,y,z)===38){setBlock(x,y,z,16,true);return}
+  _swv(x,y,z,amount,net);
+  if(amount>0)for(const [a,b,d] of [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]){
+    if(get(x+a,y+b,z+d)===38)setBlock(x+a,y+b,z+d,16,true);
+  }
+};
+setInterval(()=>{try{
+  if(!survival||dead||worldDimension!=="overworld")return;
+  const night=Math.sin(dayTime*Math.PI*2)<0;
+  const hostile=mobs.filter(m=>m.type=="z"||m.type=="s"||m.type=="c"||m.type=="sp");
+  if(!night){
+    for(let i=hostile.length-1;i>=0;i--){const m=hostile[i];const mm=m.m;const px=m.x,pz=m.z;
+      if(Math.hypot(px-p.x,pz-p.z)>12&&Math.random()<.25){if(mm&&mm.parent)scene.remove(mm);const k=mobs.indexOf(m);if(k>=0)mobs.splice(k,1)}}
+    return;
+  }
+  if(hostile.length>=16||mobs.length>=MOB_CAP-2)return;
+  const r=Math.random(),type=r<.4?"z":r<.7?"s":r<.88?"c":"sp";
+  const a=Math.random()*Math.PI*2,dist=18+Math.random()*28;
+  const x=Math.floor(p.x+Math.cos(a)*dist),z=Math.floor(p.z+Math.sin(a)*dist);
+  if(!inb(x,0,z))return;
+  for(let y=Math.min(H-3,terrainTop[col(x,z)]+10);y>1;y--){
+    const b=get(x,y,z);
+    if(b!==0&&b!==31&&b!==9&&b!==10&&b!==38){
+      if(get(x,y+1,z)===0&&get(x,y+2,z)===0){spawnMob(type,x+.5,y+1,z+.5)}
+      return;
+    }
+  }
+}catch(e){}},1500);
+try{
+  const _send=send;
+  send=function(m,except){
+    if(m&&m.t==='pos'&&Number(m.id)===Number(myId))m=Object.assign({},m,{f:(flying&&!survival)?1:0});
+    return _send(m,except);
+  };
+  const _upd=upd;
+  upd=function(m){
+    _upd(m);
+    const o=others.get(m.id);if(!o||!o.mdl)return;
+    if(m.f){o.mdl.legL.rotation.x=0;o.mdl.legR.rotation.x=0;o.mdl.armL.rotation.z=.3;o.mdl.armR.rotation.z=-.3}
+  };
+  setInterval(()=>{if(isHost||(srv&&myId===1))send({t:'time',v:dayTime})},8000);
+}catch(e){console.warn('V23 lan',e)}
+try{addChat("V23: lava, obsidiaan, öised mobid, LAN-parandused.","sys")}catch(e){}
+})();
+</script>
+
+<script>
+/* V24: PvP over LAN */
+(function(){
+  const _hit=tryHitMob;
+  tryHitMob=function(){
+    if(_hit())return true;
+    try{
+      const d=new THREE.Vector3();cam.getWorldDirection(d);
+      const ex=p.x,ey=p.y+1.62,ez=p.z;let best=null,bt=4,bid=null;
+      for(const [id,o] of others){
+        if(!o.mdl||!o.mdl.g)continue;const g=o.mdl.g.position;
+        const cx=g.x-ex,cy=g.y+.9-ey,cz=g.z-ez,t=cx*d.x+cy*d.y+cz*d.z;
+        if(t<0||t>bt)continue;
+        const qx=cx-d.x*t,qy=cy-d.y*t,qz=cz-d.z*t;
+        if(Math.hypot(qx,qz)>.6||Math.abs(qy)>1)continue;
+        let blocked=false;for(let q=.2;q<t;q+=.25)if(solid(Math.floor(ex+d.x*q),Math.floor(ey+d.y*q),Math.floor(ez+d.z*q))){blocked=true;break}
+        if(!blocked){best=o;bt=t;bid=id}
+      }
+      if(!best)return false;
+      if(atkCd>0)return true;
+      atkCd=.5;
+      send({t:'pvp',to:bid,from:myId,dmg:swordDmg(hotbar[cur]||0),fx:p.x,fz:p.z});
+      try{sfxHurt()}catch(e){}
+      return true;
+    }catch(e){return false}
+  };
+  const _on=onMsg;
+  onMsg=function(m,ch){
+    if(m&&m.t==='pvp'){
+      if(isHost)send(m,ch);
+      if(Number(m.to)===Number(myId)&&survival&&!dead){
+        const dmg=Math.max(1,Math.min(20,Number(m.dmg)||1));
+        const dx=p.x-m.fx,dz=p.z-m.fz,dd=Math.hypot(dx,dz)||1;
+        hurt(dmg,{x:m.fx,z:m.fz});
+        vx+=dx/dd*5;vz+=dz/dd*5;vy=Math.max(vy,4);
+      }
+      return;
+    }
+    _on(m,ch);
+  };
+})();
+</script>
+
+<script>
+/* V25: achievements (top right, per player, announced in LAN chat) */
+(function(){
+  const st=document.createElement('style');
+  st.textContent='#achBox{position:fixed;top:12px;right:12px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;align-items:flex-end}'+
+  '.ach{display:flex;gap:10px;align-items:center;min-width:240px;max-width:320px;padding:9px 14px;background:linear-gradient(#3a3a3a,#1e1e1e);border:3px solid #7d6a3a;border-radius:3px;color:#fff;font-family:VT323,monospace;font-size:20px;box-shadow:0 6px 16px #0008;transform:translateX(120%);transition:transform .45s cubic-bezier(.2,.9,.3,1.1),opacity .5s;opacity:1}'+
+  '.ach.in{transform:none}.ach.out{opacity:0}.ach i{font-style:normal;font-size:30px;line-height:1}.ach b{display:block;color:#ffd84a;font-weight:normal;font-size:17px;letter-spacing:.5px}.ach span{color:#cfd8c4;font-size:17px}';
+  document.head.appendChild(st);
+  const box=document.createElement('div');box.id='achBox';document.body.appendChild(box);
+  let got={};try{got=JSON.parse(localStorage.getItem('mcAch')||'{}')}catch(e){}
+  const save=()=>{try{localStorage.setItem('mcAch',JSON.stringify(got))}catch(e){}};
+  const queue=[];let showing=false;
+  const A={
+    wood:['🪵','Puuhakkaja','Kogu esimene palk'],
+    planks:['🔨','Töölaud valmis','Tee laudu'],
+    pick:['⛏️','Aeg kaevata','Meisterda kirka'],
+    iron:['🔩','Rauaaeg','Sulata raudkangi'],
+    bucket:['🪣','Ämbritäis','Meisterda ämber'],
+    diamond:['💎','TEEMANDID!','Leia teemant'],
+    obsidian:['🟪','Jää ja tuli','Hangi obsidiaani'],
+    tntcraft:['🧨','Pommimees','Meisterda TNT'],
+    kamikaze:['💥','Kamikaze','Lase esimene TNT õhku'],
+    kill:['⚔️','Esimene veri','Tapa esimene mob'],
+    zombie:['🧟','Zombikütt','Tapa zombi'],
+    creeper:['🟢','Aww man','Tapa creeper'],
+    skeleton:['💀','Luukere','Tapa skelett'],
+    golem:['🗿','Vihane golem','Löö raudgolemit'],
+    duel:['🤺','Duellist','Löö teist mängijat'],
+    nether:['🔥','Põrgusse','Mine Netherisse'],
+    fly:['🕊️','Lendaja','Hakka lendama'],
+    died:['☠️','Hopsti','Sure ära'],
+    night:['🌙','Öövaht','Tapa mob öösel'],
+  };
+  function show(){
+    if(showing||!queue.length)return;showing=true;
+    const [ic,t,d]=A[queue.shift()];
+    const e=document.createElement('div');e.className='ach';e.innerHTML='<i>'+ic+'</i><div><b>Saavutus!</b>'+t+'<br><span>'+d+'</span></div>';
+    box.appendChild(e);requestAnimationFrame(()=>requestAnimationFrame(()=>e.classList.add('in')));
+    try{sfxEquip()}catch(_){}
+    setTimeout(()=>e.classList.add('out'),4200);
+    setTimeout(()=>{e.remove();showing=false;show()},4800);
+  }
+  window.giveAch=function(k){
+    if(got[k]||!A[k])return;got[k]=1;save();queue.push(k);show();
+    try{addChat('🏆 Sa said saavutuse: '+A[k][1],'sys')}catch(e){}
+    try{send({t:'chat',n:(typeof playerName==='string'&&playerName)||'Mängija',m:'🏆 sai saavutuse: '+A[k][1]})}catch(e){}
+  };
+  const g=giveAch;
+  setInterval(()=>{try{
+    if(dead)g('died');
+    if(typeof worldDimension!=='undefined'&&worldDimension==='nether')g('nether');
+    if(flying&&!survival)g('fly');
+    if(!survival||dead)return;
+    if(inv[7]>0)g('wood');
+    if(inv[4]>0)g('planks');
+    for(let i=180;i<=185;i++)if(inv[i]>0&&isPick(i))g('pick');
+    if(inv[191]>0)g('iron');
+    if(inv[188]>0)g('bucket');
+    if(inv[224]>0)g('diamond');
+    if(inv[16]>0)g('obsidian');
+    if(inv[6]>0)g('tntcraft');
+  }catch(e){}},500);
+  const _spawnTnt=spawnTnt;
+  spawnTnt=function(x,y,z,f,auth){if(auth)g('kamikaze');return _spawnTnt(x,y,z,f,auth)};
+  const _dm=damageMob;
+  damageMob=function(o,dmg,fx,fz){
+    const was=o&&o.dead;_dm(o,dmg,fx,fz);
+    try{
+      if(o&&o.type==='g'&&fx===p.x&&fz===p.z)g('golem');
+      if(o&&o.dead&&!was&&fx===p.x&&fz===p.z){
+        g('kill');
+        if(o.type==='z')g('zombie');if(o.type==='c')g('creeper');if(o.type==='s')g('skeleton');
+        if(['z','s','c','sp'].includes(o.type)&&Math.sin(dayTime*Math.PI*2)<0)g('night');
+      }
+    }catch(e){}
+  };
+  const _send=send;
+  send=function(m,e){if(m&&m.t==='pvp'&&Number(m.from)===Number(myId))g('duel');return _send(m,e)};
+})();
 </script>
 </body>
 </html>
