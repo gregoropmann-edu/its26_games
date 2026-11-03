@@ -1,488 +1,524 @@
 <!DOCTYPE html>
 <html lang="et">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banaani Simulaator</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-        body {
-            background-color: #121218;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        #gameContainer {
-            position: relative;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.8);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 2px solid #333344;
-        }
-        canvas {
-            display: block;
-            background-color: #1e1e28;
-            cursor: default;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#121218">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Banaani Simulaator</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍌</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: #0b0b10; color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; touch-action: none; overscroll-behavior: none; }
+  body { display: flex; align-items: center; justify-content: center; }
+  #stage { position: relative; }
+  canvas { display: block; background: #1e1e28; touch-action: none; }
+  .hud { position: absolute; top: 0; right: 0; display: none; gap: 6px; padding: 8px 10px; z-index: 10; }
+  .hud.show { display: flex; }
+  .btn { background: rgba(0,0,0,.55); color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 8px;
+    padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(4px); }
+  .btn:hover { background: rgba(255,255,255,.2); }
+  .btn:active { background: rgba(255,255,255,.4); }
+  body.touch .btn { padding: 9px 14px; font-size: 15px; }
+  #fsBtn { display: block; position: absolute; right: 10px; bottom: 10px; z-index: 10; }
+  #rotate { position: fixed; inset: 0; background: #121218; z-index: 100; display: none; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; gap: 18px; padding: 24px; }
+  #rotate.show { display: flex; }
+  #rotate .ico { font-size: 64px; animation: rot 2s ease-in-out infinite; }
+  #rotate p { font-size: 20px; color: #ffe135; font-weight: 700; }
+  @keyframes rot { 0%,20% { transform: rotate(0); } 60%,100% { transform: rotate(-90deg); } }
+</style>
 </head>
 <body>
-
-<div id="gameContainer">
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="hud" class="hud">
+    <button id="pauseBtn" class="btn">⏸ Paus</button>
+    <button id="menuBtn" class="btn">🏠 Menüü</button>
+  </div>
+  <button id="fsBtn" class="btn" title="Täisekraan">⛶</button>
 </div>
+<div id="rotate"><div class="ico">📱</div><p>Pööra seade rõhtasendisse</p><span style="color:#aaa">Mäng töötab ainult horisontaalselt</span></div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
+(() => {
+'use strict';
+
+/* ---------- Setup ---------- */
+const W = 800, H = 450;                      // loogiline (landscape 16:9) lahutus
+const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
+const stage = document.getElementById('stage');
+const hud = document.getElementById('hud');
+const pauseBtn = document.getElementById('pauseBtn');
+const menuBtn = document.getElementById('menuBtn');
+const fsBtn = document.getElementById('fsBtn');
+const rotateOverlay = document.getElementById('rotate');
 
-let gameState = "MENU"; // "MENU", "GAME", "GAME_OVER"
+// Seadme tuvastus: algne arvamus + uuendus iga sisendi järgi (toetab hübriidseadmeid)
+let isTouchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+let inputMode = isTouchDevice ? 'touch' : 'mouse';
+function setInputMode(m) {
+  if (m === inputMode) return;
+  inputMode = m;
+  document.body.classList.toggle('touch', m === 'touch');
+  if (m === 'touch') resetKnife();
+}
+document.body.classList.toggle('touch', inputMode === 'touch');
 
-// Skinid (Kollane klassikaline esimesena, Käe-banaan keskel)
-const BANANA_SKINS = [
-    { name: "Kollane (Klassikaline)", color: "#ffe135", type: "classic" },
-    { name: "Roheline (Toores)", color: "#7ccd32", type: "classic" },
-    { name: "Anatoomiline Käe-Banaan 🖐️", color: "#f1c27d", type: "hand" },
-    { name: "Pruun (Üleküpsenud)", color: "#6e3c14", type: "classic" },
-    { name: "Roosa (Rave)", color: "#ff69b4", type: "classic" }
-];
-let selectedSkinIndex = 0;
+let scale = 1, dpr = 1;
 
-// Mängu parameetrid
-let level = 1;
-let cutsCount = 0;
-const TARGET_CUTS = 50;
-let timeLeft = 60;
-let timerInterval = null;
-
-// Lõikelaua värvid tasemete kaupa
-const BOARD_COLORS = [
-    { wood: '#a0522d', border: '#654321', name: 'Klassikaline Puit' },
-    { wood: '#2e4053', border: '#1b2631', name: 'Tumesinine Marmor' },
-    { wood: '#1e8449', border: '#145a32', name: 'Smaragdroheline' },
-    { wood: '#7d6608', border: '#4d3e05', name: 'Kuldne Puit' },
-    { wood: '#6c3483', border: '#4a235a', name: 'Müstiline Violetne' },
-    { wood: '#ba4a00', border: '#7e2e00', name: 'Marmorpruun' }
-];
-
-let cuts = []; // Hoiab lõigete punkte: [{ points: [{x, y}, ...] }]
-let currentCut = null; // Hetkel tõmmatav lõige
-let juiceDrips = [];
-let isCutting = false;
-
-let knife = {
-    x: 680,
-    y: 420,
-    width: 90,
-    height: 35,
-    isHeld: false
+/* ---------- Salvestus ---------- */
+const store = {
+  get(k, d) { try { const v = parseInt(localStorage.getItem(k)); return isNaN(v) ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
 };
-
-let mousePos = { x: 0, y: 0 };
-
-function drawRoundedRect(x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+const high = { maxLevel: store.get('banaani_high_level', 1), totalCuts: store.get('banaani_total_cuts', 0) };
+function saveStats(lvl, cuts) {
+  if (lvl > high.maxLevel) { high.maxLevel = lvl; store.set('banaani_high_level', lvl); }
+  high.totalCuts += cuts; store.set('banaani_total_cuts', high.totalCuts);
 }
 
-canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mousePos.x = e.clientX - rect.left;
-    mousePos.y = e.clientY - rect.top;
+/* ---------- Andmed ---------- */
+const SKINS = [
+  { name: 'Kollane (Klassikaline)', color: '#ffe135', type: 'classic' },
+  { name: 'Roheline (Toores)',      color: '#7ccd32', type: 'classic' },
+  { name: 'Anatoomiline Käe-Banaan 🖐️', color: '#f1c27d', type: 'hand' },
+  { name: 'Pruun (Üleküpsenud)',    color: '#6e3c14', type: 'classic' },
+  { name: 'Roosa (Rave)',           color: '#ff69b4', type: 'classic' }
+];
+let skinIdx = 0;
+try { const s = parseInt(localStorage.getItem('banaani_skin')); if (s >= 0 && s < SKINS.length) skinIdx = s; } catch {}
 
-    if (knife.isHeld) {
-        knife.x = mousePos.x - 20;
-        knife.y = mousePos.y - 10;
+const BOARDS = [
+  { wood: '#a0522d', border: '#654321', name: 'Klassikaline Puit' },
+  { wood: '#2e4053', border: '#1b2631', name: 'Tumesinine Marmor' },
+  { wood: '#1e8449', border: '#145a32', name: 'Smaragdroheline' },
+  { wood: '#7d6608', border: '#4d3e05', name: 'Kuldne Puit' },
+  { wood: '#6c3483', border: '#4a235a', name: 'Müstiline Violetne' },
+  { wood: '#ba4a00', border: '#7e2e00', name: 'Marmorpruun' },
+  { wood: '#117a65', border: '#0e6251', name: 'Türkiissinine Marmor' },
+  { wood: '#7b7d7d', border: '#4d5656', name: 'Kiviplaat' },
+  { wood: '#9a7d0a', border: '#7d6608', name: 'Pronks' },
+  { wood: '#b03a2e', border: '#78281f', name: 'Rubiin' }
+];
+const MAX_LEVELS = 10;
+const MIN_STROKE_LEN = 24;                   // minimaalne tõmbe pikkus, et see loeks
 
-        if (isCutting && currentCut) {
-            const lastPt = currentCut.points[currentCut.points.length - 1];
-            const dist = Math.hypot(mousePos.x - lastPt.x, mousePos.y - lastPt.y);
-            
-            if (dist > 5) {
-                currentCut.points.push({ x: mousePos.x, y: mousePos.y });
+/* ---------- Mängu olek ---------- */
+let state = 'MENU';                          // MENU | GAME | PAUSED | LEVELUP | GAME_OVER
+let level = 1, cutsCount = 0, totalRunCuts = 0, targetCuts = 50, timeLeft = 60;
+let isVictory = false, stateSince = 0, levelUpUntil = 0;
+let cuts = [], currentCut = null, drips = [], isCutting = false;
+const pointer = { x: W / 2, y: H / 2 };
+const REST = { x: 690, y: 405 };
+const knife = { x: REST.x, y: REST.y, held: false };
 
-                // Mahlatilgad lõikejoonele
-                for (let i = 0; i < 2; i++) {
-                    juiceDrips.push({
-                        x: mousePos.x + (Math.random() * 10 - 5),
-                        y: mousePos.y + (Math.random() * 10 - 5),
-                        radius: Math.random() * 4 + 2,
-                        speedY: Math.random() * 1.5 + 0.5
-                    });
-                }
-            }
-        }
-    }
-});
+const board = { x: 70, y: 66, w: 660, h: 340 };
+const targetFor = l => 50 + (l - 1) * 25;
+const timeFor = l => 25 + l * 35;
+const boardFor = l => BOARDS[(l - 1) % BOARDS.length];
 
-canvas.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {
-        if (gameState === "MENU") {
-            startGame();
-        } else if (gameState === "GAME") {
-            if (!knife.isHeld) {
-                if (mousePos.x >= knife.x - 20 && mousePos.x <= knife.x + knife.width &&
-                    mousePos.y >= knife.y - 20 && mousePos.y <= knife.y + knife.height) {
-                    knife.isHeld = true;
-                }
-            } else {
-                // Alusta uut lõiget
-                isCutting = true;
-                currentCut = { points: [{ x: mousePos.x, y: mousePos.y }] };
-            }
-        } else if (gameState === "GAME_OVER") {
-            gameState = "MENU";
-        }
-    }
-});
+// Menüü nooled
+const arrowL = { x: 120, y: 92, w: 56, h: 44 };
+const arrowR = { x: W - 120 - 56, y: 92, w: 56, h: 44 };
+const resumeB = { x: W / 2 - 110, y: 190, w: 220, h: 52 };
+const toMenuB = { x: W / 2 - 110, y: 256, w: 220, h: 52 };
 
-canvas.addEventListener('mouseup', (e) => {
-    if (e.button === 0 && isCutting) {
-        if (currentCut && currentCut.points.length > 1) {
-            cuts.push(currentCut);
-            cutsCount++; // Lisandub TÄPSELT 1 kriimustus ühe pideva tõmbe eest
+const inside = (p, r) => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 
-            if (cutsCount >= TARGET_CUTS) {
-                nextLevel();
-            }
-        }
-        isCutting = false;
-        currentCut = null;
-    }
-});
+/* ---------- Suuruse muutmine ---------- */
+function resize() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  scale = Math.min(vw / W, vh / H);
+  dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const cw = Math.floor(W * scale), ch = Math.floor(H * scale);
+  stage.style.width = cw + 'px'; stage.style.height = ch + 'px';
+  canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+  canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
+  updateRotate();
+}
+function updateRotate() {
+  const portrait = window.innerHeight > window.innerWidth;
+  const show = isTouchDevice && portrait;
+  rotateOverlay.classList.toggle('show', show);
+  if (show && state === 'GAME') pauseGame();
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 150));
+resize();
 
-canvas.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    if (knife.isHeld) {
-        knife.isHeld = false;
-        isCutting = false;
-        currentCut = null;
-        knife.x = 680;
-        knife.y = 420;
-    }
-});
-
-window.addEventListener('keydown', (e) => {
-    if (gameState === "MENU") {
-        if (e.key === "ArrowRight") {
-            selectedSkinIndex = (selectedSkinIndex + 1) % BANANA_SKINS.length;
-        } else if (e.key === "ArrowLeft") {
-            selectedSkinIndex = (selectedSkinIndex - 1 + BANANA_SKINS.length) % BANANA_SKINS.length;
-        } else if (e.key === "Enter" || e.key === " ") {
-            startGame();
-        }
-    } else if (gameState === "GAME") {
-        if (e.key === "Escape") {
-            stopTimer();
-            gameState = "MENU";
-        } else if (e.key === "c" || e.key === "C") {
-            cuts = [];
-            juiceDrips = [];
-            cutsCount = 0;
-        }
-    }
-});
-
-function startGame() {
-    level = 1;
-    resetLevelData();
-    gameState = "GAME";
-    startTimer();
+/* ---------- Sisend ---------- */
+function toLogical(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+}
+function knifeHit(p) {
+  return p.x > REST.x - 60 && p.x < REST.x + 90 && p.y > REST.y - 45 && p.y < REST.y + 40;
+}
+function startCut(p) {
+  isCutting = true;
+  currentCut = { pts: [{ x: p.x, y: p.y }], len: 0 };
+}
+function extendCut(p) {
+  const last = currentCut.pts[currentCut.pts.length - 1];
+  const d = Math.hypot(p.x - last.x, p.y - last.y);
+  if (d < 5) return;
+  currentCut.pts.push({ x: p.x, y: p.y });
+  currentCut.len += d;
+  for (let i = 0; i < 2; i++) {
+    drips.push({ x: p.x + Math.random() * 10 - 5, y: p.y + Math.random() * 10 - 5,
+                 r: Math.random() * 3.5 + 1.5, vy: Math.random() * 1.2 + 0.4, life: 1 });
+  }
+  if (drips.length > 500) drips.splice(0, drips.length - 500);
+}
+function endCut() {
+  if (!isCutting) return;
+  if (currentCut && currentCut.len >= MIN_STROKE_LEN) {
+    cuts.push(currentCut);
+    cutsCount++; totalRunCuts++;
+    if (cutsCount >= targetCuts) levelComplete();
+  }
+  isCutting = false; currentCut = null;
+}
+function resetKnife() {
+  endCut();
+  knife.held = false; knife.x = REST.x; knife.y = REST.y;
+}
+function setSkin(i) {
+  skinIdx = (i + SKINS.length) % SKINS.length;
+  try { localStorage.setItem('banaani_skin', skinIdx); } catch {}
 }
 
-function resetLevelData() {
-    cutsCount = 0;
-    cuts = [];
-    currentCut = null;
-    juiceDrips = [];
-    timeLeft = Math.max(20, 60 - (level - 1) * 5);
-    knife.isHeld = false;
-    knife.x = 680;
-    knife.y = 420;
-    isCutting = false;
-}
+canvas.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  setInputMode(e.pointerType === 'mouse' ? 'mouse' : 'touch');
+  try { canvas.setPointerCapture(e.pointerId); } catch {}
+  const p = toLogical(e); pointer.x = p.x; pointer.y = p.y;
 
-function startTimer() {
-    stopTimer();
-    timerInterval = setInterval(() => {
-        if (gameState === "GAME") {
-            timeLeft--;
-            if (timeLeft <= 0) {
-                stopTimer();
-                gameState = "GAME_OVER";
-            }
-        }
-    }, 1000);
-}
-
-function stopTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-}
-
-function nextLevel() {
-    level++;
-    resetLevelData();
-}
-
-function getBoardColor(lvl) {
-    const idx = (lvl - 1) % BOARD_COLORS.length;
-    return BOARD_COLORS[idx];
-}
-
-function drawBanana(cx, cy, skin) {
-    ctx.save();
-
-    if (skin.type === "hand") {
-        ctx.fillStyle = skin.color;
-        ctx.strokeStyle = "#b5834a";
-        ctx.lineWidth = 4;
-        ctx.lineJoin = "round";
-
-        ctx.beginPath();
-        ctx.moveTo(cx - 140, cy + 60);
-        ctx.bezierCurveTo(cx - 60, cy + 90, cx + 20, cy + 60, cx + 80, cy + 20);
-
-        ctx.lineTo(cx + 105, cy + 30);
-        ctx.lineTo(cx + 120, cy + 15);
-        ctx.lineTo(cx + 110, cy + 0);
-
-        ctx.lineTo(cx + 130, cy - 10);
-        ctx.lineTo(cx + 120, cy - 25);
-
-        ctx.lineTo(cx + 135, cy - 40);
-        ctx.lineTo(cx + 120, cy - 50);
-
-        ctx.lineTo(cx + 110, cy - 55);
-        ctx.lineTo(cx + 95, cy - 40);
-
-        ctx.lineTo(cx + 75, cy - 45);
-        ctx.lineTo(cx + 60, cy - 25);
-
-        ctx.bezierCurveTo(cx + 10, cy - 10, cx - 50, cy + 10, cx - 120, cy + 10);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.strokeStyle = "rgba(180, 100, 50, 0.25)";
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(cx - 110, cy + 35);
-        ctx.bezierCurveTo(cx - 40, cy + 45, cx + 30, cy + 25, cx + 70, cy - 5);
-        ctx.stroke();
-
+  if (state === 'MENU') {
+    if (inside(p, arrowL)) setSkin(skinIdx - 1);
+    else if (inside(p, arrowR)) setSkin(skinIdx + 1);
+    else startGame();
+  } else if (state === 'GAME') {
+    if (inputMode === 'touch') {
+      knife.held = true; knife.x = p.x; knife.y = p.y; startCut(p);
+    } else if (!knife.held) {
+      if (knifeHit(p)) { knife.held = true; knife.x = p.x; knife.y = p.y; }
     } else {
-        ctx.beginPath();
-        ctx.arc(cx, cy - 20, 115, 0.2 * Math.PI, 0.8 * Math.PI, false);
-        ctx.lineWidth = 48;
-        ctx.strokeStyle = skin.color;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy - 20, 115, 0.22 * Math.PI, 0.78 * Math.PI, false);
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.stroke();
-
-        ctx.fillStyle = '#4a2e13';
-        ctx.beginPath();
-        ctx.arc(cx - 100, cy + 50, 9, 0, Math.PI * 2);
-        ctx.arc(cx + 100, cy + 50, 9, 0, Math.PI * 2);
-        ctx.fill();
+      startCut(p);
     }
+  } else if (state === 'PAUSED') {
+    if (inside(p, resumeB)) resumeGame();
+    else if (inside(p, toMenuB)) goToMenu();
+  } else if (state === 'GAME_OVER') {
+    if (performance.now() - stateSince > 600) goToMenu();
+  }
+  syncUI();
+});
+canvas.addEventListener('pointermove', e => {
+  const p = toLogical(e); pointer.x = p.x; pointer.y = p.y;
+  if (state === 'GAME' && knife.held) {
+    knife.x = p.x; knife.y = p.y;
+    if (isCutting && currentCut) extendCut(p);
+  }
+});
+const up = e => {
+  if (inputMode === 'touch' || e.pointerType === 'touch') {
+    if (state === 'GAME') { endCut(); knife.held = false; knife.x = REST.x; knife.y = REST.y; }
+  } else {
+    endCut();
+  }
+};
+canvas.addEventListener('pointerup', up);
+canvas.addEventListener('pointercancel', up);
+canvas.addEventListener('contextmenu', e => { e.preventDefault(); if (state === 'GAME' && knife.held) resetKnife(); });
 
-    ctx.restore();
+window.addEventListener('keydown', e => {
+  const k = e.key;
+  if (state === 'MENU') {
+    if (k === 'ArrowRight') setSkin(skinIdx + 1);
+    else if (k === 'ArrowLeft') setSkin(skinIdx - 1);
+    else if (k === 'Enter' || k === ' ') { e.preventDefault(); startGame(); }
+  } else if (state === 'GAME') {
+    if (k === 'Escape' || k === 'p' || k === 'P') pauseGame();
+    else if (k === 'c' || k === 'C') { cuts = []; drips = []; }       // puhastab ainult jäljed, mitte skoori
+    else if (k === 'f' || k === 'F') toggleFullscreen();
+  } else if (state === 'PAUSED') {
+    if (k === 'Escape' || k === 'p' || k === 'P') resumeGame();
+  } else if (state === 'GAME_OVER') {
+    if ((k === 'Enter' || k === ' ') && performance.now() - stateSince > 600) goToMenu();
+  }
+});
+
+/* ---------- Nupud ---------- */
+function toggleFullscreen() {
+  const d = document;
+  if (!d.fullscreenElement && !d.webkitFullscreenElement) {
+    const el = d.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) {
+      const r = req.call(el);
+      const lock = () => { try { screen.orientation.lock('landscape').catch(() => {}); } catch {} };
+      if (r && r.then) r.then(lock).catch(() => {}); else lock();
+    }
+  } else {
+    (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    try { screen.orientation.unlock(); } catch {}
+  }
+}
+fsBtn.addEventListener('click', toggleFullscreen);
+pauseBtn.addEventListener('click', () => { if (state === 'GAME') pauseGame(); else if (state === 'PAUSED') resumeGame(); });
+menuBtn.addEventListener('click', goToMenu);
+document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'GAME') pauseGame(); });
+
+function syncUI() {
+  hud.classList.toggle('show', state === 'GAME' || state === 'PAUSED');
+  pauseBtn.textContent = state === 'PAUSED' ? '▶ Jätka' : '⏸ Paus';
+  fsBtn.style.display = (state === 'MENU' || state === 'PAUSED' || state === 'GAME_OVER') ? 'block' : 'none';
 }
 
-function drawKnifeObj(k) {
-    ctx.save();
-    
-    ctx.fillStyle = '#e0e0e0';
-    ctx.strokeStyle = '#555555';
-    ctx.lineWidth = 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(k.x, k.y);
-    ctx.lineTo(k.x + 60, k.y - 18);
-    ctx.lineTo(k.x + 50, k.y + 10);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(k.x + 5, k.y - 2);
-    ctx.lineTo(k.x + 55, k.y - 16);
-    ctx.lineTo(k.x + 45, k.y + 5);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#2c3e50';
-    ctx.fillRect(k.x - 30, k.y - 8, 32, 14);
-
-    ctx.fillStyle = '#f39c12';
-    ctx.beginPath();
-    ctx.arc(k.x - 20, k.y, 2, 0, Math.PI * 2);
-    ctx.arc(k.x - 8, k.y, 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+/* ---------- Mängu voog ---------- */
+function resetLevel() {
+  cutsCount = 0; cuts = []; drips = []; currentCut = null; isCutting = false;
+  targetCuts = targetFor(level); timeLeft = timeFor(level);
+  knife.held = false; knife.x = REST.x; knife.y = REST.y;
+}
+function startGame() {
+  level = 1; totalRunCuts = 0; isVictory = false;
+  resetLevel(); state = 'GAME'; stateSince = performance.now(); syncUI();
+}
+function pauseGame() { endCut(); state = 'PAUSED'; syncUI(); }
+function resumeGame() { state = 'GAME'; syncUI(); }
+function goToMenu() {
+  if (totalRunCuts > 0 && state !== 'GAME_OVER') saveStats(level, totalRunCuts);
+  totalRunCuts = 0; level = 1;
+  resetLevel(); state = 'MENU'; syncUI();
+}
+function levelComplete() {
+  isCutting = false; currentCut = null; knife.held = false;
+  if (level >= MAX_LEVELS) { finish(true); return; }
+  state = 'LEVELUP'; levelUpUntil = performance.now() + 1400; syncUI();
+}
+function finish(victory) {
+  isVictory = victory;
+  saveStats(victory ? MAX_LEVELS : level, totalRunCuts);
+  state = 'GAME_OVER'; stateSince = performance.now(); syncUI();
 }
 
-function renderStroke(cutObj) {
-    if (!cutObj || cutObj.points.length < 2) return;
+/* ---------- Joonistamine ---------- */
+function rr(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function text(str, x, y, size, color, align = 'center', weight = 'normal') {
+  ctx.font = `${weight} ${size}px 'Segoe UI', Arial, sans-serif`;
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(str, x, y);
+}
+function button(r, label, fill, stroke) {
+  ctx.lineWidth = 2; ctx.fillStyle = fill; ctx.strokeStyle = stroke;
+  rr(r.x, r.y, r.w, r.h, 10); ctx.fill(); ctx.stroke();
+  text(label, r.x + r.w / 2, r.y + r.h / 2 + 7, 19, '#fff', 'center', 'bold');
+}
+
+function drawBanana(cx, cy, skin, s = 1) {
+  ctx.save();
+  ctx.translate(cx, cy); ctx.scale(s, s);
+  if (skin.type === 'hand') {
+    ctx.fillStyle = skin.color; ctx.strokeStyle = '#b5834a'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(cutObj.points[0].x, cutObj.points[0].y);
-    for (let i = 1; i < cutObj.points.length; i++) {
-        ctx.lineTo(cutObj.points[i].x, cutObj.points[i].y);
-    }
-    ctx.stroke();
+    ctx.moveTo(-140, 50);
+    ctx.bezierCurveTo(-60, 80, 20, 50, 80, 10);
+    ctx.lineTo(105, 20); ctx.lineTo(120, 5); ctx.lineTo(110, -10);
+    ctx.lineTo(130, -20); ctx.lineTo(120, -35);
+    ctx.lineTo(135, -50); ctx.lineTo(120, -60);
+    ctx.lineTo(110, -65); ctx.lineTo(95, -50);
+    ctx.lineTo(75, -55); ctx.lineTo(60, -35);
+    ctx.bezierCurveTo(10, -20, -50, 0, -120, 0);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(180,100,50,.25)'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-110, 25);
+    ctx.bezierCurveTo(-40, 35, 30, 15, 70, -15); ctx.stroke();
+  } else {
+    ctx.translate(0, -80);
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, -20, 115, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.lineWidth = 48; ctx.strokeStyle = skin.color; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, -20, 115, 0.22 * Math.PI, 0.78 * Math.PI);
+    ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.stroke();
+    ctx.fillStyle = '#4a2e13';
+    ctx.beginPath();
+    ctx.arc(-100, 50, 9, 0, Math.PI * 2);
+    ctx.moveTo(109, 50); ctx.arc(100, 50, 9, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Nuga: tipp asub täpselt (x, y) juures — seal tekib ka lõige
+function drawKnife(x, y, held) {
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(held ? -0.45 : -0.25);
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = '#e6e6e6'; ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(78, -13); ctx.lineTo(78, 7); ctx.lineTo(8, 5); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,.8)';
+  ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(74, -10); ctx.lineTo(74, -4); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#2c3e50'; ctx.fillRect(78, -12, 44, 18);
+  ctx.fillStyle = '#f39c12';
+  ctx.beginPath(); ctx.arc(90, -3, 2.5, 0, 7); ctx.arc(108, -3, 2.5, 0, 7); ctx.fill();
+  ctx.restore();
+}
+
+function strokePath(c) {
+  if (!c || c.pts.length < 2) return;
+  ctx.beginPath(); ctx.moveTo(c.pts[0].x, c.pts[0].y);
+  for (let i = 1; i < c.pts.length; i++) ctx.lineTo(c.pts[i].x, c.pts[i].y);
+  ctx.stroke();
 }
 
 function renderMenu() {
-    ctx.fillStyle = '#121218';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#1a1a26'); g.addColorStop(1, '#0d0d14');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-    ctx.fillStyle = '#ffe135';
-    ctx.font = 'bold 46px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText("BANAANI SIMULAATOR", canvas.width / 2, 90);
+  text('🍌 BANAANI SIMULAATOR', W / 2, 62, 40, '#ffe135', 'center', 'bold');
 
-    const skin = BANANA_SKINS[selectedSkinIndex];
-    ctx.font = '22px Arial';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`< Banaani Skinn: ${skin.name} >`, canvas.width / 2, 180);
+  const skin = SKINS[skinIdx];
+  text(skin.name, W / 2, 122, 22, '#fff');
+  ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.fillStyle = 'rgba(255,255,255,.15)';
+  rr(arrowL.x, arrowL.y, arrowL.w, arrowL.h, 8); ctx.fill(); ctx.stroke();
+  rr(arrowR.x, arrowR.y, arrowR.w, arrowR.h, 8); ctx.fill(); ctx.stroke();
+  text('◀', arrowL.x + arrowL.w / 2, arrowL.y + 30, 22, '#fff', 'center', 'bold');
+  text('▶', arrowR.x + arrowR.w / 2, arrowR.y + 30, 22, '#fff', 'center', 'bold');
 
-    drawBanana(canvas.width / 2, 330, skin);
+  drawBanana(W / 2, 250, skin, skin.type === 'classic' ? 1.15 : 1);
 
-    ctx.font = '16px Arial';
-    ctx.fillStyle = '#aaaa88';
-    ctx.fillText("Kasuta nooli [<- / ->] skini muutmiseks", canvas.width / 2, 490);
-    ctx.fillText("Vajuta [ENTER] või tee HIIRKLÕPS alustamiseks", canvas.width / 2, 520);
+  text(`🏆 Rekord tase: ${high.maxLevel} / ${MAX_LEVELS}   |   Lõikeid kokku: ${high.totalCuts}`, W / 2, 372, 16, '#2ecc71');
+  const t = inputMode === 'touch' ? 'Puuduta ekraani alustamiseks' : 'Vajuta [ENTER] või klõpsa alustamiseks  •  ← → vahetab skini';
+  const pulse = 0.65 + 0.35 * Math.sin(performance.now() / 350);
+  ctx.globalAlpha = pulse; text(t, W / 2, 412, 16, '#ccccaa'); ctx.globalAlpha = 1;
 }
 
 function renderGame() {
-    ctx.fillStyle = '#2c3e50';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#2c3e50'; ctx.fillRect(0, 0, W, H);
+  const b = boardFor(level);
+  ctx.fillStyle = b.wood; ctx.strokeStyle = b.border; ctx.lineWidth = 10;
+  rr(board.x, board.y, board.w, board.h, 24); ctx.fill(); ctx.stroke();
 
-    const boardStyle = getBoardColor(level);
-    const boardX = 120, boardY = 90, boardW = 560, boardH = 420;
-    
-    ctx.fillStyle = boardStyle.wood;
-    ctx.strokeStyle = boardStyle.border;
-    ctx.lineWidth = 10;
-    
-    drawRoundedRect(boardX, boardY, boardW, boardH, 24);
-    ctx.fill();
-    ctx.stroke();
+  const skin = SKINS[skinIdx];
+  drawBanana(board.x + board.w / 2, board.y + board.h / 2, skin, skin.type === 'classic' ? 1.35 : 1.25);
 
-    const currentSkin = BANANA_SKINS[selectedSkinIndex];
-    drawBanana(canvas.width / 2, canvas.height / 2, currentSkin);
-
-    // Mahlatilgad
-    ctx.fillStyle = '#b30000';
-    for (let i = juiceDrips.length - 1; i >= 0; i--) {
-        let drip = juiceDrips[i];
-        ctx.beginPath();
-        ctx.arc(drip.x, drip.y, drip.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        drip.y += drip.speedY;
-        drip.radius = Math.max(0.5, drip.radius - 0.01);
+  // mahl
+  ctx.fillStyle = '#b30000';
+  for (let i = drips.length - 1; i >= 0; i--) {
+    const d = drips[i];
+    ctx.globalAlpha = Math.max(0, d.life);
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+    if (state === 'GAME') {
+      d.y += d.vy; d.r = Math.max(0.5, d.r - 0.01); d.life -= 0.0025;
+      if (d.life <= 0 || d.y > H) drips.splice(i, 1);
     }
+  }
+  ctx.globalAlpha = 1;
 
-    // Tehtud kriimustused
-    ctx.strokeStyle = '#660000';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    cuts.forEach(c => renderStroke(c));
+  ctx.strokeStyle = '#660000'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  cuts.forEach(strokePath);
+  if (isCutting && currentCut) strokePath(currentCut);
 
-    // Pooleliolev kriimustus
-    if (isCutting && currentCut) {
-        renderStroke(currentCut);
-    }
+  drawKnife(knife.x, knife.y, knife.held);
 
-    drawKnifeObj(knife);
+  // HUD
+  ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W, 50);
+  text(`Tase ${level}/${MAX_LEVELS}`, 16, 32, 19, '#fff', 'left', 'bold');
+  text(`Kriimustusi: ${cutsCount} / ${targetCuts}`, 150, 32, 19, '#ffcc00', 'left', 'bold');
+  const tl = Math.ceil(timeLeft);
+  text(`Aeg: ${tl}s`, 390, 32, 19, tl <= 10 ? '#e74c3c' : '#fff', 'left', 'bold');
+  // edenemise riba
+  ctx.fillStyle = 'rgba(255,255,255,.15)'; ctx.fillRect(0, 47, W, 3);
+  ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, 47, W * Math.min(1, cutsCount / targetCuts), 3);
 
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, canvas.width, 60);
+  let hint;
+  if (inputMode === 'touch') hint = 'Lohista sõrmega üle banaani lõikamiseks';
+  else hint = knife.held ? '1 tõmme = 1 kriimustus  |  Paremklõps paneb noa ära  |  [P] paus' : 'Klõpsa noale, et see kätte võtta!';
+  text(hint, W / 2, H - 14, 14, '#ddd');
+  if (inputMode === 'mouse' && !knife.held) {
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.setLineDash([6, 5]); ctx.lineWidth = 2;
+    rr(REST.x - 55, REST.y - 42, 160, 75, 10); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Tase: ${level} (${boardStyle.name})`, 20, 38);
+function renderPaused() {
+  renderGame();
+  ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(0, 0, W, H);
+  text('PAUS', W / 2, 140, 44, '#ffe135', 'center', 'bold');
+  button(resumeB, 'Jätka mängu', 'rgba(46,204,113,.85)', '#27ae60');
+  button(toMenuB, 'Tagasi menüüsse', 'rgba(231,76,60,.85)', '#c0392b');
+}
 
-    ctx.fillStyle = cutsCount >= TARGET_CUTS ? '#2ecc71' : '#ffcc00';
-    ctx.fillText(`Kriimustusi: ${cutsCount} / ${TARGET_CUTS}`, 300, 38);
-
-    ctx.fillStyle = timeLeft <= 10 ? '#e74c3c' : '#ffffff';
-    ctx.fillText(`Aeg: ${timeLeft}s`, 660, 38);
-
-    if (!knife.isHeld) {
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText("Võta nuga kätte (klõpsa noale)!", canvas.width / 2, 560);
-    } else {
-        ctx.fillStyle = '#aaaaaa';
-        ctx.font = '14px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText("1 tõmme = 1 kriimustus | Paremklõps paneb noa ära", canvas.width / 2, 560);
-    }
+function renderLevelUp() {
+  renderGame();
+  ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W, H);
+  text('TASE LÄBITUD! ✔', W / 2, H / 2 - 10, 42, '#2ecc71', 'center', 'bold');
+  text(`Järgmine: tase ${level + 1} — ${targetFor(level + 1)} kriimustust`, W / 2, H / 2 + 34, 20, '#fff');
 }
 
 function renderGameOver() {
-    ctx.fillStyle = 'rgba(15, 15, 20, 0.9)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#e74c3c';
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText("AEG SAAMAS OTSA!", canvas.width / 2, 220);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '22px Arial';
-    ctx.fillText(`Jõudsid tasemele: ${level}`, canvas.width / 2, 290);
-    ctx.fillText(`Skoor selles voorus: ${cutsCount} kriimustust`, canvas.width / 2, 330);
-
-    ctx.fillStyle = '#3498db';
-    ctx.font = '18px Arial';
-    ctx.fillText("Tee klõps, et minna tagasi peamenüüsse", canvas.width / 2, 440);
+  ctx.fillStyle = '#0f0f14'; ctx.fillRect(0, 0, W, H);
+  text(isVictory ? 'PALJU ÕNNE! VÕIT! 🍌' : 'AEG OTSAS!', W / 2, 62, 42, isVictory ? '#2ecc71' : '#e74c3c', 'center', 'bold');
+  const bw = 460, bh = 230, bx = W / 2 - bw / 2, by = 92;
+  ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 2;
+  rr(bx, by, bw, bh, 12); ctx.fill(); ctx.stroke();
+  text('📊 MÄNGU STATISTIKA', W / 2, by + 36, 21, '#ffe135', 'center', 'bold');
+  const done = isVictory ? MAX_LEVELS : level - 1;
+  const avg = done > 0 ? (totalRunCuts / done).toFixed(1) : '0';
+  const rows = [
+    `Läbitud tasemed: ${done} / ${MAX_LEVELS}`,
+    `Lõikeid selles voorus: ${totalRunCuts}`,
+    `Keskmiselt lõikeid tasemel: ${avg}`,
+    `Eluaegseid lõikeid kokku: ${high.totalCuts}`
+  ];
+  rows.forEach((r, i) => text('• ' + r, bx + 34, by + 82 + i * 35, 18, '#fff', 'left'));
+  const ready = performance.now() - stateSince > 600;
+  ctx.globalAlpha = ready ? 1 : 0.3;
+  text(inputMode === 'touch' ? 'Puuduta ekraani menüüsse minemiseks' : 'Klõpsa või vajuta ENTER menüüsse minemiseks', W / 2, H - 50, 17, '#3498db');
+  ctx.globalAlpha = 1;
 }
 
-function gameLoop() {
-    if (gameState === "MENU") {
-        renderMenu();
-    } else if (gameState === "GAME") {
-        renderGame();
-    } else if (gameState === "GAME_OVER") {
-        renderGameOver();
-    }
-    requestAnimationFrame(gameLoop);
-}
+/* ---------- Põhitsükkel (aeg dt põhjal) ---------- */
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
 
-gameLoop();
+  if (state === 'GAME') {
+    timeLeft -= dt;
+    if (timeLeft <= 0) { timeLeft = 0; endCut(); finish(false); }
+  } else if (state === 'LEVELUP' && now >= levelUpUntil) {
+    level++; resetLevel(); state = 'GAME'; syncUI();
+  }
+
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+  ctx.textBaseline = 'alphabetic';
+  switch (state) {
+    case 'MENU': renderMenu(); break;
+    case 'GAME': renderGame(); break;
+    case 'PAUSED': renderPaused(); break;
+    case 'LEVELUP': renderLevelUp(); break;
+    case 'GAME_OVER': renderGameOver(); break;
+  }
+  requestAnimationFrame(loop);
+}
+syncUI();
+requestAnimationFrame(loop);
+})();
 </script>
-
 </body>
 </html>
