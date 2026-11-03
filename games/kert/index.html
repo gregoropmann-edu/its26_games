@@ -679,10 +679,11 @@ function makeBedVisual(x,y,z,head){
 const bedBlanketMat=new THREE.MeshBasicMaterial({color:0x8c2024});
 
 function makeDoorVisual(x,y,z){
-  const key=x+","+y+","+z,g=new THREE.Group();g.position.set(x+.5,y,z+.5);g.rotation.y=doorStates.has(key)?Math.PI/2:0;
-  const panel=new THREE.Mesh(doorPanelGeo,doorMat);panel.position.set(0,.99,0);g.add(panel);
-  for(const yy of [.48,1.48]){const brace=new THREE.Mesh(doorBraceGeo,doorLineMat);brace.position.set(0,yy,-.058);g.add(brace);}
-  const knob=new THREE.Mesh(doorKnobGeo,doorKnobMat);knob.position.set(.29,1,-.095);g.add(knob);return g;
+  const key=x+","+y+","+z,g=new THREE.Group();g.position.set(x+.5,y,z+.5);
+  const pivot=new THREE.Group();pivot.position.set(-.43,0,.45);pivot.rotation.y=doorStates.has(key)?Math.PI/2:0;g.add(pivot);
+  const panel=new THREE.Mesh(doorPanelGeo,doorMat);panel.position.set(.43,.99,0);pivot.add(panel);
+  for(const yy of [.48,1.48]){const brace=new THREE.Mesh(doorBraceGeo,doorLineMat);brace.position.set(.43,yy,-.058);pivot.add(brace);}
+  const knob=new THREE.Mesh(doorKnobGeo,doorKnobMat);knob.position.set(.72,1,-.095);pivot.add(knob);return g;
 }
 const decorGroup=new THREE.Group();scene.add(decorGroup);
 const chestWoodMat=new THREE.MeshBasicMaterial({color:0x95602f});
@@ -4694,12 +4695,12 @@ setWaterVolume=function(x,y,z,amount,net){
   }
 };
 setInterval(()=>{try{
-  if(!survival||dead||worldDimension!=="overworld")return;
+  if(dead||worldDimension!=="overworld")return;
   const night=Math.sin(dayTime*Math.PI*2)<0;
   const hostile=mobs.filter(m=>m.type=="z"||m.type=="s"||m.type=="c"||m.type=="sp");
   if(!night){
     for(let i=hostile.length-1;i>=0;i--){const m=hostile[i];const mm=m.m;const px=m.x,pz=m.z;
-      if(Math.hypot(px-p.x,pz-p.z)>12&&Math.random()<.25){if(mm&&mm.parent)scene.remove(mm);const k=mobs.indexOf(m);if(k>=0)mobs.splice(k,1)}}
+      if(Math.hypot(px-p.x,pz-p.z)>12&&Math.random()<.25){if(mm&&mm.g){scene.remove(mm.g)}const k=mobs.indexOf(m);if(k>=0)mobs.splice(k,1)}}
     return;
   }
   if(hostile.length>=16||mobs.length>=MOB_CAP-2)return;
@@ -4707,7 +4708,7 @@ setInterval(()=>{try{
   const a=Math.random()*Math.PI*2,dist=18+Math.random()*28;
   const x=Math.floor(p.x+Math.cos(a)*dist),z=Math.floor(p.z+Math.sin(a)*dist);
   if(!inb(x,0,z))return;
-  for(let y=Math.min(H-3,terrainTop[col(x,z)]+10);y>1;y--){
+  for(let y=Math.min(H-3,terrainTop[x*D+z]+10);y>1;y--){
     const b=get(x,y,z);
     if(b!==0&&b!==31&&b!==9&&b!==10&&b!==38){
       if(get(x,y+1,z)===0&&get(x,y+2,z)===0){spawnMob(type,x+.5,y+1,z+.5)}
@@ -4854,6 +4855,34 @@ try{addChat("V23: lava, obsidiaan, öised mobid, LAN-parandused.","sys")}catch(e
   };
   const _send=send;
   send=function(m,e){if(m&&m.t==='pvp'&&Number(m.from)===Number(myId))g('duel');return _send(m,e)};
+})();
+</script>
+
+<script>
+/* V26: mobs take lava + TNT damage */
+(function(){
+  const _boom=boom;
+  boom=function(x,y,z,r,cols){
+    try{
+      const R=r*2.2;
+      for(const o of mobs.slice()){
+        if(o.dead)continue;
+        const d=Math.hypot(o.x-x,o.y+.9-y,o.z-z);
+        if(d<R){const k=1-d/R;damageMob(o,Math.max(2,Math.ceil(k*22)),x,z)}
+      }
+    }catch(e){}
+    return _boom(x,y,z,r,cols);
+  };
+  let acc=0;
+  setInterval(()=>{try{
+    for(const o of mobs.slice()){
+      if(o.dead)continue;
+      const X=Math.floor(o.x),Z=Math.floor(o.z);
+      if(get(X,Math.floor(o.y+.1),Z)===38||get(X,Math.floor(o.y+.9),Z)===38||(o.ground&&get(X,Math.floor(o.y-.2),Z)===38)){
+        damageMob(o,3,o.x,o.z);
+      }
+    }
+  }catch(e){}},600);
 })();
 </script>
 </body>
