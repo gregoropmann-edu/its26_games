@@ -448,23 +448,60 @@ function gen(s){
       }
     }
   };
-  for(let n=0,NW=Math.round(1100*W*D/262144);n<NW;n++){
+  // Lae paksus: koobas ei tohi kunagi jõuda pinnale lähemale kui MINROOF plokki (v.a. sissepääsud)
+  const MINROOF=6;
+  const lowTop=(x,z,r)=>{let m=1e9;const k=Math.max(2,Math.ceil(r));
+    for(const q of [[0,0],[k,0],[-k,0],[0,k],[0,-k],[k,k],[-k,-k],[k,-k],[-k,k]]){
+      const xx=Math.max(0,Math.min(W-1,(x+q[0])|0)),zz=Math.max(0,Math.min(D-1,(z+q[1])|0));
+      m=Math.min(m,terrainTop[xx*D+zz]);
+    }return m};
+  const worm=(x,y,z,yaw,pitch,len,baseR,entr,depth,n)=>{
+    const MOUTH=entr?26:0;
+    for(let i=0;i<len;i++){
+      x+=Math.cos(yaw)*Math.cos(pitch);z+=Math.sin(yaw)*Math.cos(pitch);y+=Math.sin(pitch);
+      yaw+=(CR()-.5)*.55;
+      if(i<MOUTH)pitch=-.5+(CR()-.5)*.12;            // sissepääs laskub järsult maa alla, mitte ei jookse pinna all
+      else pitch=pitch*.88+(CR()-.5)*.32;
+      if(x<6||z<6||x>W-7||z>D-7)return;
+      const r=baseR*(.8+.3*Math.sin(i*.17+n)+.15*Math.sin(i*.05+n*3));
+      if(y<5.5){y=5.5;pitch=Math.abs(pitch)*.5}
+      if(i>=MOUTH){
+        const maxY=lowTop(x,z,r+2)-MINROOF-r*.85;
+        if(y>maxY){y=maxY;pitch=-Math.abs(pitch)*.6}
+        if(y<5.5){y=5.5;pitch=Math.abs(pitch)*.5}
+      }
+      carve(x,y,z,r,i<MOUTH?0:MINROOF);
+      if(i>=MOUTH&&i%45===44&&CR()<.5){               // suurem koopasaal, keskpunkt vajutatud nii, et lagi jääb paksuks
+        const rr=3.4+CR()*2.8,cy=Math.min(y,lowTop(x,z,rr+2)-MINROOF-rr*.85);
+        if(cy>6)carve(x,cy,z,rr,MINROOF);
+      }
+      if(depth<2&&i>=MOUTH+10&&i%30===29&&CR()<.4){    // harunevad tunnelid
+        worm(x,y,z,yaw+(CR()<.5?1:-1)*(.9+CR()*.9),(CR()-.5)*.4,35+CR()*70,baseR*(.65+CR()*.3),false,depth+1,n+7);
+      }
+    }
+  };
+  for(let n=0,NW=Math.round(1000*W*D/262144);n<NW;n++){
     const entr=n%7===0;
     let x=8+CR()*(W-16),z=8+CR()*(D-16);
     const top0=terrainTop[(x|0)*D+(z|0)];
     if(top0<9||w[idx(x|0,top0,z|0)]==31)continue;
-    let y=entr?top0-1:4+CR()*Math.max(2,top0-8);
-    let yaw=CR()*6.2832,pitch=entr?-.45:(CR()-.5)*.5;
-    const len=entr?90+CR()*80:110+CR()*190,baseR=1.25+CR()*1.35;
-    for(let i=0;i<len;i++){
-      x+=Math.cos(yaw)*Math.cos(pitch);z+=Math.sin(yaw)*Math.cos(pitch);y+=Math.sin(pitch);
-      yaw+=(CR()-.5)*.55;pitch=pitch*.88+(CR()-.5)*.32;
-      if(x<6||z<6||x>W-7||z>D-7)break;
-      const tc=terrainTop[(x|0)*D+(z|0)],mouth=entr&&i<28;
-      if(y<5.5){y=5.5;pitch=Math.abs(pitch)*.5}
-      if(!mouth&&y>tc-3){y=tc-3;pitch=-Math.abs(pitch)*.6}
-      carve(x,y,z,baseR*(.8+.3*Math.sin(i*.17+n)),mouth?0:2);
-      if(i%45===44&&CR()<.5)carve(x,y,z,3.4+CR()*2.2,2);
+    let y=entr?top0-1:4+CR()*Math.max(2,top0-MINROOF-4);
+    const yaw=CR()*6.2832,pitch=entr?-.5:(CR()-.5)*.5;
+    const len=entr?100+CR()*90:110+CR()*190,baseR=1.25+CR()*1.35;
+    worm(x,y,z,yaw,pitch,len,baseR,entr,0,n);
+  }
+  // Suured maa-alused koopad (mitu kattuvat palli), alati sügaval ja paksu laega
+  for(let n=0,NC=Math.round(45*W*D/262144);n<NC;n++){
+    const x=14+CR()*(W-28),z=14+CR()*(D-28),top0=lowTop(x,z,10);
+    if(top0<26)continue;
+    const R0=5.5+CR()*4,cy0=9+CR()*Math.max(1,top0-MINROOF-R0-12);
+    const blobs=5+((CR()*4)|0);
+    for(let b=0;b<blobs;b++){
+      const bx=x+(CR()-.5)*R0*2.2,bz=z+(CR()-.5)*R0*2.2,rr=R0*(.55+CR()*.45);
+      let by=cy0+(CR()-.5)*R0*.5;
+      by=Math.min(by,lowTop(bx,bz,rr+2)-MINROOF-rr*.85);
+      if(by<7)continue;
+      carve(bx,by,bz,rr,MINROOF);
     }
   }
   // --- Maagid: kivisüsi, raud, kuld, teemant (veenidena, ainult kivi sees) ---
@@ -1832,8 +1869,9 @@ function openChest(x,y,z){
 function openFurnace(x,y,z){
   furnaceOpenKey=chestKey(x,y,z);
   if(!furnaceData.has(furnaceOpenKey))furnaceData.set(furnaceOpenKey,{items:[0,0,0],counts:[0,0,0],burn:0,cook:0});
-  openInv(false);addChat("Ahi avatud. Lisa sisendisse toores liha ja kütusesse kivisüsi.","sys");
+  openInv(false);addChat("Ahi avatud. Lisa sisendisse toores liha/maak ja kütusesse kivisüsi või puit (palk, laud, kepp).","sys");
 }
+const FUEL_T={200:8,8:5,55:5,60:5,4:3,30:3,35:3,187:3,190:1};
 function furnaceClick(slot){
   if(!furnaceOpenKey)return;
   const d=furnaceData.get(furnaceOpenKey);if(!d)return;
@@ -1842,8 +1880,8 @@ function furnaceClick(slot){
     const room=Math.max(0,64-(inv[it]||0)),take=Math.min(room,count);if(!take)return;
     inv[it]=(inv[it]||0)+take;d.counts[2]-=take;if(d.counts[2]<=0){d.counts[2]=0;d.items[2]=0;}autoSlot(it);refreshBar();
   }else if(held){
-    const valid=slot===0?[201,203,205,219,222,223].includes(held):([200,4,8,190].includes(held));
-    if(!valid){addChat(slot===0?"Ahi sisendisse sobib toores liha, toores raud ja toores kuld.":"Kütuseks sobib kivisüsi, plank, palk või kepp.","err");return;}
+    const valid=slot===0?[201,203,205,219,222,223].includes(held):(FUEL_T[held]!==undefined);
+    if(!valid){addChat(slot===0?"Ahi sisendisse sobib toores liha, toores raud ja toores kuld.":"Kütuseks sobib kivisüsi, palk (tamm, kask, kuusk), laud, töölaud, uks, paat või kepp.","err");return;}
     if(d.items[slot]&&d.items[slot]!==held)return;
     const amount=survival?Math.min(64,heldCount||inv[held]||1):64;
     d.items[slot]=held;d.counts[slot]=Math.min(64,(d.counts[slot]||0)+amount);
@@ -1862,7 +1900,7 @@ function renderFurnace(){
     const host=$(id);host.textContent="";const it=d.items[i]||0,s=mkSlot(it,"",d.counts[i]||0);s.title=it?nameOf(it)+" ×"+(d.counts[i]||0):"Tühi";s.onclick=()=>furnaceClick(i);host.appendChild(s);
   });
   const active=d.items[0]&&d.items[1]&&d.burn>0;
-  $("furnaceProgress").textContent=active?"Küpsetamine: "+Math.min(100,Math.floor(d.cook/4*100))+"% · kütust: "+Math.ceil(d.burn)+" s":"Lisa sisendisse liha ja kütusesse kivisüsi.";
+  $("furnaceProgress").textContent=active?"Küpsetamine: "+Math.min(100,Math.floor(d.cook/4*100))+"% · kütust: "+Math.ceil(d.burn)+" s":"Lisa sisendisse toores toit/maak ja kütusesse kivisüsi või puit (palk, laud, kepp).";
 }
 let furnaceTick=0;
 function furnaceStep(dt){
@@ -1872,7 +1910,7 @@ function furnaceStep(dt){
   for(const [k,d] of furnaceData){
     const raw=d.items[0]||0,cooked=raw===201?202:raw===203?204:raw===205?206:raw===219?220:raw===222?191:raw===223?225:0;
     if(!cooked||!d.counts[0]){d.cook=0;if(d.burn>0)d.burn=Math.max(0,d.burn-step);continue;}
-    if(d.burn<=0&&d.counts[1]>0){const fuelId=d.items[1];d.counts[1]--;if(d.counts[1]<=0)d.items[1]=0;d.burn=fuelId===200?8:(fuelId===8||fuelId===55||fuelId===60)?5:fuelId===4?3:1;}
+    if(d.burn<=0&&d.counts[1]>0){const fuelId=d.items[1];d.counts[1]--;if(d.counts[1]<=0)d.items[1]=0;d.burn=FUEL_T[fuelId]||1;}
     if(d.burn>0){d.burn=Math.max(0,d.burn-step);d.cook+=step;}
     if(d.cook>=4&&((!d.items[2]||d.items[2]===cooked)&&d.counts[2]<64)){
       d.items[2]=cooked;d.counts[2]++;d.counts[0]--;if(d.counts[0]<=0){d.counts[0]=0;d.items[0]=0;}d.cook=0;send({t:"furnaceData",k,d});
@@ -2045,10 +2083,10 @@ const RECIPES_ALL = [
   { out: 140, qty: 1, req: [4,4,190] },
   { out: 141, qty: 1, req: [11,11,190] },
   { out: 143, qty: 1, req: [13,13,190] },
-  { out: 145, qty: 1, req: [4,4,190,190] },
+  { out: 145, qty: 1, req: [4,4,4,190,190] },
   { out: 180, qty: 1, req: [4,4,4,190,190] },
   { out: 181, qty: 1, req: [11,11,11,190,190] },
-  { out: 146, qty: 1, req: [11,11,190,190] },
+  { out: 146, qty: 1, req: [11,11,11,190,190] },
   { out: 185, qty: 1, req: [190,190,190] },
   { out: 186, qty: 4, req: [3,190,99] },
    { out: 187, qty: 1, req: [4,4,4,4,4] },
@@ -2073,7 +2111,7 @@ function recipeShape(r){
   const o=r.out,q=r.req,S=190;let sh=null;
   const m=q[0];
   if(isSword(o)&&q.length==3)sh=[[m],[m],[S]];
-  else if(isAxe(o)&&q.length==4)sh=[[m,m],[0,S],[0,S]];
+  else if(isAxe(o)&&q.length==5)sh=[[m,m],[m,S],[0,S]];
   else if(isPick(o)&&q.length==5)sh=[[m,m,m],[0,S,0],[0,S,0]];
   else if(o==190&&q.length==2)sh=[[4],[4]];
   else if(o==30&&q.length==4)sh=[[4,4],[4,4]];
@@ -2644,8 +2682,18 @@ const Music=(()=>{
   function probeAll(){
     if(probeAll.done)return;probeAll.done=true;
     const bad=[],all=[...MUSIC_CFG.overworld,...MUSIC_CFG.nether];let left=all.length;
-    const fin=()=>{if(--left>0)return;if(bad.length){const m="Muusikafailid puuduvad või ei mängi: "+bad.join(", ")+" (pane need index.html-iga samasse kausta, täpselt need nimed)";console.warn(m);try{addChat(m,"err")}catch(e){}}else{try{addChat("Kõik "+all.length+" muusikafaili laadisid OK.","sys")}catch(e){}}};
-    for(const t of all){const a=new Audio();let d=false;const done=ok=>{if(d)return;d=true;if(!ok)bad.push(t.src);fin()};a.preload="metadata";a.addEventListener("loadedmetadata",()=>done(true));a.addEventListener("error",()=>done(false));setTimeout(()=>done(false),6000);a.src=t.src}
+    const fin=()=>{if(--left>0)return;if(bad.length){const m="Muusikafailid puuduvad või ei mängi: "+bad.join(", ")+" (pane mp3-failid index.html-iga samasse kausta või kausta music/; otsisin ka nime minecraft1.mp3 ja .ogg)";console.warn(m);try{addChat(m,"err")}catch(e){}}else{try{addChat("Kõik "+all.length+" muusikafaili laadisid OK.","sys")}catch(e){}}};
+    const cands=src=>{const m=src.match(/^(.*?)(\.[a-z0-9]+)$/i),base=m?m[1]:src,names=[base];if(/mineraft/i.test(base))names.push(base.replace(/mineraft/i,"minecraft"));const out=[];for(const f of ["","music/","muusika/"])for(const n of names)for(const e of [".mp3",".ogg"])out.push(f+n+e);return out};
+    for(const t of all){
+      const list=cands(t.src);let idx=0,d=false;
+      const tryNext=()=>{
+        if(idx>=list.length){if(!d){d=true;bad.push(t.src);fin()}return}
+        const c=list[idx++],a=new Audio();let done=false;
+        const next=ok=>{if(done)return;done=true;try{a.removeAttribute("src");a.load()}catch(e){}if(ok){if(!d){d=true;t.src=c;fin()}}else tryNext()};
+        a.preload="metadata";a.addEventListener("loadedmetadata",()=>next(true));a.addEventListener("error",()=>next(false));setTimeout(()=>next(false),4000);a.src=c;
+      };
+      tryNext();
+    }
   }
   function updLabel(){
     const e=document.getElementById("musicNow");if(!e)return;
@@ -3295,6 +3343,7 @@ SKINS.forEach(k=>{
   im.onload=()=>{
     const c=document.createElement("canvas");c.width=64;c.height=64;const g=c.getContext("2d");g.drawImage(im,0,0);
     k.legacy=im.height<=32;
+    if(!k.legacy){try{const lo=g.getImageData(0,32,64,32).data;let al=0;for(let i=3;i<lo.length;i+=4)al|=lo[i];if(!al)k.legacy=true}catch(e){}}
     const px=(x,y)=>{const d=g.getImageData(x,y,1,1).data;return d[3]>0?((d[0]<<16)|(d[1]<<8)|d[2]):null};
     const h=px(45,30),s=px(45,22);if(h!==null)k.skin=h;if(s!==null)k.shirt=s;
     const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;k.tex=t;
@@ -4639,9 +4688,9 @@ window.mcBoot=function(sd){
 
     /* ---- Retseptid ---- */
     const R=(out,qty,req)=>RECIPES_ALL.push({out,qty,req});
-    R(143,1,[191,191,190]);R(148,1,[191,191,190,190]);R(183,1,[191,191,191,190,190]);
-    R(142,1,[225,225,190]);R(147,1,[225,225,190,190]);R(182,1,[225,225,225,190,190]);
-    R(144,1,[224,224,190]);R(149,1,[224,224,190,190]);R(184,1,[224,224,224,190,190]);
+    R(143,1,[191,191,190]);R(148,1,[191,191,191,190,190]);R(183,1,[191,191,191,190,190]);
+    R(142,1,[225,225,190]);R(147,1,[225,225,225,190,190]);R(182,1,[225,225,225,190,190]);
+    R(144,1,[224,224,190]);R(149,1,[224,224,224,190,190]);R(184,1,[224,224,224,190,190]);
     R(225,9,[12]);R(224,9,[14]);
     R(13,1,Array(9).fill(191));R(12,1,Array(9).fill(225));R(14,1,Array(9).fill(224));
 
@@ -6423,7 +6472,7 @@ try{
     for(const a of m.l){
       if(!Array.isArray(a))continue;
       const id=a[0],type=a[1];
-      if(!ALLOWED.has(type)||!fin(a[2])||!fin(a[3])||!fin(a[4]))continue;
+      if(!(ALLOWED.has(type)||type==='pl')||!fin(a[2])||!fin(a[3])||!fin(a[4]))continue;
       seen.add(id);
       let o=byId.get(id);
       if(o&&o.type!==type){removeMob(o,false);o=null}
