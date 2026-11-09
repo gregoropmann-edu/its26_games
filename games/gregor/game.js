@@ -887,6 +887,12 @@ let guards = [];
 let margusNPC = null;
 let margusFound = false;
 let margusNear = false;
+let margusChallengeDone = false;
+let exitLockOpened = false;
+let exitLockDismissed = false;
+let lockSequence = [2, 4, 1];
+let lockProgress = 0;
+let codeBlocks = [];
 
 function getStartingRocksForGame() {
     const saved = localStorage.getItem('shadow_castle_v3_rocks');
@@ -914,6 +920,13 @@ function initLevel() {
     margusNPC = { x: margusCol * TILE_SIZE + TILE_SIZE / 2, y: margusRow * TILE_SIZE + TILE_SIZE / 2 };
     margusFound = false;
     margusNear = false;
+    margusChallengeDone = false;
+    exitLockOpened = false;
+    exitLockDismissed = false;
+    window.exitLockNoticeShown = false;
+    lockSequence = Array.from({length: 3}, () => 1 + Math.floor(Math.random() * 4));
+    lockProgress = 0;
+    codeBlocks = [];
     particles = [];
     rockProjectiles = [];
     noiseRipples = [];
@@ -1364,14 +1377,58 @@ function drawMargusNPC() {
 
 function talkToMargus() {
     if (!player || !margusNPC || margusFound || !margusNear || gameState !== 'PLAYING') return;
-    margusFound = true;
-    player.rocksRemaining += 3;
-    player.hp = Math.min(player.maxHp, player.hp + 15);
+    openMiniGame('modal-margus-code');
+    codeBlocks = [];
+    renderCodeBlocks();
+}
+
+function openMiniGame(id) {
+    gameState = 'MINIGAME';
+    resetKeys();
+    const el = document.getElementById(id);
+    el.classList.remove('hidden'); el.classList.add('flex');
+}
+function closeMiniGame(id) {
+    const el = document.getElementById(id);
+    el.classList.add('hidden'); el.classList.remove('flex');
+    if (gameState === 'MINIGAME') gameState = 'PLAYING';
+}
+function renderCodeBlocks() {
+    const workspace = document.getElementById('code-workspace');
+    const labels = {start:'🟢 When started',set:'🟦 Set greeting = "Hello, Margus!"',say:'🟪 Say greeting',jump:'🟥 Jump 10 times'};
+    workspace.innerHTML = codeBlocks.length ? codeBlocks.map((b,i)=>`<div class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-xs font-bold">${i+1}. ${labels[b]}</div>`).join('') : '<p class="text-slate-600 text-xs">Your blocks will appear here…</p>';
+}
+function finishMargusChallenge() {
+    margusChallengeDone = true; margusFound = true;
+    player.rocksRemaining += 3; player.hp = Math.min(player.maxHp, player.hp + 15);
     sfx.itemPick();
     showFloatingText('+3 LURES  +15 HP', margusNPC.x, margusNPC.y - 28, '#fbbf24');
-    showBannerAlert('MARGUS THE CASTLE SCRIBE: “The flag is in the southern sanctum. Walk softly!”');
-    const talkButton = document.getElementById('btn-talk-margus');
-    if (talkButton) talkButton.classList.add('hidden');
+    showBannerAlert('MARGUS: “Brilliant! A proper little program. The flag lies in the southern sanctum!”');
+    document.getElementById('btn-talk-margus')?.classList.add('hidden');
+    closeMiniGame('modal-margus-code');
+}
+function startLockpick() {
+    if (exitLockOpened || gameState !== 'PLAYING') return;
+    lockProgress = 0;
+    document.getElementById('lock-sequence').textContent = lockSequence.join(' · ');
+    document.getElementById('lock-progress').textContent = 'Pins set: 0 / 3';
+    document.getElementById('lock-feedback').textContent = 'Choose the first pin.';
+    openMiniGame('modal-lockpick');
+}
+function chooseLockPin(pin) {
+    if (pin === lockSequence[lockProgress]) {
+        lockProgress++;
+        document.getElementById('lock-progress').textContent = `Pins set: ${lockProgress} / 3`;
+        if (lockProgress === lockSequence.length) {
+            exitLockOpened = true; sfx.itemPick();
+            document.getElementById('lock-feedback').textContent = 'Click! The gate is open!';
+            setTimeout(() => { closeMiniGame('modal-lockpick'); if (gameState === 'PLAYING') triggerVictory(); }, 650);
+        } else document.getElementById('lock-feedback').textContent = 'Good! Set the next pin.';
+    } else {
+        lockProgress = 0;
+        document.getElementById('lock-progress').textContent = 'Pins set: 0 / 3';
+        document.getElementById('lock-feedback').textContent = 'The pins slipped. Try the sequence again.';
+    }
 }
 
 function drawGuardVisionCone(guard) {
@@ -1601,6 +1658,16 @@ document.getElementById('btn-touch-rock')?.addEventListener('pointerdown', (e) =
     if (player && gameState === 'PLAYING') player.throwRock();
 });
 document.getElementById('btn-talk-margus')?.addEventListener('pointerdown', (e) => { e.preventDefault(); talkToMargus(); });
+document.querySelectorAll('.code-block').forEach(btn => btn.addEventListener('click', () => { if (codeBlocks.length < 4) { codeBlocks.push(btn.dataset.block); renderCodeBlocks(); } }));
+document.getElementById('btn-code-clear')?.addEventListener('click', () => { codeBlocks = []; renderCodeBlocks(); document.getElementById('code-feedback').textContent = 'Hint: start → set greeting → say greeting.'; });
+document.getElementById('btn-code-close')?.addEventListener('click', () => closeMiniGame('modal-margus-code'));
+document.getElementById('btn-code-run')?.addEventListener('click', () => {
+    const correct = codeBlocks.length === 3 && codeBlocks[0] === 'start' && codeBlocks[1] === 'set' && codeBlocks[2] === 'say';
+    if (correct) { document.getElementById('code-feedback').textContent = '“Hello, Margus!” — It works!'; finishMargusChallenge(); }
+    else document.getElementById('code-feedback').textContent = 'Not quite. Use exactly: When started → Set greeting → Say greeting.';
+});
+document.querySelectorAll('.lock-pin').forEach(btn => btn.addEventListener('click', () => chooseLockPin(Number(btn.dataset.pin))));
+document.getElementById('btn-lock-cancel')?.addEventListener('click', () => { exitLockDismissed = true; closeMiniGame('modal-lockpick'); });
 
 function resizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1681,6 +1748,7 @@ function update(dt) {
     const pRow = Math.floor(player.y / TILE_SIZE);
 
     if (pRow >= 0 && pRow < MAP_ROWS && pCol >= 0 && pCol < MAP_COLS) {
+        if (MAP_GRID[pRow][pCol] !== 2 && !exitLockOpened) exitLockDismissed = false;
         if (MAP_GRID[pRow][pCol] === 3 && !flagCaptured) {
             flagCaptured = true;
             sfx.itemPick();
@@ -1704,9 +1772,10 @@ function update(dt) {
             }
         }
 
-        if (MAP_GRID[pRow][pCol] === 2 && flagCaptured) {
-            triggerVictory();
-        }
+        if (MAP_GRID[pRow][pCol] === 2 && flagCaptured && !exitLockOpened && !exitLockDismissed) {
+            if (!window.exitLockNoticeShown) { window.exitLockNoticeShown = true; showBannerAlert('THE DOOR WAS FOUND OPEN… BUT A GUARD CLOSED IT! PICK THE LOCK.'); }
+            startLockpick();
+        } else if (MAP_GRID[pRow][pCol] === 2 && flagCaptured && exitLockOpened) { triggerVictory(); }
     }
 
     guards.forEach(g => g.update(dt));

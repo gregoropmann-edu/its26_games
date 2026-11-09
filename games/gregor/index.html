@@ -289,6 +289,46 @@
         </div>
     </div>
 
+
+    <!-- Margus's Scratch-style Python challenge -->
+    <div id="modal-margus-code" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/90 backdrop-blur-md p-3 overflow-y-auto">
+      <section class="w-full max-w-xl rounded-2xl border border-amber-600/60 bg-slate-900 p-5 shadow-2xl text-slate-100">
+        <p class="text-amber-400 text-xs font-black tracking-widest">MARGUS'S LITTLE CODING CHALLENGE</p>
+        <h2 class="cinzel-font text-2xl text-amber-200 font-bold mt-1">Teach the scribe to greet!</h2>
+        <p class="text-sm text-slate-300 mt-2">Build a tiny program using blocks, just like Scratch. Put the blocks in the right order to make Margus say hello.</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4" id="code-block-palette">
+          <button data-block="start" class="code-block bg-emerald-800 border border-emerald-500 rounded-lg p-3 text-xs font-bold">🟢 When started</button>
+          <button data-block="set" class="code-block bg-sky-900 border border-sky-500 rounded-lg p-3 text-xs font-bold">Set greeting</button>
+          <button data-block="say" class="code-block bg-purple-900 border border-purple-500 rounded-lg p-3 text-xs font-bold">Say greeting</button>
+          <button data-block="jump" class="code-block bg-rose-900 border border-rose-500 rounded-lg p-3 text-xs font-bold">Jump 10 times</button>
+        </div>
+        <div class="mt-4 rounded-xl bg-slate-950 border border-slate-700 p-3">
+          <div class="text-[10px] uppercase tracking-widest text-slate-500 mb-2">Your program · tap blocks above to add</div>
+          <div id="code-workspace" class="min-h-24 flex flex-col gap-2"><p class="text-slate-600 text-xs">Your blocks will appear here…</p></div>
+        </div>
+        <p id="code-feedback" class="text-sm text-amber-200 mt-3 min-h-5">Hint: start → set greeting → say greeting.</p>
+        <div class="flex gap-2 mt-4"><button id="btn-code-clear" class="flex-1 rounded-lg bg-slate-700 py-2 font-bold text-sm">Clear</button><button id="btn-code-run" class="flex-1 rounded-lg bg-amber-500 text-slate-950 py-2 font-black text-sm">▶ Run program</button><button id="btn-code-close" class="rounded-lg border border-slate-600 px-4 py-2 text-sm">Later</button></div>
+      </section>
+    </div>
+
+    <!-- Castle exit lockpicking minigame -->
+    <div id="modal-lockpick" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/90 backdrop-blur-md p-3">
+      <section class="w-full max-w-md rounded-2xl border border-amber-700/60 bg-slate-900 p-5 shadow-2xl text-center text-slate-100">
+        <p class="text-amber-400 text-xs font-black tracking-widest">NORTH GATE · LOCKPICKING</p>
+        <h2 class="cinzel-font text-2xl text-amber-200 font-bold mt-1">The guard locked it again!</h2>
+        <p class="text-sm text-slate-300 mt-2">The door was found open, but a guard noticed and closed it. Align the pins in the shown order to open the gate.</p>
+        <div class="my-4 rounded-xl border border-amber-900 bg-slate-950 p-4">
+          <div class="text-xs text-slate-400 mb-2">PIN CODE · match the sequence</div><div id="lock-sequence" class="text-2xl tracking-[.5em] font-black text-amber-300">2 · 4 · 1</div>
+          <div id="lock-pin-buttons" class="grid grid-cols-4 gap-2 mt-4">
+            <button data-pin="1" class="lock-pin rounded-lg bg-slate-700 py-4 font-black">1</button><button data-pin="2" class="lock-pin rounded-lg bg-slate-700 py-4 font-black">2</button><button data-pin="3" class="lock-pin rounded-lg bg-slate-700 py-4 font-black">3</button><button data-pin="4" class="lock-pin rounded-lg bg-slate-700 py-4 font-black">4</button>
+          </div>
+          <p id="lock-progress" class="text-xs text-slate-400 mt-3">Pins set: 0 / 3</p>
+        </div>
+        <p id="lock-feedback" class="text-sm text-amber-200 min-h-5">Choose the first pin.</p>
+        <button id="btn-lock-cancel" class="mt-3 w-full rounded-lg border border-slate-600 py-2 text-sm">Step away</button>
+      </section>
+    </div>
+
     <!-- Main Game Script -->
     <script type="module" src="game.js"></script>
 </body>
