@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="theme-color" content="#030712">
+    <meta name="description" content="A stealth maze heist. Sneak through Shadow Castle, outsmart guards, steal the Royal Flag and escape.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Shadow Castle: Flag Heist</title>
     <!-- Tailwind CSS CDN -->
@@ -67,6 +69,10 @@
         </div>
     </div>
 
+    <div id="objective-panel" class="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-10 pointer-events-none bg-slate-950/75 border border-amber-900/40 rounded-lg px-3 py-1.5 text-[10px] sm:text-xs text-amber-200 shadow-lg text-center max-w-[78vw]">
+        <span class="font-black text-amber-400">OBJECTIVE</span> · <span id="objective-status">Find the Royal Flag in the southern sanctum</span>
+    </div>
+
     <!-- Alert Banner Overlay -->
     <div id="banner-alert" class="absolute top-14 sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-4 max-w-[90vw]">
         <div id="banner-bg" class="bg-red-950/90 border-2 border-red-500 text-white font-bold px-4 sm:px-6 py-2 rounded-xl shadow-2xl backdrop-blur-md text-center text-[10px] sm:text-sm tracking-wide">
@@ -80,11 +86,15 @@
         <span class="text-slate-600">•</span>
         <span><b class="text-amber-300">Mouse</b> Aim</span>
         <span class="text-slate-600">•</span>
+        <span><b class="text-amber-300">P / Esc</b> Pause
+        <span class="text-slate-600">•</span>
         <span><b class="text-amber-300">C</b> Crouch</span>
         <span class="text-slate-600">•</span>
         <span><b class="text-amber-300">Shift / Space</b> Sprint</span>
         <span class="text-slate-600">•</span>
         <span><b class="text-amber-300">E</b> Throw Distraction Rock</span>
+        <span class="text-slate-600">•</span>
+        <span><b class="text-amber-300">F</b> Talk / Interact</span>
         <span class="text-slate-600">•</span>
         <span><b class="text-amber-300">Left Click</b> Strike (Needs Sword)</span>
     </div>
@@ -125,12 +135,17 @@
         </div>
     </div>
 
+    <!-- Contextual Margus easter-egg interaction -->
+    <button id="btn-talk-margus" class="hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-30 px-5 py-2.5 rounded-xl border border-amber-400/70 bg-slate-900/95 text-amber-200 font-black text-xs tracking-widest shadow-2xl">
+        ✦ TALK TO MARGUS · F
+    </button>
+
     <!-- Game Canvas -->
     <canvas id="gameCanvas" class="w-full h-full cursor-crosshair"></canvas>
 
     <!-- Minimap Box -->
-    <div class="absolute bottom-4 right-4 z-10 pointer-events-none border-2 border-slate-700/80 rounded-xl overflow-hidden shadow-2xl bg-slate-950/90 hidden sm:block">
-        <canvas id="minimapCanvas" width="130" height="130" class="block"></canvas>
+    <div id="minimap-wrap" class="absolute bottom-3 right-3 z-10 pointer-events-none border-2 border-slate-700/80 rounded-xl overflow-hidden shadow-2xl bg-slate-950/90">
+        <canvas id="minimapCanvas" width="150" height="150" class="block"></canvas>
     </div>
 
     <!-- Start Screen Modal -->

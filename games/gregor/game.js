@@ -322,6 +322,13 @@ function generateCleanMazeGrid(rows, cols) {
         }
     }
 
+    // Add a handful of optional loops so layouts are less corridor-like on replay.
+    for (let i = 0; i < 9; i++) {
+        const rr = mazeStartRow + 2 + Math.floor(Math.random() * Math.max(1, mazeEndRow - mazeStartRow - 3));
+        const cc = 2 + Math.floor(Math.random() * Math.max(1, cols - 4));
+        if (grid[rr][cc] === 1 && (grid[rr-1][cc] === 0 || grid[rr+1][cc] === 0 || grid[rr][cc-1] === 0 || grid[rr][cc+1] === 0)) grid[rr][cc] = 0;
+    }
+
     const armoryR = Math.floor(rows * 0.4);
     const armoryC = cols - 4;
     for (let dr = -1; dr <= 1; dr++) {
@@ -461,7 +468,7 @@ class Player {
             }
         }
 
-        this.moveWithCollision(dx * moveSpeed, dy * moveSpeed);
+        this.moveWithCollision(dx * moveSpeed * dt * 60, dy * moveSpeed * dt * 60);
 
         if (isMobileDevice) {
             let closestGuard = null;
@@ -607,6 +614,40 @@ function lerpAngle(current, target, turnSpeed, dt) {
     return current + Math.sign(diff) * maxStep;
 }
 
+// Grid A* keeps guards from walking into walls during pursuit.
+function findGuardPath(startX, startY, targetX, targetY) {
+    const toCell = (x, y) => ({ c: Math.max(0, Math.min(MAP_COLS - 1, Math.floor(x / TILE_SIZE))), r: Math.max(0, Math.min(MAP_ROWS - 1, Math.floor(y / TILE_SIZE))) });
+    const start = toCell(startX, startY), goal = toCell(targetX, targetY);
+    const key = (r, c) => `${r},${c}`;
+    const blocked = (r, c) => r < 0 || c < 0 || r >= MAP_ROWS || c >= MAP_COLS || [1, 4, 7].includes(MAP_GRID[r][c]);
+    if (blocked(goal.r, goal.c)) return [];
+    const open = [{ r: start.r, c: start.c, g: 0, f: Math.abs(goal.r-start.r)+Math.abs(goal.c-start.c) }];
+    const came = new Map(), cost = new Map([[key(start.r,start.c), 0]]), closed = new Set();
+    while (open.length && closed.size < MAP_ROWS * MAP_COLS) {
+        open.sort((a,b) => a.f-b.f);
+        const cur = open.shift(), ck = key(cur.r,cur.c);
+        if (closed.has(ck)) continue;
+        if (cur.r === goal.r && cur.c === goal.c) {
+            const path = [{ r: goal.r, c: goal.c }];
+            let k = ck;
+            while (came.has(k)) { const prev = came.get(k); path.push({ r: prev.r, c: prev.c }); k = key(prev.r,prev.c); }
+            path.reverse(); path.shift();
+            return path.map(cell => ({ x: cell.c*TILE_SIZE+TILE_SIZE/2, y: cell.r*TILE_SIZE+TILE_SIZE/2 }));
+        }
+        closed.add(ck);
+        for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+            const nr=cur.r+dr,nc=cur.c+dc,nk=key(nr,nc);
+            if (blocked(nr,nc) || closed.has(nk)) continue;
+            const ng=cur.g+1;
+            if (ng < (cost.get(nk) ?? Infinity)) {
+                came.set(nk,{r:cur.r,c:cur.c}); cost.set(nk,ng);
+                open.push({r:nr,c:nc,g:ng,f:ng+Math.abs(goal.r-nr)+Math.abs(goal.c-nc)});
+            }
+        }
+    }
+    return [];
+}
+
 class Guard {
     constructor(x, y) {
         this.x = x;
@@ -629,6 +670,11 @@ class Guard {
         this.patrolTimer = 0;
         this.patrolState = 'WALK';
         this.waitTime = 0;
+        this.chaseTimer = 0;
+        this.searchTimer = 0;
+        this.path = [];
+        this.pathIndex = 0;
+        this.pathRefresh = 0;
     }
 
     update(dt) {
@@ -642,8 +688,10 @@ class Guard {
         const canSee = this.canSeePlayer();
         const canHear = distToPlayer < player.noiseRadius && player.state !== 'CROUCH';
 
-        if (alarmTriggered && this.state !== 'CHASE') {
-            this.state = 'CHASE';
+        if (alarmTriggered && this.state === 'PATROL') {
+            this.state = 'SUSPICIOUS';
+            this.suspicionTimer = 1.4;
+            this.targetLastKnown = { x: player.x, y: player.y };
         }
 
         switch (this.state) {
@@ -659,40 +707,56 @@ class Guard {
 
             case 'SUSPICIOUS':
                 if (canSee) {
+                    this.targetLastKnown = { x: player.x, y: player.y };
                     this.suspicionTimer += dt * 2.2;
-                    if (this.suspicionTimer > 1.0 || alarmTriggered) {
+                    if (this.suspicionTimer > 1.0) {
                         this.state = 'CHASE';
+                        this.chaseTimer = 7;
                         triggerAlarm();
                     }
                 } else if (canHear) {
                     this.targetLastKnown = { x: player.x, y: player.y };
+                    this.suspicionTimer = Math.max(this.suspicionTimer, 1.5);
                 }
-
                 if (this.targetLastKnown) {
-                    this.moveTowards(this.targetLastKnown.x, this.targetLastKnown.y, this.speed * 0.85, this.turnSpeed, dt);
+                    const searchDistance = Math.hypot(this.targetLastKnown.x-this.x, this.targetLastKnown.y-this.y);
+                    if (searchDistance > 18) this.moveTowards(this.targetLastKnown.x, this.targetLastKnown.y, this.speed * 0.85, this.turnSpeed, dt);
+                    else {
+                        this.angle += dt * 1.1;
+                        this.searchTimer = Math.max(0, this.searchTimer - dt);
+                    }
                 }
-
-                this.suspicionTimer -= dt * 0.35;
-                if (this.suspicionTimer <= 0 && !alarmTriggered) {
+                this.suspicionTimer -= dt * 0.3;
+                if (this.suspicionTimer <= 0) {
                     this.state = 'PATROL';
                     this.targetLastKnown = null;
+                    this.path = [];
                 }
                 break;
 
             case 'CHASE':
-                this.targetLastKnown = { x: player.x, y: player.y };
-                this.moveTowards(player.x, player.y, this.chaseSpeed, this.chaseTurnSpeed, dt);
-
+                if (canSee) {
+                    this.targetLastKnown = { x: player.x, y: player.y };
+                    this.chaseTimer = 7;
+                } else {
+                    this.chaseTimer -= dt;
+                }
+                if (this.targetLastKnown) {
+                    this.moveTowards(this.targetLastKnown.x, this.targetLastKnown.y, this.chaseSpeed, this.chaseTurnSpeed, dt);
+                }
                 if (distToPlayer < this.radius + player.radius + 8 && this.attackCooldown <= 0) {
                     player.hp -= 16;
                     this.attackCooldown = 0.75;
                     sfx.guardHit();
                     createBloodParticles(player.x, player.y);
                     showFloatingText("-16", player.x, player.y, "#ef4444");
-
-                    if (player.hp <= 0) {
-                        triggerGameOver();
-                    }
+                    if (player.hp <= 0) triggerGameOver();
+                }
+                if (this.chaseTimer <= 0 && !canSee) {
+                    this.state = 'SUSPICIOUS';
+                    this.suspicionTimer = 2.8;
+                    this.searchTimer = 2.8;
+                    this.path = [];
                 }
                 break;
         }
@@ -761,8 +825,9 @@ class Guard {
                 this.targetAngle = this.angle + Math.PI;
             }
         } else {
-            const vx = Math.cos(this.angle) * this.speed;
-            const vy = Math.sin(this.angle) * this.speed;
+            const frameScale = dt * 60;
+            const vx = Math.cos(this.angle) * this.speed * frameScale;
+            const vy = Math.sin(this.angle) * this.speed * frameScale;
 
             let nextX = this.x + vx;
             let nextY = this.y + vy;
@@ -773,17 +838,28 @@ class Guard {
     }
 
     moveTowards(tx, ty, speed, turnSpeed, dt) {
-        const targetAngle = Math.atan2(ty - this.y, tx - this.x);
+        this.pathRefresh -= dt;
+        if (this.pathRefresh <= 0 || !this.path.length) {
+            this.path = findGuardPath(this.x, this.y, tx, ty);
+            this.pathIndex = 0;
+            this.pathRefresh = 0.45;
+        }
+        let waypoint = this.path[this.pathIndex];
+        if (!waypoint) {
+            // If the target is in the same open cell, direct movement is safe.
+            waypoint = { x: tx, y: ty };
+        }
+        if (Math.hypot(waypoint.x-this.x, waypoint.y-this.y) < 9 && this.pathIndex < this.path.length-1) {
+            this.pathIndex++;
+            waypoint = this.path[this.pathIndex];
+        }
+        const targetAngle = Math.atan2(waypoint.y-this.y, waypoint.x-this.x);
         this.angle = lerpAngle(this.angle, targetAngle, turnSpeed, dt);
-
-        const vx = Math.cos(this.angle) * speed;
-        const vy = Math.sin(this.angle) * speed;
-
-        let nextX = this.x + vx;
-        let nextY = this.y + vy;
-
-        if (!checkTileCollision(nextX, this.y, this.radius)) this.x = nextX;
-        if (!checkTileCollision(this.x, nextY, this.radius)) this.y = nextY;
+        const step = speed * dt * 60;
+        const vx = Math.cos(this.angle) * step, vy = Math.sin(this.angle) * step;
+        const nextX=this.x+vx, nextY=this.y+vy;
+        if (!checkTileCollision(nextX,this.y,this.radius)) this.x=nextX;
+        if (!checkTileCollision(this.x,nextY,this.radius)) this.y=nextY;
     }
 
     takeDamage(amount, attackerX, attackerY) {
@@ -808,6 +884,9 @@ let noiseRipples = [];
 let floatingTexts = [];
 let player = null;
 let guards = [];
+let margusNPC = null;
+let margusFound = false;
+let margusNear = false;
 
 function getStartingRocksForGame() {
     const saved = localStorage.getItem('shadow_castle_v3_rocks');
@@ -829,6 +908,12 @@ function initLevel() {
     }
 
     guards = [];
+    // Margus hides in a quiet corner of the western chamber.
+    const margusRow = Math.floor(MAP_ROWS * 0.4) + 1;
+    const margusCol = 5;
+    margusNPC = { x: margusCol * TILE_SIZE + TILE_SIZE / 2, y: margusRow * TILE_SIZE + TILE_SIZE / 2 };
+    margusFound = false;
+    margusNear = false;
     particles = [];
     rockProjectiles = [];
     noiseRipples = [];
@@ -842,7 +927,7 @@ function initLevel() {
 
     for (let r = 7; r < MAP_ROWS - 3; r += 4) {
         for (let c = 3; c < MAP_COLS - 3; c += 4) {
-            if (MAP_GRID[r][c] === 0 && Math.random() < 0.6) {
+            if (MAP_GRID[r][c] === 0 && Math.hypot(c * TILE_SIZE + TILE_SIZE/2 - margusNPC.x, r * TILE_SIZE + TILE_SIZE/2 - margusNPC.y) > TILE_SIZE * 2 && Math.random() < 0.6) {
                 guards.push(new Guard(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2));
             }
         }
@@ -869,7 +954,7 @@ function checkTileCollision(x, y, radius) {
 
 function hasLineOfSightObstruction(x1, y1, x2, y2) {
     const dist = Math.hypot(x2 - x1, y2 - y1);
-    const steps = Math.ceil(dist / 12);
+    const steps = Math.max(1, Math.ceil(dist / 12));
     const dx = (x2 - x1) / steps;
     const dy = (y2 - y1) / steps;
 
@@ -898,7 +983,12 @@ function triggerAlarm() {
         sfx.alarm();
         showBannerAlert("ALARM TRIGGERED! GUARDS ALERTED!");
         guards.forEach(g => {
-            if (g.hp > 0) g.state = 'CHASE';
+            if (g.hp > 0) {
+                g.state = 'CHASE';
+                g.chaseTimer = 7;
+                g.targetLastKnown = { x: player.x, y: player.y };
+                g.path = [];
+            }
         });
     }
 }
@@ -971,16 +1061,19 @@ function showBannerAlert(msg) {
 function render() {
     if (!player) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.clientWidth || window.innerWidth, canvas.clientHeight || window.innerHeight);
 
-    cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, MAP_COLS * TILE_SIZE - canvas.width));
-    cameraY = Math.max(0, Math.min(player.y - canvas.height / 2, MAP_ROWS * TILE_SIZE - canvas.height));
+    const viewW = canvas.clientWidth || window.innerWidth;
+    const viewH = canvas.clientHeight || window.innerHeight;
+    cameraX = Math.max(0, Math.min(player.x - viewW / 2, MAP_COLS * TILE_SIZE - viewW));
+    cameraY = Math.max(0, Math.min(player.y - viewH / 2, MAP_ROWS * TILE_SIZE - viewH));
 
     ctx.save();
     ctx.translate(-cameraX, -cameraY);
 
     drawMap();
     drawInteractiveItems();
+    drawMargusNPC();
 
     noiseRipples.forEach(r => {
         ctx.strokeStyle = 'rgba(245, 158, 11, ' + (r.life * 2) + ')';
@@ -1222,6 +1315,65 @@ function drawInteractiveItems() {
     }
 }
 
+function drawMargusNPC() {
+    if (!margusNPC || margusFound) return;
+    const x = margusNPC.x, y = margusNPC.y;
+    ctx.save();
+    ctx.translate(x, y);
+    // Warm lantern-like marker, only noticeable when you get close.
+    if (margusNear) {
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.13)';
+        ctx.beginPath(); ctx.arc(0, 0, 29, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(2, 6, 23, 0.45)';
+    ctx.beginPath(); ctx.ellipse(0, 13, 15, 6, 0, 0, Math.PI * 2); ctx.fill();
+    // Deep plum travelling cloak and muted green medieval tunic.
+    ctx.fillStyle = '#49334b';
+    ctx.beginPath(); ctx.moveTo(-13, 3); ctx.quadraticCurveTo(-17, 12, -13, 17);
+    ctx.lineTo(13, 17); ctx.quadraticCurveTo(17, 12, 13, 3); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#251d2c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#64745a';
+    ctx.beginPath(); ctx.moveTo(-8, -1); ctx.lineTo(8, -1); ctx.lineTo(10, 15); ctx.lineTo(-10, 15); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#b58a52'; ctx.fillRect(-10, 7, 20, 3);
+    ctx.fillStyle = '#e5c28f'; ctx.fillRect(-2, 7, 4, 3);
+    // Face and tousled chestnut hair, inspired by Margus's portrait.
+    ctx.fillStyle = '#e7b995';
+    ctx.beginPath(); ctx.ellipse(0, -8, 9, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#49352f';
+    ctx.beginPath(); ctx.moveTo(-9, -9); ctx.quadraticCurveTo(-12, -23, -2, -22);
+    ctx.quadraticCurveTo(8, -25, 10, -12); ctx.lineTo(7, -14); ctx.lineTo(3, -18);
+    ctx.lineTo(-1, -14); ctx.lineTo(-5, -17); ctx.lineTo(-8, -12); ctx.closePath(); ctx.fill();
+    // Signature round spectacles.
+    ctx.strokeStyle = '#4b5563'; ctx.lineWidth = 1.7;
+    ctx.beginPath(); ctx.ellipse(-4, -8, 3.7, 2.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(4, -8, 3.7, 2.8, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-0.3, -8); ctx.lineTo(0.3, -8); ctx.moveTo(-8, -9); ctx.lineTo(-10, -10); ctx.moveTo(8, -9); ctx.lineTo(10, -10); ctx.stroke();
+    ctx.fillStyle = '#3f302c';
+    ctx.beginPath(); ctx.arc(-4, -8, 0.8, 0, Math.PI * 2); ctx.arc(4, -8, 0.8, 0, Math.PI * 2); ctx.fill();
+    // Tiny hood clasp and an old parchment tucked into his belt.
+    ctx.fillStyle = '#eabf64'; ctx.beginPath(); ctx.arc(-10, 2, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d9c9a3'; ctx.fillRect(7, 9, 3, 6);
+    ctx.restore();
+
+    if (margusNear) {
+        ctx.save(); ctx.fillStyle = '#fde68a'; ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center'; ctx.shadowColor = '#020617'; ctx.shadowBlur = 5;
+        ctx.fillText('MARGUS', x, y - 29); ctx.restore();
+    }
+}
+
+function talkToMargus() {
+    if (!player || !margusNPC || margusFound || !margusNear || gameState !== 'PLAYING') return;
+    margusFound = true;
+    player.rocksRemaining += 3;
+    player.hp = Math.min(player.maxHp, player.hp + 15);
+    sfx.itemPick();
+    showFloatingText('+3 LURES  +15 HP', margusNPC.x, margusNPC.y - 28, '#fbbf24');
+    showBannerAlert('MARGUS THE CASTLE SCRIBE: “The flag is in the southern sanctum. Walk softly!”');
+    const talkButton = document.getElementById('btn-talk-margus');
+    if (talkButton) talkButton.classList.add('hidden');
+}
+
 function drawGuardVisionCone(guard) {
     ctx.save();
     ctx.translate(guard.x, guard.y);
@@ -1255,11 +1407,15 @@ function drawDarknessFog() {
     if (fogCanvas.width !== canvas.width || fogCanvas.height !== canvas.height) {
         fogCanvas.width = canvas.width;
         fogCanvas.height = canvas.height;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        fCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    const viewW = canvas.clientWidth || window.innerWidth;
+    const viewH = canvas.clientHeight || window.innerHeight;
     fCtx.globalCompositeOperation = 'source-over';
     fCtx.fillStyle = '#020617';
-    fCtx.fillRect(0, 0, canvas.width, canvas.height);
+    fCtx.fillRect(0, 0, viewW, viewH);
 
     fCtx.globalCompositeOperation = 'destination-out';
 
@@ -1294,32 +1450,33 @@ function drawDarknessFog() {
         fCtx.fill();
     });
 
-    ctx.drawImage(fogCanvas, cameraX, cameraY);
+    ctx.drawImage(fogCanvas, cameraX, cameraY, canvas.clientWidth || window.innerWidth, canvas.clientHeight || window.innerHeight);
 }
 
 function drawMinimap() {
-    mmCtx.clearRect(0, 0, 130, 130);
+    const mw = minimapCanvas.width, mh = minimapCanvas.height;
+    mmCtx.clearRect(0, 0, mw, mh);
     mmCtx.fillStyle = 'rgba(3, 7, 18, 0.95)';
-    mmCtx.fillRect(0, 0, 130, 130);
+    mmCtx.fillRect(0, 0, mw, mh);
 
-    const scaleX = 130 / (MAP_COLS * TILE_SIZE);
-    const scaleY = 130 / (MAP_ROWS * TILE_SIZE);
+    const scaleX = mw / (MAP_COLS * TILE_SIZE);
+    const scaleY = mh / (MAP_ROWS * TILE_SIZE);
 
     for (let r = 0; r < MAP_ROWS; r++) {
         for (let c = 0; c < MAP_COLS; c++) {
             const tile = MAP_GRID[r][c];
             if (tile === 1 || tile === 4) {
                 mmCtx.fillStyle = '#475569';
-                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 3, 3);
+                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, Math.max(2,mw/130*3), Math.max(2,mh/130*3));
             } else if (tile === 2) {
                 mmCtx.fillStyle = '#10b981';
-                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 4, 4);
+                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, Math.max(3,mw/130*4), Math.max(3,mh/130*4));
             } else if (tile === 3 && !flagCaptured) {
                 mmCtx.fillStyle = '#f59e0b';
-                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 5, 5);
+                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, Math.max(4,mw/130*5), Math.max(4,mh/130*5));
             } else if (tile === 6) {
                 mmCtx.fillStyle = '#ef4444';
-                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, 4, 4);
+                mmCtx.fillRect(c * TILE_SIZE * scaleX, r * TILE_SIZE * scaleY, Math.max(3,mw/130*4), Math.max(3,mh/130*4));
             }
         }
     }
@@ -1328,13 +1485,18 @@ function drawMinimap() {
         if (g.hp <= 0) return;
         mmCtx.fillStyle = g.state === 'CHASE' ? '#ef4444' : '#eab308';
         mmCtx.beginPath();
-        mmCtx.arc(g.x * scaleX, g.y * scaleY, 2, 0, Math.PI * 2);
+        mmCtx.arc(g.x * scaleX, g.y * scaleY, Math.max(2,mw/130*2), 0, Math.PI * 2);
         mmCtx.fill();
     });
 
+    if (margusNPC && margusFound) {
+        mmCtx.fillStyle = '#fbbf24';
+        mmCtx.beginPath(); mmCtx.arc(margusNPC.x * scaleX, margusNPC.y * scaleY, 3, 0, Math.PI * 2); mmCtx.fill();
+    }
+
     mmCtx.fillStyle = '#38bdf8';
     mmCtx.beginPath();
-    mmCtx.arc(player.x * scaleX, player.y * scaleY, 3, 0, Math.PI * 2);
+    mmCtx.arc(player.x * scaleX, player.y * scaleY, Math.max(3,mw/130*3), 0, Math.PI * 2);
     mmCtx.fill();
 }
 
@@ -1361,6 +1523,7 @@ function handleKeyEvent(e, isDown) {
     const key = e.key;
     let handled = false;
 
+    if (isDown && (code === 'Escape' || code === 'KeyP')) { togglePause(); handled = true; }
     if (code === 'KeyW' || code === 'ArrowUp' || key === 'w' || key === 'W' || key === 'ArrowUp') {
         keyState.up = isDown; handled = true;
     }
@@ -1383,6 +1546,10 @@ function handleKeyEvent(e, isDown) {
         if (player && gameState === 'PLAYING') player.throwRock();
         handled = true;
     }
+    if (isDown && (code === 'KeyF' || key === 'f' || key === 'F')) {
+        talkToMargus();
+        handled = true;
+    }
 
     if (handled && e.cancelable) {
         e.preventDefault();
@@ -1391,7 +1558,8 @@ function handleKeyEvent(e, isDown) {
 
 window.addEventListener('keydown', (e) => handleKeyEvent(e, true));
 window.addEventListener('keyup', (e) => handleKeyEvent(e, false));
-window.addEventListener('blur', resetKeys);
+window.addEventListener('blur', () => { resetKeys(); if (gameState === 'PLAYING') togglePause(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && gameState === 'PLAYING') { resetKeys(); togglePause(); } });
 
 window.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -1410,9 +1578,11 @@ window.addEventListener('mousedown', (e) => {
 const bindTouchBtn = (id, keyName) => {
     const btn = document.getElementById(id);
     if (!btn) return;
-    btn.addEventListener('touchstart', (e) => { e.preventDefault(); keyState[keyName] = true; });
-    btn.addEventListener('touchend', (e) => { e.preventDefault(); keyState[keyName] = false; });
-    btn.addEventListener('touchcancel', (e) => { e.preventDefault(); keyState[keyName] = false; });
+    btn.addEventListener('pointerdown', (e) => { e.preventDefault(); keyState[keyName] = true; btn.setPointerCapture?.(e.pointerId); });
+    const release = (e) => { e.preventDefault(); keyState[keyName] = false; };
+    btn.addEventListener('pointerup', release);
+    btn.addEventListener('pointercancel', release);
+    btn.addEventListener('lostpointercapture', () => { keyState[keyName] = false; });
 };
 
 bindTouchBtn('btn-touch-up', 'up');
@@ -1422,18 +1592,23 @@ bindTouchBtn('btn-touch-right', 'right');
 bindTouchBtn('btn-touch-crouch', 'crouch');
 bindTouchBtn('btn-touch-sprint', 'sprint');
 
-document.getElementById('btn-touch-strike')?.addEventListener('touchstart', (e) => {
+document.getElementById('btn-touch-strike')?.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     if (player && gameState === 'PLAYING') player.attack();
 });
-document.getElementById('btn-touch-rock')?.addEventListener('touchstart', (e) => {
+document.getElementById('btn-touch-rock')?.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     if (player && gameState === 'PLAYING') player.throwRock();
 });
+document.getElementById('btn-talk-margus')?.addEventListener('pointerdown', (e) => { e.preventDefault(); talkToMargus(); });
 
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     detectDevice();
 }
 window.addEventListener('resize', resizeCanvas);
@@ -1444,6 +1619,9 @@ function update(dt) {
     gameTime += dt;
 
     player.update(dt);
+    margusNear = !!(margusNPC && !margusFound && Math.hypot(player.x - margusNPC.x, player.y - margusNPC.y) < 62);
+    const talkButton = document.getElementById('btn-talk-margus');
+    if (talkButton) talkButton.classList.toggle('hidden', !margusNear || gameState !== 'PLAYING');
 
     rockProjectiles.forEach(rock => {
         rock.progress += dt * rock.speed;
@@ -1534,14 +1712,14 @@ function update(dt) {
     guards.forEach(g => g.update(dt));
 
     particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * dt * 60;
+        p.y += p.vy * dt * 60;
         p.life -= dt;
     });
     particles = particles.filter(p => p.life > 0);
 
     floatingTexts.forEach(ft => {
-        ft.y += ft.vy;
+        ft.y += ft.vy * dt * 60;
         ft.life -= dt;
     });
     floatingTexts = floatingTexts.filter(ft => ft.life > 0);
@@ -1608,6 +1786,8 @@ function updateHUD() {
     }
 
     document.getElementById('game-timer').innerText = formatTime(gameTime);
+    const objective = document.getElementById('objective-status');
+    if (objective) objective.innerText = flagCaptured ? 'Escape through the north gate to the wagon' : 'Find the Royal Flag in the southern sanctum';
 }
 
 function formatTime(seconds) {
@@ -1665,7 +1845,7 @@ async function fetchLeaderboard() {
         querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const safeName = esc(String(data.name || 'Anonymous').slice(0, 40));
-            const safeTime = typeof data.time === 'number' ? formatTime(data.time) : '--:--';
+            const safeTime = Number.isFinite(data.time) && data.time >= 0 && data.time < 86400 ? formatTime(data.time) : '--:--';
             html += `<div class="flex justify-between border-b border-slate-900 pb-0.5 text-xs">
                 <span>#${rank++} <strong class="text-slate-200">${safeName}</strong></span>
                 <span class="text-amber-400 font-mono">${safeTime}</span>
@@ -1680,7 +1860,7 @@ async function fetchLeaderboard() {
 
 // One entry per player (doc id = uid). Only overwritten when the new time is faster.
 async function submitScore() {
-    if (!currentUser) return;
+    if (!currentUser || gameState !== 'VICTORY' || !Number.isFinite(gameTime) || gameTime <= 0) return;
 
     const btn = document.getElementById('btn-submit-score');
     if (btn) {
@@ -1797,6 +1977,7 @@ function startGame() {
     initLevel();
     resetKeys();
     gameState = 'PLAYING';
+    lastTime = 0;
     document.getElementById('modal-start').classList.add('hidden');
     document.getElementById('modal-pause').classList.add('hidden');
     document.getElementById('modal-gameover').classList.add('hidden');
