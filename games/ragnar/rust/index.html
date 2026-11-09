@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DECKFIGHT — Cargo-01</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071720;color:#e9f4f7;font-family:Inter,system-ui,Segoe UI,Arial}
+canvas{display:block;position:fixed;inset:0;z-index:0}
+#hud{position:fixed;z-index:2;inset:14px 16px auto;display:flex;justify-content:space-between;pointer-events:none;gap:10px}
+.panel{background:linear-gradient(135deg,#0b1b22df,#07141bdc);border:1px solid #91a9ad55;border-radius:8px;padding:10px 14px;box-shadow:0 5px 20px #0005;backdrop-filter:blur(8px)}
+.brand{font-weight:950;letter-spacing:.18em;color:#e6f2f2;font-size:18px}.sub{font-size:11px;color:#9eb5ba;margin-top:4px;letter-spacing:.06em}
+#stats{text-align:right;min-width:160px;font-size:13px;font-weight:800}
+#bottom{position:fixed;z-index:2;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:24px;pointer-events:none}
+.stat span{display:block;font-size:9px;letter-spacing:.16em;color:#a9c0c4}.stat strong{font-size:17px;color:#e9d6a3}
+#crosshair{position:fixed;z-index:2;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none;opacity:.85}
+#crosshair:before,#crosshair:after{content:"";position:absolute;background:#e8eeee;box-shadow:0 1px 3px #000}
+#crosshair:before{width:1px;height:16px;left:8px;top:1px}#crosshair:after{height:1px;width:16px;left:1px;top:8px}
+#feed{position:fixed;z-index:2;right:16px;top:112px;text-align:right;font-size:11px;line-height:1.8;text-shadow:0 2px 5px #000}
+#toast{position:fixed;z-index:2;top:17%;left:50%;transform:translateX(-50%);font-weight:900;letter-spacing:.16em;font-size:19px;color:#ead7a7;text-shadow:0 2px 10px #000}
+#help{position:fixed;z-index:2;left:16px;bottom:16px;font-size:10px;line-height:1.7;color:#b9c9cb}
+#start{position:fixed;z-index:20;inset:0;display:grid;place-items:center;background:linear-gradient(120deg,#07141deF,#112832eF)}
+#card{width:min(580px,92vw);padding:30px;background:#0a1b23f2;border:1px solid #849da455;border-radius:12px;box-shadow:0 25px 100px #000b}
+h1{font-size:35px;letter-spacing:.18em;margin:0;color:#e8f1ef}p{line-height:1.55;color:#b7c9ca}
+label{font-size:11px;letter-spacing:.12em;color:#a9bdc0}input{display:block;width:100%;padding:12px;margin:7px 0 15px;background:#07141b;border:1px solid #627c82;border-radius:6px;color:#fff}
+button{background:#d0c39c;color:#182327;border:0;border-radius:6px;padding:13px 20px;font-weight:900;letter-spacing:.08em;cursor:pointer}
+#hint{font-size:11px;color:#8fa6ab}
+#hurt{position:fixed;inset:0;pointer-events:none;background:radial-gradient(transparent 50%,#8b201a88);opacity:0}
+#hubBack{position:fixed;z-index:25;top:14px;left:16px;padding:8px 12px;font-size:12px;font-weight:800;letter-spacing:.06em;text-decoration:none;color:#e9f4f7;background:#0b1b22df;border:1px solid #91a9ad55;border-radius:8px;backdrop-filter:blur(8px);pointer-events:auto}
+#hubBack:hover{color:#ead7a7;border-color:#d0c39c}
+</style>
+</head>
+<body>
+<a id="hubBack" href="../">← Ragnari mängud</a>
+<div id="hud">
+ <div class="panel"><div class="brand">DECKFIGHT</div><div class="sub">CARGO-01 / NORTH ATLANTIC</div><div class="sub" id="connection">LOCAL TRAINING SESSION</div></div>
+ <div class="panel" id="stats"><div id="score">ELIMINATIONS 0 / 7</div><div class="sub" id="players">TRAINING TARGETS 6</div></div>
+</div>
+<div id="feed"></div><div id="toast">CARGO-01</div><div id="crosshair"></div>
+<div id="bottom" class="panel">
+ <div class="stat"><span>LOADOUT</span><strong id="weapon">REVOLVER</strong></div>
+ <div class="stat"><span>VITALS</span><strong id="health">100</strong></div>
+ <div class="stat"><span>AMMUNITION</span><strong id="ammo">∞</strong></div>
+</div>
+<div id="help" class="panel">WASD MOVE · MOUSE LOOK · CLICK FIRE<br>SPACE JUMP · SHIFT SPRINT · ESC RELEASE MOUSE</div>
+<div id="hurt"></div>
+<div id="start"><div id="card">
+<h1>DECKFIGHT</h1>
+<p>A weather-beaten cargo ship lost in cold open water. Explore its decks, fight arcade training raiders and climb the weapon ladder.</p>
+<label>CALLSIGN</label><input id="playerName" maxlength="16" value="Deckhand">
+<button id="play">BOARD THE SHIP</button>
+<p id="hint">Visual prototype: detailed procedural ship environment, moving ocean, weather, first-person view and training targets. Multiplayer is not included yet.</p>
+</div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
+
+const $=id=>document.getElementById(id);
+const weapons=['REVOLVER','PYTHON','SAP','SAR','THOMPSON','CUSTOM SMG','AK','M249'];
+const weaponTint=[0x8e9a9a,0x9aa5a5,0x778c80,0x65766f,0x78817c,0x778c91,0x8e7d66,0x7e8c80];
+let scene,camera,renderer,clock,started=false,locked=false,health=100,kills=0,weapon=0,vy=0,grounded=true,shotWait=0;
+const keys={},targets=[],tracers=[],rain=[],tmp=new THREE.Vector3(),forward=new THREE.Vector3(),right=new THREE.Vector3();
+const feed=[];
+const mat=(color,rough=.85,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+function box(parent,x,y,z,w,h,d,material){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function cylinder(parent,x,y,z,r1,r2,h,material,segments=12){const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function canvasTexture(draw){
+ const c=document.createElement('canvas');c.width=512;c.height=512;const g=c.getContext('2d');draw(g);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;return t;
+}
+const steelTex=canvasTexture(g=>{
+ g.fillStyle='#596267';g.fillRect(0,0,512,512);
+ for(let y=0;y<512;y+=32){g.fillStyle=y%64?'#626c70':'#4b555a';g.fillRect(0,y,512,27);g.fillStyle='#252f33';g.fillRect(0,y+27,512,3);}
+ for(let i=0;i<2200;i++){g.fillStyle=Math.random()>.5?'#a0a6a5':'#182327';g.globalAlpha=Math.random()*.16;g.fillRect(Math.random()*512,Math.random()*512,Math.random()*4+1,Math.random()*2+1);}g.globalAlpha=1;
+ for(let x=16;x<512;x+=64){g.fillStyle='#303a3e';g.fillRect(x,0,3,512);for(let y=20;y<512;y+=64){g.fillStyle='#aab0ad';g.beginPath();g.arc(x+1,y,2,0,Math.PI*2);g.fill();}}
+});
+const rustTex=canvasTexture(g=>{
+ g.fillStyle='#59666a';g.fillRect(0,0,512,512);
+ for(let i=0;i<1400;i++){g.globalAlpha=Math.random()*.4;g.fillStyle=['#9b5439','#bd8150','#303e42','#778184'][i%4];g.beginPath();g.ellipse(Math.random()*512,Math.random()*512,Math.random()*20+2,Math.random()*9+1,Math.random()*3,0,Math.PI*2);g.fill();}
+ g.globalAlpha=1;for(let y=0;y<512;y+=48){g.fillStyle='#29373b';g.fillRect(0,y,512,3);g.fillStyle='#9ca5a3';g.fillRect(0,y+4,512,1);}
+});
+const rubberTex=canvasTexture(g=>{g.fillStyle='#242b2e';g.fillRect(0,0,512,512);for(let i=0;i<4000;i++){g.fillStyle=Math.random()>.5?'#657073':'#080e10';g.globalAlpha=.12;g.fillRect(Math.random()*512,Math.random()*512,2,2);}g.globalAlpha=1;});
+function texmat(tex,rough=.9,metal=.2){return new THREE.MeshStandardMaterial({map:tex,roughness:rough,metalness:metal});}
+function addText(s){$('toast').textContent=s;clearTimeout(addText.timer);addText.timer=setTimeout(()=>$('toast').textContent='',1900);}
+function log(s){feed.unshift(s);feed.splice(4);$('feed').innerHTML=feed.map(x=>`<div>${x}</div>`).join('');}
+
+function init(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x91aeb5);scene.fog=new THREE.FogExp2(0x9bb4b8,.0085);
+ camera=new THREE.PerspectiveCamera(76,innerWidth/innerHeight,.1,350);camera.position.set(0,1.72,7);
+ renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+ clock=new THREE.Clock();
+ scene.add(new THREE.HemisphereLight(0xc8dce0,0x263238,1.5));
+ const sun=new THREE.DirectionalLight(0xffe2bc,2.6);sun.position.set(-35,48,24);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-48;sun.shadow.camera.right=48;sun.shadow.camera.top=48;sun.shadow.camera.bottom=-48;sun.shadow.bias=-.0002;scene.add(sun);
+ const fill=new THREE.DirectionalLight(0x91b6c7,.65);fill.position.set(28,15,-32);scene.add(fill);
+ buildSky();buildOcean();buildShip();buildAtmosphere();buildTargets();buildWeapon();
+ addEventListener('resize',resize);
+ renderer.domElement.addEventListener('click',()=>{if(started&&!locked)renderer.domElement.requestPointerLock();});
+ document.addEventListener('pointerlockchange',()=>locked=document.pointerLockElement===renderer.domElement);
+ document.addEventListener('mousemove',e=>{if(!locked)return;camera.rotation.order='YXZ';camera.rotation.y-=e.movementX*.0021;camera.rotation.x-=e.movementY*.0018;camera.rotation.x=THREE.MathUtils.clamp(camera.rotation.x,-1.4,1.4);});
+ document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space')e.preventDefault();});
+ document.addEventListener('keyup',e=>keys[e.code]=false);
+ document.addEventListener('mousedown',e=>{if(e.button===0&&locked)shoot();});
+ $('play').onclick=()=>{if(!renderer){$('hint').textContent='The 3D scene has not loaded yet. Check your internet connection and reload the page.';return;}started=true;$('start').style.display='none';addText('YOU ARE ON YOUR OWN');animate();try{renderer.domElement.requestPointerLock();}catch(e){$('hint').textContent='Click the game screen once to enable mouse look.';}};
+}
+function buildSky(){
+ const sky=new THREE.Mesh(new THREE.SphereGeometry(280,48,32),new THREE.MeshBasicMaterial({color:0x9bb9c1,side:THREE.BackSide}));scene.add(sky);
+ // Low layered cloud banks, deliberately soft and distant.
+ const cloudMat=new THREE.MeshStandardMaterial({color:0xd4dedc,transparent:true,opacity:.22,roughness:1,depthWrite:false});
+ for(let i=0;i<24;i++){const c=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),cloudMat);c.scale.set(9+Math.random()*18,1.2+Math.random()*2,4+Math.random()*8);c.position.set((Math.random()-.5)*180,20+Math.random()*18,-85+Math.random()*100);scene.add(c);}
+}
+function buildOcean(){
+ const geo=new THREE.PlaneGeometry(600,600,150,150);geo.rotateX(-Math.PI/2);
+ const waterMat=new THREE.MeshStandardMaterial({color:0x174b5b,roughness:.28,metalness:.18,transparent:true,opacity:.98});
+ const water=new THREE.Mesh(geo,waterMat);water.position.y=-1.45;water.name='ocean';scene.add(water);
+ // Foam flecks near the hull
+ const foamMat=new THREE.MeshBasicMaterial({color:0xb7d0cf,transparent:true,opacity:.16});
+ for(let i=0;i<90;i++){const f=new THREE.Mesh(new THREE.PlaneGeometry(1+Math.random()*3,.12),foamMat);f.rotation.x=-Math.PI/2;f.position.set((Math.random()-.5)*38,-1.25,(Math.random()-.5)*60);scene.add(f);}
+}
+function buildShip(){
+ const hull=mat(0x293a40,.55,.65),hullRust=texmat(rustTex,.82,.45),deck=texmat(steelTex,.86,.38),paint=mat(0x667277,.78,.42),dark=mat(0x17252a,.9,.2),yellow=mat(0xc3a85e,.8,.15),glass=new THREE.MeshStandardMaterial({color:0x547a83,roughness:.2,metalness:.4});
+ // Main hull, stepped bow and stern, broad open deck
+ box(scene,0,-.8,0,34,2.6,58,hull);
+ box(scene,0,-.15,-28,28,1.2,5,hullRust);
+ box(scene,0,-.1,29,28,1.1,4,hullRust);
+ // Bow taper wedges
+ for(let side of [-1,1]){const wedge=new THREE.Mesh(new THREE.BoxGeometry(4,2.3,8),hull);wedge.position.set(side*13,-.7,-27);wedge.rotation.y=side*.16;scene.add(wedge);}
+ const floor=box(scene,0,.38,0,32,.28,55,deck);floor.material.map.repeat.set(2,4);
+ // side bulwarks and rails
+ for(const x of [-15.9,15.9]){
+  box(scene,x,.95,0,.35,1.15,55,hullRust);
+  box(scene,x,1.62,0,.16,.13,55,paint);
+  for(let z=-26;z<=26;z+=3.2){cylinder(scene,x,1.35,z,.055,.055,.9,paint,8);}
+ }
+ for(const z of [-27.4,27.4])box(scene,0,1,z,31,1.1,.3,hullRust);
+ // Deck plate seams, tie-down rings, markings
+ for(let z=-25;z<=25;z+=5.5){box(scene,0,.535,z,31,.018,.045,dark);}
+ for(let x of [-12,-8,8,12])box(scene,x,.55,0,.12,.025,52,yellow);
+ for(let x=-14;x<=14;x+=2.8)for(let z=-24;z<=24;z+=4){const ring=new THREE.Mesh(new THREE.TorusGeometry(.11,.025,6,12),paint);ring.rotation.x=Math.PI/2;ring.position.set(x,.57,z);scene.add(ring);}
+ // Cargo containers with corrugation, corner castings, doors and stencilled markings
+ const palette=[0x566d72,0x785c4a,0x536b62,0x6b5c50,0x526878,0x77705c];
+ const slots=[[-10,-17],[-5,-17],[5,-17],[10,-17],[-10,3],[-5,3],[5,3],[10,3],[-10,20],[10,20]];
+ slots.forEach(([x,z],i)=>{
+  const w=4.4,h=3.8,d=10,c=palette[i%palette.length];
+  const body=box(scene,x,2.5,z,w,h,d,texmat(rustTex,.8,.32));body.material.color.setHex(c);body.material.map.repeat.set(1,2);
+  for(let k=0;k<13;k++){box(scene,x-w/2+.18+k*(w-.36)/12,2.5,z,.055,3.55,9.85,mat(0x28383d,.9,.25));}
+  for(let sx of [-1,1])for(let sz of [-1,1])box(scene,x+sx*(w/2-.12),2.5,z+sz*(d/2-.12),.24,3.8,.24,paint);
+  box(scene,x,4.43,z,w+.08,.12,d+.08,paint);
+  // end doors face toward the bow
+  box(scene,x,2.5,z-d/2-.07,w-.2,3.55,.1,mat(0x46565a,.85,.45));
+  for(let j=0;j<8;j++)box(scene,x-w/2+.2+j*(w-.4)/7,2.5,z-d/2-.14,.045,3.4,.08,paint);
+  for(let sx of [-1,1]){box(scene,x+sx*1.8,2.5,z-d/2-.2,.06,2.8,.1,dark);cylinder(scene,x+sx*1.8,2.5,z-d/2-.29,.035,.035,2.1,paint,8);}
+  // Small hazard label panel
+  box(scene,x-w/2+.55,3.95,z-d/2-.18,.65,.25,.025,yellow);
+ });
+ // Bridge superstructure at stern with window band
+ box(scene,0,3.2,24,10,4.6,6,paint);box(scene,0,5.65,21.8,10.2,.35,5.8,dark);
+ for(let x=-4.2;x<=4.2;x+=1.4)box(scene,x,4.25,20.92,1.05,1.45,.08,glass);
+ box(scene,0,5.95,24,11,.2,6,hull);
+ // bridge wings and upper mast
+ box(scene,-6,3.1,24,3,.3,7,deck);box(scene,6,3.1,24,3,.3,7,deck);
+ cylinder(scene,0,9.5,25,.13,.13,7,paint,10);
+ for(let y of [8.2,10.2,11.3])box(scene,0,y,25,2.8,.08,.08,paint);
+ // pipes, vents, winches and bollards
+ for(let x of [-13,13])for(let z of [-23,-10,8,23]){
+  cylinder(scene,x,.95,z,.48,.48,1.2,mat(0x8a4e38,.85,.4),16);
+  cylinder(scene,x,1.58,z,.52,.52,.12,paint,16);
+ }
+ for(let z of [-25,-9,9,25]){
+  for(let x of [-14,14]){cylinder(scene,x,.85,z,.23,.23,.65,paint,12);cylinder(scene,x,.55,z,.29,.29,.1,dark,12);}
+ }
+ // Exhaust stacks and ventilation housings
+ for(let x of [-3,3]){box(scene,x,1.2,25,1.5,1.2,1.5,dark);cylinder(scene,x,2.3,25,.38,.5,1.1,paint,16);box(scene,x,2.9,25,.9,.12,.9,dark);}
+ // Lifeboat pods on starboard side
+ for(let z of [-17,-12]){const pod=new THREE.Mesh(new THREE.CapsuleGeometry(.65,3,5,10),mat(0xc5c5b7,.8,.1));pod.rotation.x=Math.PI/2;pod.position.set(14.2,3.1,z);scene.add(pod);box(scene,14.2,2.5,z,1.1,.2,4,paint);}
+ // Staircases and walkways
+ buildStairs(-7,0,9,deck,paint);buildStairs(7,0,9,deck,paint);
+ // Small raised service deck
+ box(scene,0,3.1,13,8,.35,5,deck);for(let x=-3.8;x<=3.8;x+=.8)box(scene,x,3.65,10.8,.08,1.1,.08,paint);
+}
+function buildStairs(x,y,z,deckMaterial,railMaterial){
+ const group=new THREE.Group();group.position.set(x,y,z);scene.add(group);
+ for(let i=0;i<9;i++){const step=box(group,0,.22+i*.19,-i*.42,2.1,.16,.48,deckMaterial);step.position.y=.18+i*.19;}
+ for(let side of [-1,1]){const rail=box(group,side*1.05,1.1,-1.7,.09,2.1,4.2,railMaterial);rail.rotation.x=-.42;}
+}
+function buildAtmosphere(){
+ // Rain streaks are lightweight decorative particles, not a physics simulation.
+ const rainGeo=new THREE.BufferGeometry(),count=750,positions=new Float32Array(count*3);
+ for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*75;positions[i*3+1]=Math.random()*30;positions[i*3+2]=(Math.random()-.5)*90;}
+ rainGeo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+ const rainMat=new THREE.PointsMaterial({color:0xc6d9dc,size:.055,transparent:true,opacity:.38,depthWrite:false});
+ const points=new THREE.Points(rainGeo,rainMat);scene.add(points);rain.push({points,positions,count});
+ // Warm deck work lights
+ for(const [x,z] of [[-14,-24],[14,-24],[-14,23],[14,23],[0,24]]){
+  const lamp=box(scene,x,2.1,z,.22,.18,.22,mat(0xd4b77d,.35,.1));
+  const light=new THREE.PointLight(0xe0bd83,9,9,2);light.position.set(x,2.2,z);scene.add(light);
+ }
+}
+function buildTargets(){
+ const bodyMat=mat(0x555b56,.95),vest=mat(0x656c5a,.95),skin=mat(0x9b806b,.95),dark=mat(0x1e282b,.8,.2);
+ const spots=[[-12,-8],[12,-6],[-12,12],[12,12],[0,-23],[-2,8]];
+ spots.forEach((p,i)=>{
+  const g=new THREE.Group();g.position.set(p[0],.55,p[1]);
+  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.68,4,8),vest);torso.position.y=.95;torso.castShadow=true;g.add(torso);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.23,12,10),skin);head.position.y=1.65;head.castShadow=true;g.add(head);
+  const helmet=new THREE.Mesh(new THREE.SphereGeometry(.255,12,8,0,Math.PI*2,0,Math.PI*.55),dark);helmet.position.y=1.72;g.add(helmet);
+  const pack=box(g,0,.95,-.34,.55,.65,.24,bodyMat);
+  const legs=mat(0x343e3e,.98);for(let x of [-.14,.14]){const leg=box(g,x,.32,0,.17,.55,.18,legs);}
+  const barBg=new THREE.Mesh(new THREE.PlaneGeometry(.9,.09),new THREE.MeshBasicMaterial({color:0x17231f}));barBg.position.y=2.05;g.add(barBg);
+  const bar=new THREE.Mesh(new THREE.PlaneGeometry(.85,.055),new THREE.MeshBasicMaterial({color:0x75bd83}));bar.position.set(0,2.05,.012);g.add(bar);
+  scene.add(g);targets.push({g,name:['DOCK RAT','SEA GHOST','ANCHOR','CRATE RAT','DECK BOSS','WAVE RUNNER'][i],hp:100,bar,alive:true,respawn:0,phase:Math.random()*10,homeX:p[0],homeZ:p[1]});
+ });
+}
+let weaponRig,weaponGroup;
+function buildWeapon(){
+ weaponRig=new THREE.Group();camera.add(weaponRig);weaponRig.position.set(.36,-.34,-.62);
+ const sleeve=mat(0x38464a,.95),glove=mat(0x555d59,.95),metal=mat(0x394448,.5,.75),poly=texmat(rubberTex,.68,.25),wood=mat(0x594637,.8);
+ box(weaponRig,-.13,-.18,.12,.19,.2,.45,sleeve);
+ box(weaponRig,-.13,-.12,-.05,.16,.13,.28,glove);
+ weaponGroup=new THREE.Group();weaponRig.add(weaponGroup);
+ const add=(geo,m,x,y,z,rx=0,ry=0,rz=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.rotation.set(rx,ry,rz);o.castShadow=true;weaponGroup.add(o);return o;};
+ weaponRig.userData={add,metal,poly,wood};
+ makeWeapon();
+}
+function makeWeapon(){
+ if(!weaponRig)return;weaponGroup.clear();const {add,metal,poly,wood}=weaponRig.userData;
+ // Fictional, non-functional game prop silhouettes; visual variation only.
+ const widths=[.15,.16,.17,.18,.18,.19,.2,.22],lengths=[.46,.49,.5,.56,.62,.64,.7,.76];
+ const w=widths[weapon],l=lengths[weapon];
+ add(new THREE.BoxGeometry(w,.14,l),poly,0,0,0);
+ add(new THREE.CylinderGeometry(.035,.035,l*.72,12),metal,0,.025,-l*.55,Math.PI/2);
+ add(new THREE.BoxGeometry(w*.65,.19,.13),poly,0,-.14,.12,-.18);
+ add(new THREE.BoxGeometry(w*.6,.2,.12),weapon<2?metal:poly,0,-.2,-.04,-.08);
+ add(new THREE.BoxGeometry(w*.6,.045,.18),metal,0,.095,-.08);
+ add(new THREE.BoxGeometry(.045,.07,.04),metal,0,.15,-.31);
+ if(weapon>=4)add(new THREE.BoxGeometry(.12,.13,.23),wood,0,-.01,.23);
+ if(weapon>=6)add(new THREE.BoxGeometry(.13,.11,.26),poly,0,-.04,.34);
+ const muzzle=new THREE.Mesh(new THREE.SphereGeometry(.04,8,8),new THREE.MeshBasicMaterial({color:0xffd28a}));muzzle.position.set(0,.025,-l*.94);muzzle.visible=false;weaponGroup.add(muzzle);weaponRig.userData.muzzle=muzzle;
+}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
+function shoot(){
+ if(!locked||shotWait>0)return;shotWait=[.5,.42,.54,.24,.15,.13,.13,.09][weapon];
+ const dir=new THREE.Vector3();camera.getWorldDirection(dir);
+ const ray=new THREE.Raycaster(camera.position,dir,0,75);
+ const hit=ray.intersectObjects(targets.filter(t=>t.alive).flatMap(t=>t.g.children),true)[0];
+ const end=hit?hit.point.clone():camera.position.clone().add(dir.multiplyScalar(55));
+ if(hit){const t=targets.find(t=>t.alive&&t.g===hit.object.parent);if(t)damage(t);}
+ const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([camera.position.clone(),end]),new THREE.LineBasicMaterial({color:weaponTint[weapon],transparent:true,opacity:.7}));scene.add(line);tracers.push({line,life:.055});
+ const muzzle=weaponRig.userData.muzzle;if(muzzle){muzzle.visible=true;setTimeout(()=>{if(muzzle)muzzle.visible=false;},45);}
+ weaponRig.userData.kick=.07;
+}
+function damage(t){
+ const damageValues=[50,58,44,34,27,30,38,52];t.hp-=damageValues[weapon];t.bar.scale.x=Math.max(0,t.hp/100);
+ if(t.hp<=0){t.alive=false;t.g.visible=false;t.respawn=3.5;kills++;weapon=Math.min(7,weapon+1);makeWeapon();$('weapon').textContent=weapons[weapon];$('score').textContent=`ELIMINATIONS ${kills} / 7`;log(`<b>YOU</b> eliminated ${t.name} · ${weapons[weapon]}`);addText(`LOADOUT UPGRADED: ${weapons[weapon]}`);}
+}
+function update(dt){
+ if(!started)return;shotWait=Math.max(0,shotWait-dt);
+ const dir=camera.getWorldDirection(forward);forward.y=0;forward.normalize();right.crossVectors(forward,new THREE.Vector3(0,1,0)).normalize().negate();
+ const move=new THREE.Vector3();if(keys.KeyW)move.add(forward);if(keys.KeyS)move.sub(forward);if(keys.KeyD)move.add(right);if(keys.KeyA)move.sub(right);
+ if(move.lengthSq())camera.position.add(move.normalize().multiplyScalar((keys.ShiftLeft?9:5.7)*dt));
+ camera.position.x=THREE.MathUtils.clamp(camera.position.x,-14.3,14.3);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-26,26);
+ if(keys.Space&&grounded){vy=6.2;grounded=false;}vy-=17*dt;camera.position.y+=vy*dt;if(camera.position.y<1.72){camera.position.y=1.72;vy=0;grounded=true;}
+ // Gentle ship sway and bobbing ocean surface
+ const water=scene.getObjectByName('ocean');const pos=water.geometry.attributes.position;const t=clock.elapsedTime;
+ for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,Math.sin(x*.12+t*.65)*.17+Math.cos(z*.095+t*.52)*.14+Math.sin((x+z)*.045+t*.4)*.12);}pos.needsUpdate=true;water.geometry.computeVertexNormals();
+ rain.forEach(r=>{for(let i=0;i<r.count;i++){r.positions[i*3+1]-=dt*22;if(r.positions[i*3+1]<0){r.positions[i*3+1]=28;r.positions[i*3]=(Math.random()-.5)*75;r.positions[i*3+2]=(Math.random()-.5)*90;}}r.points.geometry.attributes.position.needsUpdate=true;});
+ targets.forEach(t=>{if(!t.alive){t.respawn-=dt;if(t.respawn<=0){t.alive=true;t.hp=100;t.bar.scale.x=1;t.g.visible=true;}return;}
+ t.phase+=dt;t.g.position.x=t.homeX+Math.sin(t.phase*.55)*1.2;t.g.position.z=t.homeZ+Math.cos(t.phase*.42)*1.0;t.g.rotation.y=Math.atan2(camera.position.x-t.g.position.x,camera.position.z-t.g.position.z);
+ });
+ tracers.forEach(p=>{p.life-=dt;if(p.life<=0){scene.remove(p.line);p.line.geometry.dispose();p.line.material.dispose();}});for(let i=tracers.length-1;i>=0;i--)if(tracers[i].life<=0)tracers.splice(i,1);
+ const kick=weaponRig.userData.kick||0;weaponRig.position.z=-.62+kick;weaponRig.userData.kick=Math.max(0,kick-dt*.5);
+ $('health').textContent=health;$('ammo').textContent='∞';
+}
+function animate(){if(!started)return;requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera);}
+try{init();}catch(error){console.error(error);$('hint').textContent='The game could not load. Check your internet connection, then reload the page.';}
+</script>
+</body></html>
