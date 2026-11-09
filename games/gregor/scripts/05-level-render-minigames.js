@@ -58,10 +58,25 @@ function initLevel() {
     gameTime = 0;
     resetKeys();
 
-    for (let r = 7; r < MAP_ROWS - 3; r += 4) {
-        for (let c = 3; c < MAP_COLS - 3; c += 4) {
-            if (MAP_GRID[r][c] === 0 && Math.hypot(c * TILE_SIZE + TILE_SIZE/2 - margusNPC.x, r * TILE_SIZE + TILE_SIZE/2 - margusNPC.y) > TILE_SIZE * 2 && seededRandom() < 0.6) {
-                guards.push(new Guard(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2));
+    // Keep the opening area clear and cap guard density so each run is readable.
+    const spawnX = player.x;
+    const spawnY = player.y;
+    const maxGuards = 12;
+    const minSpawnDistance = TILE_SIZE * 8;
+    const minGuardSpacing = TILE_SIZE * 4.5;
+
+    for (let r = 9; r < MAP_ROWS - 3 && guards.length < maxGuards; r += 5) {
+        for (let c = 3; c < MAP_COLS - 3 && guards.length < maxGuards; c += 5) {
+            if (MAP_GRID[r][c] !== 0 || seededRandom() >= 0.42) continue;
+
+            const gx = c * TILE_SIZE + TILE_SIZE / 2;
+            const gy = r * TILE_SIZE + TILE_SIZE / 2;
+            const farFromSpawn = Math.hypot(gx - spawnX, gy - spawnY) >= minSpawnDistance;
+            const farFromMargus = Math.hypot(gx - margusNPC.x, gy - margusNPC.y) >= TILE_SIZE * 3;
+            const spacedOut = guards.every(g => Math.hypot(g.x - gx, g.y - gy) >= minGuardSpacing);
+
+            if (farFromSpawn && farFromMargus && spacedOut) {
+                guards.push(new Guard(gx, gy));
             }
         }
     }
@@ -114,11 +129,17 @@ function triggerAlarm() {
     if (!alarmTriggered) {
         alarmTriggered = true;
         sfx.alarm();
-        showBannerAlert("ALARM TRIGGERED! GUARDS ALERTED!");
+        showBannerAlert("ALARM TRIGGERED! NEARBY GUARDS ARE INVESTIGATING!");
+
+        // Only nearby guards investigate the alarm. Distant guards keep patrolling,
+        // so triggering an alarm does not make the entire map rush the spawn area.
+        const alarmRadius = TILE_SIZE * 9;
         guards.forEach(g => {
-            if (g.hp > 0) {
-                g.state = 'CHASE';
-                g.chaseTimer = 7;
+            if (g.hp <= 0) return;
+            const distance = Math.hypot(g.x - player.x, g.y - player.y);
+            if (distance <= alarmRadius) {
+                g.state = 'SUSPICIOUS';
+                g.suspicionTimer = 2.2;
                 g.targetLastKnown = { x: player.x, y: player.y };
                 g.path = [];
             }

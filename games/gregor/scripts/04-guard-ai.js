@@ -53,13 +53,13 @@ class Guard {
         this.maxHp = 80;
         this.angle = seededRandom() * Math.PI * 2;
         this.targetAngle = this.angle;
-        this.speed = 1.3;
-        this.chaseSpeed = 2.3;
-        this.turnSpeed = 2.2;
-        this.chaseTurnSpeed = 3.8;
+        this.speed = 0.9;
+        this.chaseSpeed = 1.35;
+        this.turnSpeed = 1.7;
+        this.chaseTurnSpeed = 2.6;
         this.state = 'PATROL';
-        this.visionRadius = 240;
-        this.visionAngle = Math.PI / 3.4;
+        this.visionRadius = 180;
+        this.visionAngle = Math.PI / 3.8;
         this.suspicionTimer = 0;
         this.targetLastKnown = null;
         this.attackCooldown = 0;
@@ -83,12 +83,6 @@ class Guard {
         const distToPlayer = Math.hypot(player.x - this.x, player.y - this.y);
         const canSee = this.canSeePlayer();
         const canHear = distToPlayer < player.noiseRadius && player.state !== 'CROUCH';
-
-        if (alarmTriggered && this.state === 'PATROL') {
-            this.state = 'SUSPICIOUS';
-            this.suspicionTimer = 1.4;
-            this.targetLastKnown = { x: player.x, y: player.y };
-        }
 
         switch (this.state) {
             case 'PATROL':
