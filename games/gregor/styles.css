@@ -53,3 +53,25 @@ canvas {
     background: rgba(217, 119, 6, 0.7);
     opacity: 1 !important;
 }
+
+
+/* Responsive HUD and reliable touch input */
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: 2px solid #fbbf24; outline-offset: 3px; }
+#gameCanvas { image-rendering: auto; }
+.touch-btn { touch-action: none; }
+#minimap-wrap { opacity: .88; transition: opacity .2s ease; }
+#minimap-wrap:hover { opacity: 1; }
+@media (max-width: 640px) {
+    #minimap-wrap { bottom: 10.5rem; right: .65rem; transform: scale(.72); transform-origin: bottom right; }
+    #objective-panel { top: 5.6rem; }
+    #hud-top { gap: .25rem; }
+}
+@media (max-height: 560px) {
+    #touch-dpad { width: 8.5rem; height: 8.5rem; }
+    #mobile-controls > div:last-child { width: 8.5rem; height: 8.5rem; gap: .35rem; }
+    #minimap-wrap { transform: scale(.65); transform-origin: bottom right; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
