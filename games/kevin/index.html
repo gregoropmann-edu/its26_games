@@ -174,6 +174,52 @@ input[type=checkbox]{accent-color:var(--buoy);width:20px;height:20px}
 .splash-card .sp-warn{margin:8px 0 0;font-size:22px;line-height:1.5;color:var(--brass);max-width:34ch}
 .splash-card .sp-tip{margin:0;font-size:15px;color:var(--mist)}
 .splash-card .btn{margin-top:8px;min-width:180px}
+.mini-panel{width:min(520px,100%)}
+.mini-card{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:8px;padding:14px;color:var(--foam);cursor:pointer;font:inherit}
+.mini-card:hover{border-color:var(--brass)}
+.mini-card b{display:block;font-family:var(--display);font-weight:400;font-size:22px}
+.mini-card span{color:var(--mist);font-size:14px}
+.mc-ic{display:grid;grid-template-columns:repeat(2,22px);gap:3px;flex:none}
+.mc-ic i{width:22px;height:22px;border-radius:4px;background:#ff8a3d;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.mc-ic i:nth-child(2){background:#4fc3ff}.mc-ic i:nth-child(3){background:#7ee08f}.mc-ic i:nth-child(4){background:#ffd24a}
+.bb-top{display:flex;align-items:center;gap:18px;margin-bottom:10px}
+.bb-top div{display:flex;flex-direction:column}
+.bb-top span{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.bb-top b{font-family:var(--display);font-weight:400;font-size:30px;color:var(--foam);line-height:1.1}
+.bb-top .btn{margin-left:auto}
+#bbCv{width:100%;height:auto;display:block;touch-action:none;border-radius:8px;background:#0b1f28}
+.acc-panel{width:min(600px,100%);box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:30px 32px;overflow:hidden}
+.acc-panel h1{margin:0 0 6px;text-align:center;font-size:clamp(34px,9vw,72px);line-height:.95;white-space:nowrap}
+.acc-panel h1 .b{font-size:1em}
+.acc-panel label{display:flex;flex-direction:column;gap:6px;font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.acc-panel input[type=text],.acc-panel input:not([type]),.acc-panel input[type=password]{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:6px;color:var(--foam);font:16px inherit;padding:10px 11px;letter-spacing:0;text-transform:none}
+.acc-panel input:focus{outline:none;border-color:var(--brass)}
+.acc-check{flex-direction:row!important;align-items:center;gap:8px!important;text-transform:none!important;letter-spacing:0!important;font:14px inherit!important;color:var(--foam)!important}
+.acc-tabs{display:flex;gap:6px}
+.acc-tabs button{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--mist);border-radius:6px;padding:9px;font:600 13px/1 var(--mono);cursor:pointer}
+.acc-tabs button.on{border-color:var(--brass);color:var(--brass)}
+.acc-wide{width:100%}
+.acc-msg{min-height:18px;margin:0;font-size:14px;color:var(--danger)}
+.acc-msg.ok{color:#7ee08f}
+.acc-small{margin:0;font-size:12px;color:var(--mist);text-align:center}
+.adm-det{font-size:12px;color:var(--mist);line-height:1.5}
+.adm-del{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:5px;padding:4px 8px;font:600 11px/1 var(--mono);cursor:pointer}
+.adm-del:hover{background:rgba(255,80,80,.12)}
+.lb-panel{width:min(760px,100%)}
+.lb-me{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.lb-me label{display:flex;flex-direction:column;gap:6px;font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist);flex:1;min-width:200px}
+.lb-me input{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:6px;color:var(--foam);font:16px var(--body,inherit);padding:9px 10px;text-transform:none;letter-spacing:0}
+.lb-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.lb-tabs button{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--mist);border-radius:999px;padding:6px 12px;font:600 12px/1 var(--mono);cursor:pointer}
+.lb-tabs button.on{border-color:var(--brass);color:var(--brass)}
+.lb-table{width:100%;border-collapse:collapse;font-size:15px}
+.lb-table th{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist);text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+.lb-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--foam)}
+.lb-table td.n{font-variant-numeric:tabular-nums;text-align:right}.lb-table th.n{text-align:right}
+.lb-table tr.me td{background:rgba(224,184,103,.10)}
+.lb-table .rk{width:34px;color:var(--mist);font-variant-numeric:tabular-nums}
+.lb-table tr:nth-child(1) .rk{color:#ffd24a}.lb-table tr:nth-child(2) .rk{color:#cfd6dc}.lb-table tr:nth-child(3) .rk{color:#d99a5b}
+.lb-note{color:var(--mist);font-size:13px;margin:10px 0 0}
 .intro-card{width:min(560px,100%);display:flex;flex-direction:column;gap:12px}
 .intro-card .ic-top{display:flex;justify-content:space-between;align-items:center;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
 .intro-card .ic-top span:last-child{color:var(--mist)}
@@ -334,10 +380,12 @@ input[type=checkbox]{accent-color:var(--buoy);width:20px;height:20px}
       <section><h2>Vali kalamees</h2><div class="cards" id="charCards"></div></section>
       <section><h2><span>Vali veekogu</span><span id="lvlNote"></span></h2><div class="cards maps" id="mapCards"></div></section>
       <div class="row"><button class="btn primary" id="btnPlay">Sõida välja</button></div>
-      <div class="row" style="margin-top:-6px;flex-wrap:nowrap"><button class="btn" id="btnChars">Tegelased</button><button class="btn" id="btnSet1">Settings</button><button class="btn" id="btnFull1">Fullscreen</button></div>
+      <div class="row" style="margin-top:-6px;flex-wrap:wrap"><button class="btn" id="btnChars">Tegelased</button><button class="btn" id="btnLb">Edetabel</button><button class="btn" id="btnAdmin" hidden>Admin</button><button class="btn" id="btnSet1">Settings</button><button class="btn" id="btnFull1">Fullscreen</button></div>
       <div class="ctrl-mini" id="ctrlMini"></div>
       <p class="mobile-note">Omad Kalamehed vajab klaviatuuri ja hiirt.</p>
       <p class="profile" id="profileLine"></p>
+      <p class="profile" id="saveLine" style="opacity:.75;font-size:13px"></p>
+      <p class="profile" id="accLine" style="font-size:13px"></p>
     </div>
   </div>
 
@@ -349,6 +397,7 @@ input[type=checkbox]{accent-color:var(--buoy);width:20px;height:20px}
       <button class="btn" id="pSet">Settings</button>
       <button class="btn" id="btnFull3">Fullscreen</button>
       <button class="btn" id="pMenu">Peamenüü</button>
+      <button class="btn" id="pMini">Minimängud</button>
     </div>
   </div>
 
@@ -388,6 +437,9 @@ input[type=checkbox]{accent-color:var(--buoy);width:20px;height:20px}
       <div id="bindList"></div>
       <div class="row" style="margin-top:12px"><button class="btn" id="resetKeys">Reset keybinds</button></div>
       <div class="set-sec">Progress</div>
+      <div class="set-row" style="flex-direction:column;align-items:stretch;gap:8px"><span>Save backup code — copy it to keep your progress anywhere, paste one to load it</span>
+        <textarea id="saveCode" rows="3" spellcheck="false" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.25);color:var(--foam);border:1px solid var(--line);border-radius:6px;padding:8px;font:12px/1.4 var(--mono);resize:vertical" placeholder="Paste a save code here to load it"></textarea>
+        <div class="row"><button class="btn" id="saveCopy">Copy save code</button><button class="btn" id="saveLoad">Load save code</button><button class="btn" id="saveFile">Download save file</button></div></div>
       <div class="row"><button class="btn danger" id="resetSave">Reset all progress</button></div>
     </div>
   </div>
@@ -403,6 +455,50 @@ input[type=checkbox]{accent-color:var(--buoy);width:20px;height:20px}
     </div>
   </div>
 
+  <div id="miniScr" class="screen center" hidden>
+    <div class="panel mini-panel">
+      <div class="panel-head"><h2 id="miniTitle">Minimängud</h2><button class="x" id="miniBack">Tagasi</button></div>
+      <div id="miniList">
+        <button class="mini-card" id="miniBlocks"><div class="mc-ic"><i></i><i></i><i></i><i></i></div><div><b>Klotsipusle</b><span>Lohista klotse 8×8 lauale. Täida rida või veerg, et see plahvataks.</span></div></button>
+      </div>
+      <div id="bbWrap" hidden>
+        <div class="bb-top"><div><span>Skoor</span><b id="bbScore">0</b></div><div><span>Rekord</span><b id="bbBest">0</b></div><button class="btn" id="bbNew">Uus mäng</button></div>
+        <canvas id="bbCv" width="440" height="600"></canvas>
+      </div>
+    </div>
+  </div>
+  <div id="accScr" class="screen center splash-full" hidden>
+    <div class="panel acc-panel">
+      <h1>Omad<span class="b">Kalamehed</span></h1>
+      <div class="acc-tabs"><button data-acc="login" class="on">Logi sisse</button><button data-acc="new">Loo konto</button></div>
+      <div id="accResume" hidden><button class="btn primary acc-wide" id="accResumeBtn"></button><p class="acc-small">või logi sisse teise kontoga allpool</p></div>
+      <label>Kasutajanimi<input id="accUser" maxlength="16" autocomplete="username" spellcheck="false" placeholder="nt kalamees123"></label>
+      <label>Parool<input id="accPass" type="password" maxlength="64" autocomplete="current-password"></label>
+      <label id="accPass2Row" hidden>Parool uuesti<input id="accPass2" type="password" maxlength="64" autocomplete="new-password"></label>
+      <label id="accCarryRow" class="acc-check" hidden><input type="checkbox" id="accCarry" checked> Too praegune edenemine uuele kontole kaasa</label>
+      <p class="acc-msg" id="accMsg"></p>
+      <button class="btn primary acc-wide" id="accGo">Logi sisse</button>
+      <button class="btn acc-wide" id="accGuest">Mängi ilma kontota</button>
+      <p class="acc-small">Ära kasuta siin oma päris paroole (e-post, pank jne). Kontod töötavad, kui oled claude.ai-sse sisse logitud ja sul on mängule vähemalt Contributor õigus.</p>
+    </div>
+  </div>
+  <div id="adminScr" class="screen center" hidden>
+    <div class="panel wide lb-panel">
+      <div class="panel-head"><h2>Admin</h2><span style="display:flex;gap:8px"><button class="x" id="admRefresh">Värskenda</button><button class="x" id="admBack">Tagasi</button></span></div>
+      <p class="lb-note" style="margin-top:0">Seda lehte näed ainult sina (mängu omanik).</p>
+      <div class="shop-h">Kontod</div><div id="admAcc"><p class="lb-note">Laen…</p></div>
+      <div class="shop-h" style="margin-top:18px">Edetabel</div><div id="admLb"><p class="lb-note">Laen…</p></div>
+    </div>
+  </div>
+  <div id="lbScr" class="screen center" hidden>
+    <div class="panel wide lb-panel">
+      <div class="panel-head"><h2>Edetabel</h2><button class="x" id="lbBack">Tagasi</button></div>
+      <div class="lb-me"><label>Sinu nimi edetabelis <input id="lbName" maxlength="18" spellcheck="false" placeholder="Kalamees"></label><button class="btn primary" id="lbSaveName">Salvesta nimi</button></div>
+      <div class="lb-tabs"><button data-sort="level" class="on">Kõrgeim tase</button><button data-sort="fish">Kalu kokku</button><button data-sort="herring">Heeringaid</button><button data-sort="cash">Raha</button></div>
+      <div id="lbBody"><p class="lb-note">Laen…</p></div>
+      <p class="lb-note" id="lbInfo"></p>
+    </div>
+  </div>
   <div id="charsScr" class="screen center" hidden>
     <div class="panel wide">
       <div class="panel-head"><h2>Tegelased</h2><button class="x" id="charsBack">Tagasi</button></div>
@@ -525,8 +621,8 @@ const MAP_ORDER=['lake','baltic','fjord'];
 const SWEET=[0.78,0.94], POWER_MAX=1.22;
 
 /* ================= SAVE ================= */
-const DEFAULT_KEYS={forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD',fish:'KeyE',inventory:'KeyI',shop:'KeyB',view:'KeyV',chars:'KeyC',harpoon:'KeyH',song:'KeyN',drift:'ShiftLeft',nitro:'Space',fullscreen:'KeyF'};
-const ACTION_LABEL={forward:'Row forward',back:'Row backward',left:'Turn left',right:'Turn right',fish:'Start / stop fishing',inventory:'Inventory',shop:'Shop',chars:'Characters',harpoon:'Harpoon / rod switch',view:'Change camera view (F5 also works)',song:'Next song',drift:'Drift (hold, only with nitro)',nitro:'Nitro boost (hold)',fullscreen:'Fullscreen'};
+const DEFAULT_KEYS={forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD',fish:'KeyE',inventory:'KeyI',shop:'KeyB',view:'KeyV',chars:'KeyC',harpoon:'KeyH',phone:'KeyT',flip:'KeyG',song:'KeyN',drift:'ShiftLeft',nitro:'Space',fullscreen:'KeyF'};
+const ACTION_LABEL={forward:'Row forward',back:'Row backward',left:'Turn left',right:'Turn right',fish:'Start / stop fishing',inventory:'Inventory',shop:'Shop',chars:'Characters',harpoon:'Harpoon / rod switch',phone:'Phone (pocket / take out)',flip:'Middle finger (show / hide)',view:'Change camera view (F5 also works)',song:'Next song',drift:'Drift (hold, only with nitro)',nitro:'Nitro boost (hold)',fullscreen:'Fullscreen'};
 const SAVE_KEY='herring-hunt-save-v1';
 function freshSettings(){return {showFps:true,fpsCap:0,quality:'high',brightness:100,sens:50,fov:75,volume:60,music:40,builtin:false,shuffle:false,invertY:false,keys:Object.assign({},DEFAULT_KEYS)};}
 function freshSave(){return {char:'bairon',map:'lake',cash:40,xp:0,level:1,rods:['twig'],lures:['spinner'],rod:'twig',lure:'spinner',catches:{},total:0,cooler:[],slots:{},slotKey:'bairon|lake',settings:freshSettings()};}
@@ -569,11 +665,25 @@ function mergeSave(o){
   return s;
 }
 function loadSave(){try{const r=localStorage.getItem(SAVE_KEY); if(r) return mergeSave(JSON.parse(r));}catch(e){} return freshSave();}
-function save(){ S.savedAt=Date.now(); try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} cloudSave(); }
+function accOn(){ try{ return !!ACC.name; }catch(e){ return false; } }
+function save(){ S.savedAt=Date.now(); try{ lbPush(false); }catch(e){}
+  if(accOn()){ try{ localStorage.setItem('omad-kalamehed-acc-cache',JSON.stringify(S)); }catch(e){} accSave(false); return; }   // account progress stays out of this browser's guest save
+  const js=JSON.stringify(S); let ok=false; try{localStorage.setItem(SAVE_KEY,js); ok=true;}catch(e){} saveLocalOk=ok; idbSave(js); cloudSave(); }
+/* 3 places a save lives: browser localStorage, browser IndexedDB (survives some storage clears/quota issues), and the player's claude.ai account */
+let saveLocalOk=true, cloudOk=null, idbT=null;
+function idbOpen(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('omad-kalamehed',1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){ rej(e); } }); }
+function idbSave(js){ clearTimeout(idbT); idbT=setTimeout(async()=>{ try{ const db=await idbOpen(); db.transaction('kv','readwrite').objectStore('kv').put(js,'save'); }catch(e){} },800); }
+async function idbLoad(){ try{ const db=await idbOpen(); return await new Promise(res=>{ const q=db.transaction('kv').objectStore('kv').get('save'); q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null); }); }catch(e){ return null; } }
+function adoptSave(o,msg){ S=mergeSave(o); if(!accOn()){ try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} }
+  applySettings(); buildMap(S.level>=mapD().unlock?S.map:'lake'); resetPlayer(); buildRod(); renderTitle(); if(msg) toast(msg); }
+function saveWhere(){ return cloudOk?'konto + see brauser':(saveLocalOk?'ainult see brauser':'ei salvestu (brauseri salvestus on blokeeritud)'); }
 /* progress is also kept in your private claude.ai storage, so it survives new versions, other browsers and cleared site data */
 let cloudRef=null, cloudT=null;
-function cloudSave(now){ if(!cloudRef) return; clearTimeout(cloudT); const go=()=>{ try{ cloudRef.set({json:JSON.stringify(S),at:Date.now()}).catch(()=>{}); }catch(e){} }; if(now) go(); else cloudT=setTimeout(go,1500); }
+function cloudSave(now){ if(!cloudRef) return; clearTimeout(cloudT); const go=()=>{ try{ cloudRef.set({json:JSON.stringify(S),at:Date.now()}).then(()=>{ if(cloudOk!==true){ cloudOk=true; if(mode==='title') renderTitle(); } },()=>{ if(cloudOk!==false){ cloudOk=false; if(mode==='title') renderTitle(); } }); }catch(e){} }; if(now) go(); else cloudT=setTimeout(go,1500); }
 async function cloudInit(){
+  // the IndexedDB copy can be newer than localStorage (e.g. localStorage was cleared)
+  if(ACC.name) return;   // playing on an in-game account: that account's save wins
+  try{ const js=await idbLoad(); if(js){ const o=JSON.parse(js); if((o.savedAt||0)>(S.savedAt||0)&&mode==='title') adoptSave(o,'Edenemine taastatud brauseri varukoopiast.'); } }catch(e){}
   try{
     if(!window.claude||typeof window.claude.use!=='function') return;
     const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]); if(!db||!user) return;
@@ -584,15 +694,14 @@ async function cloudInit(){
     if(!snap.exists){ try{ const old=await Promise.race([db.doc('data/users/'+id+'/save').get(),tmo()]); if(old.exists) snap=old; }catch(e){} }   // earlier save location
     cloudRef=ref;
     let cs=null; if(snap.exists){ try{ cs=JSON.parse(snap.data().json); }catch(e){} }
+    if(ACC.name){ cloudRef=null; return; }
     const fresh=!S.total&&S.level===1&&!S.xp;
     if(cs&&((cs.savedAt||0)>(S.savedAt||0)||(fresh&&(cs.total||cs.xp)))&&mode==='title'){
-      S=mergeSave(cs); try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}
-      applySettings(); buildMap(S.level>=mapD().unlock?S.map:'lake'); resetPlayer(); buildRod(); renderTitle();
-      toast('Edenemine laaditud: tase <b>'+S.level+'</b>, '+S.total+' kala');
+      adoptSave(cs,'Edenemine laaditud kontolt: tase <b>'+cs.level+'</b>'); cloudSave(true);
     } else cloudSave(true);
   }catch(e){}
 }
-addEventListener('pagehide',()=>{ try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} cloudSave(true); });
+addEventListener('pagehide',()=>{ if(accOn()) return; try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} cloudSave(true); });
 let S=freshSave();
 const rodD=()=>RODS.find(r=>r.id===S.rod)||RODS[0];
 const lureD=()=>LURES.find(r=>r.id===S.lure)||LURES[0];
@@ -1871,14 +1980,33 @@ function buildBuddy(f,P,px,mirror,O){
       box(g,0.022,0.03,0.008,sil,0,0.73,-0.124); box(g,0.016,0.016,0.008,sil,0,0.795,-0.124); } }
   else if(!P.shirtless){ box(g,0.008,0.46,0.012,hoodD,0,0.72,-0.118); box(g,0.3,0.14,0.012,hoodD,0,0.56,-0.118); box(g,0.24,0.06,0.03,hoodD,0,0.94,-0.1);
     [-1,1].forEach(sd=>box(g,0.008,0.12,0.008,L('#d9dccf'),sd*0.04,0.85,-0.124)); }
+  if(P.zigzag){ // navy shirt, yellow right side split by a zig-zag edge with a navy bolt inside it (no badges or logos)
+    const mk=(mirror)=>{ const cv=document.createElement('canvas'); cv.width=256; cv.height=320; const x=cv.getContext('2d');
+      if(mirror){ x.translate(256,0); x.scale(-1,1); }
+      x.fillStyle=P.hood; x.fillRect(0,0,256,320);
+      // lightning edge: steep strokes down-left with short jogs to the right
+      const edge=(off)=>{ const pts=[]; let x0=96+off, y=0; pts.push([x0,0]); for(let i=0;i<5;i++){ y+=66; pts.push([x0-40,y]); pts.push([x0+2,y-6]); } return pts; };
+      x.fillStyle=P.sleeveR; x.beginPath(); x.moveTo(0,0); edge(0).forEach(([a,b])=>x.lineTo(a,b)); x.lineTo(0,330); x.closePath(); x.fill();
+      // a yellow bolt beside it on the navy
+      const l=edge(26), r=edge(60); x.beginPath(); l.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b)); r.reverse().forEach(([a,b])=>x.lineTo(a,b)); x.closePath(); x.fill();
+      const gr=x.createLinearGradient(0,0,256,320); gr.addColorStop(0,'rgba(255,255,255,.08)'); gr.addColorStop(1,'rgba(0,0,0,.12)'); x.fillStyle=gr; x.fillRect(0,0,256,320);
+      return new T.MeshLambertMaterial({map:new T.CanvasTexture(cv)}); };
+    const fr=new T.Mesh(new T.PlaneGeometry(0.42,0.52),mk(false)); fr.position.set(0,0.71,-0.1162); fr.rotation.y=Math.PI; g.add(fr);
+    const bk=new T.Mesh(new T.PlaneGeometry(0.42,0.52),mk(true)); bk.position.set(0,0.71,0.1162); g.add(bk);
+    const sp=new T.Mesh(new T.PlaneGeometry(0.23,0.52),L(P.sleeveR)); sp.position.set(0.2105,0.71,0); sp.rotation.y=Math.PI/2; g.add(sp); }
+  if(P.collar){ const cm=L(P.hoodD); [-1,1].forEach(sd=>{ const c=box(g,0.11,0.022,0.07,cm,sd*0.055,0.975,-0.09); c.rotation.set(0.5,sd*0.25,-sd*0.35); });
+    box(g,0.2,0.03,0.2,cm,0,0.97,0.0); }
   if(P.backName){ // white name + number printed on the back of the shirt
     const cv=document.createElement('canvas'); cv.width=256; cv.height=320; const x=cv.getContext('2d'); x.fillStyle='#f5f5f2'; x.textAlign='center';
-    x.font='400 40px Bungee, Impact, "Arial Black", sans-serif'; x.fillText(P.backName,128,70); x.font='400 150px Bungee, Impact, "Arial Black", sans-serif'; x.fillText(P.backNum||'',128,230);
-    const bp=new T.Mesh(new T.PlaneGeometry(0.4,0.5),new T.MeshBasicMaterial({map:new T.CanvasTexture(cv),transparent:true})); bp.position.set(0,0.71,0.1165); g.add(bp); }
+    x.strokeStyle='#14193a'; x.lineJoin='round';
+    x.font='400 40px Bungee, Impact, "Arial Black", sans-serif'; x.lineWidth=6; x.strokeText(P.backName,128,70); x.fillText(P.backName,128,70);
+    x.font='400 150px Bungee, Impact, "Arial Black", sans-serif'; x.lineWidth=10; x.strokeText(P.backNum||'',128,230); x.fillText(P.backNum||'',128,230);
+    const bp=new T.Mesh(new T.PlaneGeometry(0.4,0.5),new T.MeshBasicMaterial({map:new T.CanvasTexture(cv),transparent:true})); bp.position.set(0,0.71,0.1172); g.add(bp); }
   // arms holding the rod in front of the belly
   const fArms={};
-  [['r',1],['l',-1]].forEach(([k,sd])=>{ fArms[k+'u']=new T.Mesh(UNIT_BOX,sleeveM); fArms[k+'f']=new T.Mesh(UNIT_BOX,P.shortSleeve?skin:sleeveM); fArms[k+'w']=new T.Mesh(UNIT_BOX,skin); g.add(fArms[k+'u'],fArms[k+'f'],fArms[k+'w']);
-    box(g,0.13,0.14,0.15,P.kit?sleeveM:hood,sd*0.215,0.9,0); });
+  const sleeveRM=P.sleeveR?L(P.sleeveR):sleeveM;
+  [['r',1],['l',-1]].forEach(([k,sd])=>{ const sm=sd>0?sleeveRM:sleeveM; fArms[k+'u']=new T.Mesh(UNIT_BOX,sm); fArms[k+'f']=new T.Mesh(UNIT_BOX,P.shortSleeve?skin:sm); fArms[k+'w']=new T.Mesh(UNIT_BOX,skin); g.add(fArms[k+'u'],fArms[k+'f'],fArms[k+'w']);
+    box(g,0.13,0.14,0.15,P.kit?sleeveM:(P.sleeveR&&sd>0?sleeveRM:hood),sd*0.215,0.9,0); });
   // head group pivots at the neck
   box(g,0.1,0.08,0.1,skin,0,1.0,0);
   const h=new T.Group(); h.rotation.order='YXZ'; h.position.set(0,1.05,0); g.add(h);
@@ -2609,7 +2737,7 @@ function toast(msg,cls){
 }
 let bigT=0;
 function bigcall(txt,cls,dur){const b=$('bigcall'); b.textContent=txt; b.className=cls||''; b.style.opacity='1'; bigT=dur||1.0;}
-const menuOpen=()=>!$('pause').hidden||!$('settings').hidden||!$('inv').hidden;
+const menuOpen=()=>!$('pause').hidden||!$('settings').hidden||!$('inv').hidden||!$('miniScr').hidden;
 const catchOpen=()=>!$('catch').hidden;
 const blocking=()=>mode!=='play'||menuOpen()||catchOpen()||!!cine;
 let cine=null;   // in-game crew introduction: camera flies to each face
@@ -2658,6 +2786,7 @@ function buildCastTicks(){
 let lastHint='';
 function setHint(h){ if(h!==lastHint){ $('hint').innerHTML=h; lastHint=h; } }
 function hintFor(){
+  if(!HP.on&&F.state==='waiting'&&viewMode===0) return 'Jälgi ujukit. Hoia <kbd>LMB</kbd>, et aeglaselt sisse kerida · '+K('fish')+' keri kiiresti sisse · '+K('phone')+' telefon '+(PH.pocket?'välja':'taskusse')+' · '+K('flip')+' 🖕';
   if(HP.on) return HP.state==='aim'?(HP.power>1?'Liiga kaua! Lase kohe lahti':'Lase lahti, et lasta'):HP.state==='idle'?'Harpuunipüss käes: hoia <kbd>LMB</kbd>, et sihtida ja pinguldada, lase lahti, et lasta · '+K('harpoon')+' õng tagasi':'…';
   switch(F.state){
     case 'idle': return 'Vajuta '+K('fish')+', et õng välja võtta · '+K('forward')+K('left')+K('back')+K('right')+' sõua \u00b7 hoia '+K('nitro')+' nitro \u00b7 '+K('nitro')+'+'+K('drift')+' drift';
@@ -2728,7 +2857,7 @@ function landLure(){
   F.dist=Math.hypot(x-camera.position.x,z-camera.position.z);
   ripple(x,z,1.2,1.4); splash(x,waveH(x,z,time),z,16,0.6); SFX.splash(0.7);
   if(!inBounds(x,z,0)||colliders.some(c=>Math.hypot(x-c.x,z-c.z)<c.r)){ toast('Jäi kaldasse kinni. Keran tagasi.','bad'); setState('reelin'); return; }
-  setState('waiting'); F.biteT=rand(3,8)/lureD().bite; F.nibbleT=rand(0.8,2.2);
+  setState('waiting'); F.biteT=rand(7,15)/lureD().bite; F.nibbleT=rand(0.8,2.2);
   $('castM').textContent=F.flight.dist.toFixed(1)+' m';
   toast('Vise <b>'+F.dist.toFixed(1)+' m</b>');
 }
@@ -2775,6 +2904,349 @@ function landTrash(fi,f){
   splash(lurePos.x,lurePos.y,lurePos.z,14,0.5); SFX.splash(0.5); SFX.catch();
   addXP(xp); hudStats(); save();
   setTimeout(()=>friendSay(fi.id==='t_coin'?'coin':'trash'),900);
+}
+/* ================= PHONE =================
+   while your line is out and you're waiting for a bite, your free hand holds a phone and the thumb plays a block puzzle on it */
+const PH={pocket:false,wasWait:false,k:0,t:0,acc:0,lane:1,x:1,jump:0,obs:[],coins:[],score:0,speed:9,spawn:0,run:0,dead:0};
+const phCv=document.createElement('canvas'); phCv.width=180; phCv.height=360; const phX=phCv.getContext('2d');
+const phTex=new T.CanvasTexture(phCv); phTex.minFilter=T.LinearFilter;
+const phone=new T.Group(); phone.visible=false; eye.add(phone);
+{ const body=new T.Mesh(new T.BoxGeometry(0.074,0.152,0.009),new T.MeshPhongMaterial({color:0x111216,shininess:80,specular:0x555555})); phone.add(body);
+  const scr=new T.Mesh(new T.PlaneGeometry(0.067,0.134),new T.MeshBasicMaterial({map:phTex})); scr.position.z=0.0048; phone.add(scr);
+  const cam=new T.Mesh(new T.CylinderGeometry(0.004,0.004,0.002,10),new T.MeshBasicMaterial({color:0x000000})); cam.rotation.x=Math.PI/2; cam.position.set(0,0.07,0.0052); phone.add(cam); }
+let phHand=null;
+function phEnsureHand(){ if(phHand&&phHand.userData.ch===S.char) return; if(phHand) phone.remove(phHand);
+  const c=chD(), sk=new T.MeshLambertMaterial({color:new T.Color(c.skin)}), cr=new T.MeshLambertMaterial({color:new T.Color(shade(c.skin,-40))});
+  // a proper left hand cradling the phone: palm on the back, thumb up the left edge, fingertips curling round the right edge
+  const arm=new T.MeshLambertMaterial({color:new T.Color(c.arm||c.skin)});
+  const g=new T.Group(), bx=(w,h,d,x,y,z,m,rz)=>{ const o=new T.Mesh(UNIT_BOX,m||sk); o.scale.set(w,h,d); o.position.set(x,y,z); if(rz) o.rotation.z=rz; g.add(o); return o; };
+  bx(0.07,0.08,0.02,0.004,-0.04,-0.016);                       // palm behind the phone
+  bx(0.05,0.035,0.024,-0.012,-0.085,-0.018);                   // heel of the palm
+  // the thumb is the part that plays: base + middle segments stretch to wherever the tip is on the screen
+  g.userData.tb=bx(1,1,1,0,0,0); g.userData.tm=bx(1,1,1,0,0,0);
+  g.userData.tt=bx(0.018,0.02,0.009,0,0,0);                    // thumb pad
+  g.userData.tn=bx(0.011,0.008,0.002,0,0,0,cr);                // thumbnail
+  for(let i=0;i<4;i++){ const y=-0.004-i*0.021, sh=i===3?0.8:1;
+    bx(0.016,0.017*sh,0.022,0.044,y,-0.006);                    // finger wrapping the right edge
+    bx(0.011*sh,0.015*sh,0.008,0.036,y,0.0075);                 // fingertip just over the screen edge
+    bx(0.003,0.012*sh,0.004,0.0305,y,0.0115,cr); }              // fingertip crease
+  bx(0.05,0.11,0.042,0.0,-0.15,-0.03,arm);                      // wrist / forearm going down out of view
+  phHand=g; phHand.userData.ch=S.char; phone.add(phHand); phThumb(); }
+/* phone game: a self-playing block puzzle — the thumb picks a piece from the tray and drags it onto the 8x8 board */
+const PG={N:8,CX:10,CY:56,C:20,TY:268};
+function phPiece(){ return {cells:BB_SHAPES[Math.floor(Math.random()*BB_SHAPES.length)],col:BB_COLS[Math.floor(Math.random()*BB_COLS.length)],used:false}; }
+function phReset(){ PH.g=Array.from({length:PG.N},()=>Array(PG.N).fill(null)); PH.tray=[phPiece(),phPiece(),phPiece()]; PH.score=0; PH.st='think'; PH.t=0.6; PH.mv=null; PH.flash=[]; PH.over=0;
+  PH.thumb={x:40,y:330,press:0}; }
+function phFits(p,gx,gy){ return p.cells.every(([x,y])=>{ const cx=gx+x, cy=gy+y; return cx>=0&&cy>=0&&cx<PG.N&&cy<PG.N&&!PH.g[cy][cx]; }); }
+function phSlot(i){ return {x:30+i*60,y:PG.TY+36}; }
+function phPieceBox(p){ let w=0,h=0; p.cells.forEach(([x,y])=>{ w=Math.max(w,x+1); h=Math.max(h,y+1); }); return {w,h}; }
+// the thumb's brain: try every piece in every spot, prefer clearing lines and packing tight against walls/blocks
+function phBest(){ let best=null; const N=PG.N;
+  PH.tray.forEach((p,pi)=>{ if(p.used) return;
+    for(let gy=0;gy<N;gy++) for(let gx=0;gx<N;gx++){ if(!phFits(p,gx,gy)) continue;
+      const g=PH.g.map(r=>r.slice()); p.cells.forEach(([x,y])=>g[gy+y][gx+x]=1);
+      let lines=0; for(let r=0;r<N;r++) if(g[r].every(Boolean)) lines++; for(let c=0;c<N;c++) if(g.every(r=>r[c])) lines++;
+      let touch=0; p.cells.forEach(([x,y])=>{ const cx=gx+x, cy=gy+y; [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{ const nx=cx+dx, ny=cy+dy; if(nx<0||ny<0||nx>=N||ny>=N||(PH.g[ny][nx])) touch++; }); });
+      let iso=0; for(let y=0;y<N;y++) for(let x=0;x<N;x++) if(!g[y][x]){ let f=0; [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{ const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=N||ny>=N||g[ny][nx]) f++; }); if(f===4) iso++; }
+      const sc=lines*40+touch*2-iso*9+p.cells.length+Math.random()*1.5;
+      if(!best||sc>best.sc) best={sc,pi,gx,gy}; } });
+  return best; }
+function phPlace(m){ const p=PH.tray[m.pi], N=PG.N; p.used=true;
+  p.cells.forEach(([x,y])=>PH.g[m.gy+y][m.gx+x]=p.col); PH.score+=p.cells.length;
+  const rows=[], cols=[]; for(let r=0;r<N;r++) if(PH.g[r].every(Boolean)) rows.push(r); for(let c=0;c<N;c++) if(PH.g.every(r=>r[c])) cols.push(c);
+  rows.forEach(r=>{ for(let c=0;c<N;c++) PH.flash.push({x:c,y:r,col:PH.g[r][c],t:0.35}); }); cols.forEach(c=>{ for(let r=0;r<N;r++) PH.flash.push({x:c,y:r,col:PH.g[r][c],t:0.35}); });
+  rows.forEach(r=>{ for(let c=0;c<N;c++) PH.g[r][c]=null; }); cols.forEach(c=>{ for(let r=0;r<N;r++) PH.g[r][c]=null; });
+  const n=rows.length+cols.length; if(n) PH.score+=n*10*n;
+  if(PH.tray.every(q=>q.used)) PH.tray=[phPiece(),phPiece(),phPiece()]; }
+function phSim(dt){ if(!PH.g) phReset();
+  const th=PH.thumb; PH.flash.forEach(f=>f.t-=dt); PH.flash=PH.flash.filter(f=>f.t>0);
+  if(PH.over>0){ PH.over-=dt; th.press=Math.max(0,th.press-dt*4); if(PH.over<=0) phReset(); return; }
+  PH.t-=dt;
+  if(PH.st==='think'){ th.press=Math.max(0,th.press-dt*5);
+    if(PH.t<=0){ const m=phBest(); if(!m){ PH.over=2.2; return; } PH.mv=m; const sl=phSlot(m.pi); m.sx=sl.x; m.sy=sl.y; m.from={x:th.x,y:th.y}; PH.st='reach'; PH.t=0.35; } }
+  else if(PH.st==='reach'){ const m=PH.mv, k=1-Math.max(0,PH.t)/0.35, e=k*k*(3-2*k); th.x=lerp(m.from.x,m.sx,e); th.y=lerp(m.from.y,m.sy,e); th.press=e*0.3;
+    if(PH.t<=0){ th.press=1; PH.st='drag'; PH.t=0.7; } }
+  else if(PH.st==='drag'){ const m=PH.mv, p=PH.tray[m.pi], b=phPieceBox(p), k=1-Math.max(0,PH.t)/0.7, e=k*k*(3-2*k);
+    // finger sits a little under the piece, like a real drag
+    const tx=PG.CX+(m.gx+b.w/2)*PG.C, ty=PG.CY+(m.gy+b.h)*PG.C+14; th.x=lerp(m.sx,tx,e); th.y=lerp(m.sy,ty,e); th.press=1;
+    if(PH.t<=0){ phPlace(m); PH.mv=null; PH.st='think'; PH.t=rand(0.35,0.75); } }
+}
+function phCell(x,px,py,sz,col,a){ x.globalAlpha=a==null?1:a; x.fillStyle=col; x.fillRect(px+1,py+1,sz-2,sz-2); x.fillStyle='rgba(255,255,255,.35)'; x.fillRect(px+1,py+1,sz-2,Math.max(2,sz*0.18)); x.fillStyle='rgba(0,0,0,.22)'; x.fillRect(px+1,py+sz-1-Math.max(2,sz*0.16),sz-2,Math.max(2,sz*0.16)); x.globalAlpha=1; }
+function phDraw(){ const x=phX, W=180, H=360, N=PG.N, C=PG.C; if(!PH.g) phReset();
+  const bg=x.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#2a3d8f'); bg.addColorStop(1,'#1a2560'); x.fillStyle=bg; x.fillRect(0,0,W,H);
+  x.fillStyle='#ffd24a'; x.font='bold 13px sans-serif'; x.textAlign='center'; x.fillText('KLOTSIPUSLE',W/2,20);
+  x.fillStyle='#fff'; x.font='bold 22px sans-serif'; x.fillText(PH.score,W/2,46);
+  x.fillStyle='#16204f'; x.fillRect(PG.CX-3,PG.CY-3,N*C+6,N*C+6);
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){ const v=PH.g[r][c]; if(v) phCell(x,PG.CX+c*C,PG.CY+r*C,C,v); else { x.fillStyle='#23306e'; x.fillRect(PG.CX+c*C+1,PG.CY+r*C+1,C-2,C-2); } }
+  PH.flash.forEach(f=>{ phCell(x,PG.CX+f.x*C,PG.CY+f.y*C,C,'#ffffff',f.t/0.35); });
+  const m=PH.mv;
+  // ghost where the piece will land while dragging
+  if(m&&PH.st==='drag'){ const p=PH.tray[m.pi]; p.cells.forEach(([cx,cy])=>phCell(x,PG.CX+(m.gx+cx)*C,PG.CY+(m.gy+cy)*C,C,p.col,0.3)); }
+  // tray
+  PH.tray.forEach((p,i)=>{ if(p.used) return; if(m&&m.pi===i&&PH.st==='drag') return; const b=phPieceBox(p), sl=phSlot(i), s=10;
+    p.cells.forEach(([cx,cy])=>phCell(x,sl.x-b.w*s/2+cx*s,sl.y-b.h*s/2+cy*s,s,p.col)); });
+  // the dragged piece follows the thumb at full size
+  if(m&&PH.st==='drag'){ const p=PH.tray[m.pi], b=phPieceBox(p), th=PH.thumb, ox=th.x-b.w*C/2, oy=th.y-14-b.h*C;
+    p.cells.forEach(([cx,cy])=>phCell(x,ox+cx*C,oy+cy*C,C,p.col,0.95)); }
+  if(PH.over>0){ x.fillStyle='rgba(0,0,0,.6)'; x.fillRect(0,0,W,H); x.fillStyle='#fff'; x.font='bold 18px sans-serif'; x.fillText('RUUM OTSAS',W/2,H/2-6); x.font='13px sans-serif'; x.fillText(PH.score+' punkti',W/2,H/2+16); }
+  phTex.needsUpdate=true;
+}
+/* phone app: a vertical short-video feed ("Klipid") — the thumb scrolls to the next clip every few seconds and sometimes double-taps a like */
+const CLIPS=[
+ {u:'@kassike_vibe',c:'kass lihtsalt taidleb 😼',m:'♫ originaalheli — kassike_vibe',l:'402',s:'cat',bad:1},
+ {u:'@emajoe_kalur',c:'see hüpe tho 🐟💦 #kalapüük',m:'♫ vesi ja tuul',l:'12,9K',s:'fish'},
+ {u:'@kokk_kärt',c:'5 min hommikusöök 🍳 #retsept',m:'♫ köögi asmr',l:'7 311',s:'cook'},
+ {u:'@rula_rasmus',c:'lõpuks tuli välja!!! 🛹',m:'♫ päikeseloojang lofi',l:'103K',s:'skate'},
+ {u:'@rahulik_liiv',c:'kõige rahustavam video täna 😌',m:'♫ asmr — rahulik_liiv',l:'2,1M',s:'sand'},
+ {u:'@tantsu_tõnu',c:'uus tants, proovi järgi 🕺 #tants',m:'♫ disko 2026',l:'88,4K',s:'dance'},
+ {u:'@driftikuningas',c:'parkla on tühi 😈',m:'♫ turbo heli',l:'31,0K',s:'drift'},
+ {u:'@kalameme',c:'POV: kala pole 3 tundi võtnud',m:'♫ kurb viiul',l:'250K',s:'meme'},
+ // the dumb-funny ones — these get watched to the end
+ {u:'@sillapoiss',c:'esimene päev kalal 💀',m:'♫ splash',l:'1,4M',s:'dock'},
+ {u:'@jõusaali_jüri',c:'uus PR 1 kg 💪💪💪',m:'♫ gym phonk',l:'402K',s:'gym'},
+ {u:'@sigma_kalamees',c:'ma ei püüa kala, kala püüab mind 🗿',m:'♫ sigma bass',l:'777K',s:'sigma'},
+ {u:'@vihane_konn',c:'konn kuulis et esmaspäev on 🐸',m:'♫ laser.mp3',l:'919K',s:'frog'},
+ {u:'@koer_kreisi',c:'kui keegi ütleb "viimane mäng"',m:'♫ ringiratast',l:'560K',s:'dog'},
+ {u:'@mikro_madis',c:'kartul mikros 4 minutit 🥔 (ei juhtu midagi)',m:'♫ mmmmmmmm',l:'1,1M',s:'micro'},
+ {u:'@npc_ott',c:'kui õps küsib kas said aru',m:'♫ jah jah jah',l:'333K',s:'npc'},
+ // trickshots
+ {u:'@korvi_kaspar',c:'katuselt korvi?? 🏀 esimese korraga',m:'♫ trickshot hype',l:'2,3M',s:'hoop'},
+ {u:'@pudel_pets',c:'pudel lauaserva peale 🍾 #trickshot',m:'♫ slowmo',l:'846K',s:'bottle'},
+ {u:'@pingpong_piia',c:'5 põrget ja topsi 🏓',m:'♫ trickshot hype',l:'1,2M',s:'pong'},
+ {u:'@tagurpidi_toomas',c:'üle õla prügikasti 📄🗑️ ilma vaatamata',m:'♫ sus',l:'655K',s:'paper'},
+ {u:'@lant_lauri',c:'viskasin landi tassi 20m pealt 🎣',m:'♫ trickshot hype',l:'980K',s:'cup'},
+ // the trash ones — the thumb flicks past these almost immediately
+ {u:'@superpakkumised',c:'Sponsitud · OSTA KOHE',m:'♫ reklaamimuusika',l:'12',s:'ad',bad:1},
+ {u:'@mõtteguru_mart',c:'kuidas saada miljonäriks (1/47) 👇',m:'♫ originaalheli',l:'31',s:'talk',bad:1},
+ {u:'@kartulikaamera',c:'vaata lõpuni!!!',m:'♫ ???',l:'3',s:'blur',bad:1},
+];
+function clipScene(x,k,t,W,H){ const c=CLIPS[k%CLIPS.length], sc=c.s;
+  if(sc==='cat'){ x.fillStyle='#ffd8e8'; x.fillRect(0,0,W,H); x.fillStyle='#ffc0d9'; for(let i=0;i<6;i++) x.fillRect(0,i*70+((t*30)%70)-70,W,30);
+    const b=Math.sin(t*8)*10, cx=W/2, cy=H*0.55; x.fillStyle='#f08a2c'; x.beginPath(); x.ellipse(cx,cy+40,45,50,0,0,7); x.fill();
+    x.save(); x.translate(cx,cy-30); x.rotate(Math.sin(t*8)*0.25); x.beginPath(); x.ellipse(0,0,38,32,0,0,7); x.fill();
+    x.beginPath(); x.moveTo(-34,-10); x.lineTo(-26,-44); x.lineTo(-8,-26); x.fill(); x.beginPath(); x.moveTo(34,-10); x.lineTo(26,-44); x.lineTo(8,-26); x.fill();
+    x.fillStyle='#222'; x.fillRect(-18,-6,7,9+b*0.2); x.fillRect(11,-6,7,9+b*0.2); x.fillStyle='#ff9fb5'; x.fillRect(-4,8,8,5); x.restore();
+    x.fillStyle='#d36f1c'; x.save(); x.translate(cx+40,cy+70); x.rotate(Math.sin(t*6)*0.6-0.6); x.fillRect(0,-6,45,12); x.restore(); return; }
+  if(sc==='fish'){ const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#9fd8ff'); g.addColorStop(0.5,'#d9f0ff'); g.addColorStop(0.5,'#2a6f9a'); g.addColorStop(1,'#123a55'); x.fillStyle=g; x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=2; for(let r=0;r<4;r++){ x.beginPath(); for(let i=0;i<=W;i+=6) x.lineTo(i,H*0.5+r*14+Math.sin(i*0.08+t*3+r)*3); x.stroke(); }
+    const ph=(t%2.2)/2.2, fx=W*0.2+ph*W*0.6, fy=H*0.5-Math.sin(ph*Math.PI)*120;
+    x.save(); x.translate(fx,fy); x.rotate(-Math.cos(ph*Math.PI)*0.9); x.fillStyle='#c9d6dc'; x.beginPath(); x.ellipse(0,0,26,10,0,0,7); x.fill(); x.beginPath(); x.moveTo(-22,0); x.lineTo(-38,-11); x.lineTo(-38,11); x.fill(); x.fillStyle='#000'; x.fillRect(14,-4,3,3); x.restore();
+    if(ph>0.9||ph<0.1){ x.fillStyle='rgba(255,255,255,.8)'; for(let i=0;i<8;i++) x.fillRect((ph<0.5?W*0.2:W*0.8)+Math.cos(i)*16*(1+t%1),H*0.5-10-Math.abs(Math.sin(i*3))*20,3,3); } return; }
+  if(sc==='cook'){ x.fillStyle='#4b3a30'; x.fillRect(0,0,W,H); x.fillStyle='#6b564a'; for(let i=0;i<W;i+=30) x.fillRect(i,0,1,H);
+    const cx=W/2, cy=H*0.55; x.fillStyle='#222'; x.fillRect(cx+60,cy-6,60,12); x.beginPath(); x.arc(cx,cy,66,0,7); x.fill(); x.fillStyle='#333'; x.beginPath(); x.arc(cx,cy,58,0,7); x.fill();
+    [[-18,-10],[22,14]].forEach(([dx,dy],i)=>{ x.fillStyle='#fff'; x.beginPath(); x.ellipse(cx+dx,cy+dy,24+Math.sin(t*9+i)*1.5,20,0,0,7); x.fill(); x.fillStyle='#ffb21a'; x.beginPath(); x.arc(cx+dx,cy+dy,9,0,7); x.fill(); });
+    x.fillStyle='rgba(255,255,255,.25)'; for(let i=0;i<10;i++){ const pt=(t*0.8+i*0.1)%1; x.beginPath(); x.arc(cx-40+i*9+Math.sin(t*2+i)*6,cy-40-pt*120,6+pt*8,0,7); x.fill(); } return; }
+  if(sc==='skate'){ const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#ff7b54'); g.addColorStop(1,'#ffd36e'); x.fillStyle=g; x.fillRect(0,0,W,H);
+    x.fillStyle='#ffe9a8'; x.beginPath(); x.arc(W*0.7,H*0.35,30,0,7); x.fill(); x.fillStyle='#7a4b3a'; x.fillRect(0,H*0.72,W,H);
+    const ph=(t%2)/2, jx=W*0.15+ph*W*0.7, jy=H*0.72-12-Math.max(0,Math.sin(ph*Math.PI))*90, rot=ph>0.3&&ph<0.7?(ph-0.3)/0.4*Math.PI*2:0;
+    x.save(); x.translate(jx,jy); x.save(); x.rotate(rot); x.fillStyle='#222'; x.fillRect(-18,8,36,4); x.fillStyle='#eee'; x.fillRect(-14,12,5,5); x.fillRect(9,12,5,5); x.restore();
+    x.strokeStyle='#1d2b3a'; x.lineWidth=4; x.beginPath(); x.moveTo(-8,8); x.lineTo(0,-14); x.lineTo(8,8); x.moveTo(0,-14); x.lineTo(0,-36); x.moveTo(-14,-28); x.lineTo(14,-24); x.stroke(); x.fillStyle='#1d2b3a'; x.beginPath(); x.arc(0,-44,8,0,7); x.fill(); x.restore(); return; }
+  if(sc==='sand'){ const cols=['#ff9ec7','#a8e6ff','#c9f7a8','#ffe28a','#d6b8ff']; for(let i=0;i<5;i++){ x.fillStyle=cols[i]; x.fillRect(0,i*H/5,W,H/5+1); }
+    const kx=((t*45)%(W+60))-30; x.fillStyle='rgba(0,0,0,.15)'; x.fillRect(kx,0,3,H);
+    for(let i=0;i<5;i++){ x.fillStyle=cols[(i+2)%5]; for(let y=0;y<H/5;y+=8) x.fillRect(kx-12-(y%16),i*H/5+y,10,6); }
+    x.fillStyle='#c8cdd2'; x.fillRect(kx-2,H*0.1,6,H*0.8); x.fillStyle='#5a3b28'; x.fillRect(kx-4,H*0.02,10,H*0.12); return; }
+  if(sc==='dance'){ x.fillStyle='#160d2e'; x.fillRect(0,0,W,H); ['#ff3d9a','#3dd6ff','#ffe03d'].forEach((col,i)=>{ x.fillStyle=col; x.globalAlpha=0.25; x.beginPath(); const a=t*1.5+i*2; x.moveTo(W/2,0); x.lineTo(W/2+Math.cos(a)*200,H); x.lineTo(W/2+Math.cos(a+0.3)*200,H); x.fill(); }); x.globalAlpha=1;
+    for(let i=0;i<6;i++) for(let j=0;j<2;j++){ x.fillStyle=((i+j+Math.floor(t*4))%2)?'#3b2a6e':'#ff3d9a'; x.fillRect(i*W/6,H*0.8+j*H*0.1,W/6,H*0.1); }
+    const b=Math.abs(Math.sin(t*6))*10, cx=W/2, cy=H*0.62-b; x.fillStyle='#f2c9ab'; x.fillRect(cx-10,cy-62,20,20); x.fillStyle='#ff3d9a'; x.fillRect(cx-14,cy-40,28,34); x.fillStyle='#2e3a7f'; x.fillRect(cx-14,cy-6,12,30); x.fillRect(cx+2,cy-6,12,30);
+    x.fillStyle='#f2c9ab'; x.save(); x.translate(cx-14,cy-36); x.rotate(Math.sin(t*6)*1.4+2.4); x.fillRect(0,-4,26,8); x.restore(); x.save(); x.translate(cx+14,cy-36); x.rotate(-Math.sin(t*6)*1.4+0.7); x.fillRect(0,-4,26,8); x.restore(); return; }
+  if(sc==='drift'){ x.fillStyle='#55595e'; x.fillRect(0,0,W,H); x.strokeStyle='#e8e8e8'; x.lineWidth=2; for(let i=0;i<4;i++) x.strokeRect(10+i*42,30,30,60);
+    const cx=W/2, cy=H*0.55, a=t*2.4; x.fillStyle='rgba(30,30,30,.55)'; for(let i=0;i<40;i++){ const b=a-i*0.05; x.fillRect(cx+Math.cos(b)*55-2,cy+Math.sin(b)*75-2,4,4); }
+    x.fillStyle='rgba(230,230,230,.35)'; for(let i=0;i<6;i++){ const b=a-0.3-i*0.12; x.beginPath(); x.arc(cx+Math.cos(b)*55,cy+Math.sin(b)*75,8+i*3,0,7); x.fill(); }
+    x.save(); x.translate(cx+Math.cos(a)*55,cy+Math.sin(a)*75); x.rotate(a+Math.PI*0.95); x.fillStyle='#e8322b'; x.fillRect(-11,-20,22,40); x.fillStyle='#222'; x.fillRect(-9,-8,18,10); x.fillStyle='#ffe98a'; x.fillRect(-9,-21,5,3); x.fillRect(4,-21,5,3); x.restore(); return; }
+  if(sc==='ad'){ const fl=Math.floor(t*6)%2; x.fillStyle=fl?'#ffe600':'#ff2a2a'; x.fillRect(0,0,W,H); x.fillStyle=fl?'#ff2a2a':'#ffe600';
+    x.textAlign='center'; x.font='bold 30px sans-serif'; x.fillText('-90%',W/2,H*0.36); x.font='bold 15px sans-serif'; x.fillText('AINULT TÄNA!!!',W/2,H*0.46);
+    x.fillStyle='#fff'; x.fillRect(W/2-45,H*0.53,90,60); x.fillStyle='#999'; x.fillRect(W/2-35,H*0.56,70,40); x.fillStyle='#222'; x.font='bold 11px sans-serif'; x.fillText('MÕTTETU VIDIN',W/2,H*0.53+74); return; }
+  if(sc==='talk'){ x.fillStyle='#e8e2d6'; x.fillRect(0,0,W,H); x.fillStyle='#b9ad98'; x.fillRect(0,H*0.15,W,4);
+    const cx=W/2, cy=H*0.5, m=Math.abs(Math.sin(t*14))*7; x.fillStyle='#2b2b2b'; x.fillRect(cx-60,cy+40,120,120); x.fillStyle='#e7b896'; x.beginPath(); x.ellipse(cx,cy,42,50,0,0,7); x.fill();
+    x.fillStyle='#222'; x.fillRect(cx-22,cy-12,10,4); x.fillRect(cx+12,cy-12,10,4); x.fillStyle='#7a2a2a'; x.fillRect(cx-12,cy+20,24,3+m);
+    x.fillStyle='#fff'; x.fillRect(10,H*0.22,W-20,22); x.fillStyle='#111'; x.textAlign='center'; x.font='bold 11px sans-serif'; x.fillText(['nii et kuula nüüd','see muutis mu elu','osa 2 lingis'][Math.floor(t)%3],W/2,H*0.22+15); return; }
+  if(sc==='blur'){ x.fillStyle='#2a2622'; x.fillRect(0,0,W,H); const j=Math.sin(t*23)*6;
+    x.fillStyle='rgba(120,100,80,.5)'; for(let i=0;i<5;i++){ x.beginPath(); x.arc(W/2+j+Math.sin(i*2+t)*30,H*0.45+Math.cos(i*3)*40,40,0,7); x.fill(); }
+    x.fillStyle='rgba(0,0,0,.4)'; for(let i=0;i<60;i++) x.fillRect(Math.random()*W,Math.random()*H,2,2); return; }
+  if(sc==='dock'){ const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#bfe3ff'); g.addColorStop(0.55,'#e8f6ff'); g.addColorStop(0.55,'#3d7fa8'); g.addColorStop(1,'#1d4a68'); x.fillStyle=g; x.fillRect(0,0,W,H);
+    x.fillStyle='#8a5a34'; x.fillRect(0,H*0.53,W*0.55,10); x.fillRect(W*0.1,H*0.53,6,50); x.fillRect(W*0.45,H*0.53,6,50);
+    const ph=(t%3)/3; let px, py, rot=0; if(ph<0.45){ px=W*0.08+ph/0.45*W*0.4; py=H*0.53; } else if(ph<0.62){ const k=(ph-0.45)/0.17; px=W*0.48+k*30; py=H*0.53-Math.sin(k*Math.PI)*30+k*k*60; rot=k*2.5; } else { px=W*0.48+30; py=H*0.53+60; rot=2.5; }
+    if(ph<0.62){ x.save(); x.translate(px,py); x.rotate(rot); x.fillStyle='#2d6b3a'; x.fillRect(-7,-38,14,22); x.fillStyle='#333'; x.fillRect(-6,-16,5,16); x.fillRect(1,-16,5,16); x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(0,-46,8,0,7); x.fill(); x.strokeStyle='#222'; x.lineWidth=2; x.beginPath(); x.moveTo(6,-30); x.lineTo(30,-60); x.stroke(); x.restore(); }
+    else { const k=(ph-0.62)/0.38; x.fillStyle='rgba(255,255,255,.85)'; for(let i=0;i<14;i++){ const a=i/14*Math.PI; x.beginPath(); x.arc(px+Math.cos(a)*30*(0.3+k),H*0.55-Math.sin(a)*40*(1-k)*Math.min(1,k*6),4,0,7); x.fill(); }
+      x.strokeStyle='rgba(255,255,255,.7)'; x.lineWidth=2; x.beginPath(); x.ellipse(px,H*0.56,20+k*40,5+k*8,0,0,7); x.stroke(); x.fillStyle='#f2c9ab'; if(k>0.5){ x.beginPath(); x.arc(px,H*0.555,7,Math.PI,0); x.fill(); } }
+    x.fillStyle='#111'; x.textAlign='center'; x.font='bold 13px sans-serif'; x.fillText('😭😭😭',W/2,H*0.25); return; }
+  if(sc==='gym'){ x.fillStyle='#2c2c33'; x.fillRect(0,0,W,H); x.fillStyle='#45454f'; x.fillRect(0,H*0.75,W,H); x.fillStyle='#55556a'; for(let i=0;i<4;i++) x.fillRect(10+i*45,H*0.2,30,60);
+    const ph=Math.sin(t*5), cx=W/2, cy=H*0.6, shake=Math.sin(t*60)*1.5; x.save(); x.translate(cx+shake,cy);
+    x.fillStyle='#f2c9ab'; x.fillRect(-26,-70,52,55); x.fillStyle='#d23b3b'; x.fillRect(-28,-40,56,20); x.fillStyle='#333'; x.fillRect(-22,-15,18,50); x.fillRect(4,-15,18,50);
+    x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(0,-84,16,0,7); x.fill(); x.fillStyle='#c0392b'; x.fillRect(-16,-90,32,4);
+    x.fillStyle='#222'; x.fillRect(-8,-88,4,3); x.fillRect(4,-88,4,3); x.fillRect(-6,-76,12,3+Math.abs(ph)*3);
+    const ay=-60-ph*25; x.fillStyle='#f2c9ab'; x.fillRect(-46,ay,18,40+ph*25); x.fillRect(28,ay,18,40+ph*25); x.fillStyle='#888'; x.fillRect(-48,ay-4,22,5); x.fillRect(26,ay-4,22,5); x.restore();
+    x.fillStyle='rgba(120,200,255,.8)'; for(let i=0;i<5;i++) x.fillRect(cx-30+i*14,cy-110+((t*60+i*13)%40),3,6);
+    x.fillStyle='#fff'; x.textAlign='center'; x.font='bold 16px sans-serif'; x.fillText('1 KG',W/2,H*0.14); return; }
+  if(sc==='sigma'){ const bass=Math.max(0,Math.sin(t*Math.PI*2))**8, sh=bass*5; x.fillStyle=bass>0.5?'#000':'#1b1b1b'; x.fillRect(0,0,W,H); x.save(); x.translate(Math.sin(t*50)*sh,Math.cos(t*47)*sh);
+    x.fillStyle='#333'; x.fillRect(W/2-34,H*0.5,68,90); x.fillStyle='#d8b08c'; x.fillRect(W/2-26,H*0.3,52,58); x.fillStyle='#111'; x.fillRect(W/2-30,H*0.36,60,12); x.fillStyle='#4a3a2a'; x.fillRect(W/2-28,H*0.27,56,10);
+    x.fillStyle='#000'; x.fillRect(W/2-10,H*0.45,20,3); x.restore(); x.fillStyle='rgba(255,255,255,'+(0.4+bass*0.6)+')'; x.textAlign='center'; x.font='bold 18px sans-serif'; x.fillText('🗿 SIGMA 🗿',W/2,H*0.2);
+    x.filter='none'; x.fillStyle='rgba(0,0,0,'+(0.3+bass*0.3)+')'; x.fillRect(0,0,W,12); x.fillRect(0,H-12,W,12); return; }
+  if(sc==='frog'){ x.fillStyle='#173b1d'; x.fillRect(0,0,W,H); const cx=W/2, cy=H*0.55;
+    x.fillStyle='#4cbb4f'; x.beginPath(); x.ellipse(cx,cy,60,42,0,0,7); x.fill(); x.beginPath(); x.arc(cx-30,cy-38,18,0,7); x.fill(); x.beginPath(); x.arc(cx+30,cy-38,18,0,7); x.fill();
+    x.fillStyle='#fff'; x.beginPath(); x.arc(cx-30,cy-38,10,0,7); x.fill(); x.beginPath(); x.arc(cx+30,cy-38,10,0,7); x.fill(); x.fillStyle='#d00'; x.beginPath(); x.arc(cx-30,cy-38,5,0,7); x.fill(); x.beginPath(); x.arc(cx+30,cy-38,5,0,7); x.fill();
+    x.strokeStyle='#2a7a2c'; x.lineWidth=3; x.beginPath(); x.moveTo(cx-30,cy+8); x.quadraticCurveTo(cx,cy-6,cx+30,cy+8); x.stroke();
+    if(Math.sin(t*3)>0){ x.strokeStyle='rgba(255,40,40,.9)'; x.lineWidth=4+Math.random()*2; [-30,30].forEach(dx=>{ x.beginPath(); x.moveTo(cx+dx,cy-38); x.lineTo(cx+dx*5,-20); x.stroke(); }); x.fillStyle='rgba(255,60,60,.15)'; x.fillRect(0,0,W,H); } return; }
+  if(sc==='dog'){ x.fillStyle='#9fd27a'; x.fillRect(0,0,W,H); x.fillStyle='#86bd62'; for(let i=0;i<30;i++) x.fillRect((i*37)%W,(i*71)%H,3,8);
+    const cx=W/2, cy=H*0.55; x.save(); x.translate(cx,cy); x.rotate(t*9); x.fillStyle='#c8873e'; x.beginPath(); x.ellipse(0,0,34,18,0,0,7); x.fill(); x.beginPath(); x.arc(34,-4,14,0,7); x.fill(); x.fillStyle='#8a5522'; x.fillRect(36,-20,8,10);
+    x.fillStyle='#000'; x.fillRect(40,-8,3,3); x.fillStyle='#c8873e'; x.fillRect(-46,-3,14,5); x.restore(); x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=2; x.beginPath(); x.arc(cx,cy,50,t*9,t*9+2); x.stroke(); return; }
+  if(sc==='micro'){ x.fillStyle='#d8d2c4'; x.fillRect(0,0,W,H); x.fillStyle='#ccc'; x.fillRect(12,H*0.3,W-24,H*0.4); x.fillStyle='#ffe9a0'; x.fillRect(20,H*0.33,W-80,H*0.34);
+    x.fillStyle='#333'; x.fillRect(W-52,H*0.36,26,14); x.fillStyle='#3f3'; x.font='bold 9px monospace'; x.textAlign='center'; const left=Math.max(0,240-Math.floor(t*12)); x.fillText(Math.floor(left/60)+':'+String(left%60).padStart(2,'0'),W-39,H*0.36+10);
+    const cx=20+(W-80)/2, cy=H*0.58; x.fillStyle='#fff'; x.beginPath(); x.ellipse(cx,cy+8,40,8,0,0,7); x.fill(); x.save(); x.translate(cx,cy); x.scale(Math.cos(t*2),1); x.fillStyle='#b98545'; x.beginPath(); x.ellipse(0,0,22,14,0,0,7); x.fill(); x.fillStyle='#8a5d2a'; x.fillRect(-8,-4,3,3); x.fillRect(6,2,3,3); x.restore(); return; }
+  if(sc==='npc'){ x.fillStyle='#9ec8e8'; x.fillRect(0,0,W,H); x.fillStyle='#3a6b3a'; x.fillRect(0,H*0.7,W,H);
+    const cx=W/2, cy=H*0.5, nod=Math.abs(Math.sin(t*7))*6; x.fillStyle='#5d8fd6'; x.fillRect(cx-28,cy+20,56,90); x.fillStyle='#f2c9ab'; x.fillRect(cx-26,cy-40+nod,52,56);
+    x.fillStyle='#000'; x.fillRect(cx-16,cy-22+nod,6,6); x.fillRect(cx+10,cy-22+nod,6,6); x.fillRect(cx-10,cy+2+nod,20,3);
+    x.fillStyle='#fff'; x.fillRect(cx+20,cy-70,60,22); x.fillStyle='#000'; x.textAlign='center'; x.font='bold 11px sans-serif'; x.fillText('jah. jah.',cx+50,cy-55); return; }
+  if(['hoop','bottle','pong','paper','cup'].includes(sc)){ const Wg=W-40, L=3.2, ph=(t%L)/L, hit=ph>0.72, slow=ph>0.55&&ph<0.72;
+    const g=x.createLinearGradient(0,0,0,H);
+    if(sc==='hoop'){ g.addColorStop(0,'#7cc4ff'); g.addColorStop(1,'#d8efff'); x.fillStyle=g; x.fillRect(0,0,W,H); x.fillStyle='#8f6f5a'; x.fillRect(0,H*0.2,46,H); x.fillStyle='#5a463a'; x.fillRect(0,H*0.2,52,6); x.fillStyle='#9a9a9a'; x.fillRect(0,H*0.82,W,H);
+      x.fillStyle='#fff'; x.fillRect(Wg-30,H*0.48,6,H*0.34); x.fillRect(Wg-40,H*0.42,20,30); x.strokeStyle='#e8562a'; x.lineWidth=3; x.beginPath(); x.moveTo(Wg-62,H*0.53); x.lineTo(Wg-40,H*0.53); x.stroke(); x.strokeStyle='rgba(255,255,255,.8)'; x.lineWidth=1; for(let i=0;i<4;i++){ x.beginPath(); x.moveTo(Wg-60+i*6,H*0.53); x.lineTo(Wg-56+i*5,H*0.6); x.stroke(); }
+      x.fillStyle='#222'; x.fillRect(16,H*0.2-30,12,30); x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(22,H*0.2-38,7,0,7); x.fill();
+      const k=Math.min(1,ph/0.72), bx=lerp(30,Wg-51,k), by=hit?H*0.53+(ph-0.72)*400:lerp(H*0.2-44,H*0.53,k)-Math.sin(k*Math.PI)*110; if(by<H*0.82){ x.fillStyle='#e8762a'; x.beginPath(); x.arc(bx,Math.min(by,H*0.8),7,0,7); x.fill(); } }
+    else if(sc==='bottle'){ x.fillStyle='#e9dcc8'; x.fillRect(0,0,W,H); x.fillStyle='#8a5a34'; x.fillRect(Wg*0.45,H*0.62,W,10); x.fillRect(Wg*0.9,H*0.62,6,H); x.fillStyle='#f2c9ab'; x.fillRect(10,H*0.6,24,10);
+      const k=Math.min(1,ph/0.72), bx=lerp(26,Wg*0.7,k), by=lerp(H*0.6,H*0.62-20,k)-Math.sin(k*Math.PI)*120, rot=hit?0:k*Math.PI*4;
+      x.save(); x.translate(bx,by); x.rotate(rot); x.fillStyle='rgba(120,200,255,.75)'; x.fillRect(-7,-18,14,36); x.fillStyle='#2a7ad6'; x.fillRect(-4,-24,8,6); x.fillStyle='rgba(60,140,230,.8)'; x.fillRect(-7,4,14,14); x.restore(); }
+    else if(sc==='pong'){ x.fillStyle='#24345a'; x.fillRect(0,0,W,H); x.fillStyle='#2f8a4a'; x.fillRect(0,H*0.72,W,H); const pts=[[12,H*0.3],[32,H*0.72],[50,H*0.55],[68,H*0.72],[84,H*0.6],[100,H*0.72],[112,H*0.64],[124,H*0.72-14]];
+      x.fillStyle='#e8322b'; x.fillRect(114,H*0.72-26,22,26); x.fillStyle='#fff'; x.fillRect(114,H*0.72-26,22,3);
+      const k=Math.min(0.999,ph/0.72)*(pts.length-1), i=Math.floor(k), f=k-i, a=pts[i], b=pts[i+1], up=(i%2===0)?0:1;
+      const bx=lerp(a[0],b[0],f), by=hit?H*0.72-16:lerp(a[1],b[1],f)-Math.sin(f*Math.PI)*(i===0?0:30)*up; x.fillStyle='#ff9a2a'; x.beginPath(); x.arc(bx,by,4,0,7); x.fill();
+      x.fillStyle='rgba(255,255,255,.4)'; for(let j=1;j<=i&&j<pts.length-1;j+=2){ x.beginPath(); x.ellipse(pts[j][0],H*0.72,6,2,0,0,7); x.fill(); } }
+    else if(sc==='paper'){ x.fillStyle='#f3efe6'; x.fillRect(0,0,W,H); x.fillStyle='#c9bfae'; x.fillRect(0,H*0.75,W,H); x.fillStyle='#444'; x.fillRect(Wg-50,H*0.75-40,34,40); x.fillStyle='#333'; x.fillRect(Wg-52,H*0.75-42,38,5);
+      x.fillStyle='#5577aa'; x.fillRect(22,H*0.5,26,50); x.fillStyle='#333'; x.fillRect(24,H*0.5+50,10,38); x.fillRect(38,H*0.5+50,10,38); x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(35,H*0.5-12,11,0,7); x.fill(); x.fillStyle='#3a2a1a'; x.fillRect(24,H*0.5-24,22,8);
+      const k=Math.min(1,ph/0.72), bx=lerp(30,Wg-33,k), by=hit?H*0.75-30+(ph-0.72)*60:lerp(H*0.5-20,H*0.75-40,k)-Math.sin(k*Math.PI)*140; x.fillStyle='#fff'; x.strokeStyle='#bbb'; x.beginPath(); x.arc(bx,Math.min(by,H*0.75-10),6,0,7); x.fill(); x.stroke(); }
+    else { g.addColorStop(0,'#9fd8ff'); g.addColorStop(1,'#e8f6ff'); x.fillStyle=g; x.fillRect(0,0,W,H); x.fillStyle='#7cba5a'; x.fillRect(0,H*0.75,W,H); x.fillStyle='#fff'; x.fillRect(Wg-40,H*0.75-18,22,18); x.fillRect(Wg-20,H*0.75-14,6,10);
+      x.fillStyle='#2d6b3a'; x.fillRect(14,H*0.75-56,14,34); x.fillStyle='#333'; x.fillRect(14,H*0.75-22,6,22); x.fillRect(22,H*0.75-22,6,22); x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(21,H*0.75-64,8,0,7); x.fill();
+      x.strokeStyle='#222'; x.lineWidth=2; x.beginPath(); x.moveTo(26,H*0.75-46); x.lineTo(50,H*0.75-100); x.stroke();
+      const k=Math.min(1,ph/0.72), bx=lerp(50,Wg-29,k), by=hit?H*0.75-10:lerp(H*0.75-100,H*0.75-18,k)-Math.sin(k*Math.PI)*90; x.strokeStyle='rgba(60,60,60,.5)'; x.lineWidth=1; x.beginPath(); x.moveTo(50,H*0.75-100); x.quadraticCurveTo((50+bx)/2,Math.min(H*0.75-100,by)-30,bx,by); x.stroke(); x.fillStyle='#e8322b'; x.beginPath(); x.arc(bx,by,4,0,7); x.fill(); }
+    if(slow){ x.fillStyle='rgba(0,0,0,.25)'; x.fillRect(0,0,W,H); x.fillStyle='#fff'; x.textAlign='center'; x.font='bold 11px sans-serif'; x.fillText('SLOWMO',Wg/2+10,H*0.14); }
+    if(hit){ const k=(ph-0.72)/0.28; x.textAlign='center'; x.font='bold '+Math.floor(22+Math.sin(k*20)*3)+'px sans-serif'; x.fillStyle='#ffd24a'; x.strokeStyle='#000'; x.lineWidth=3; x.strokeText('SISSE!!! 🔥',Wg/2+10,H*0.32); x.fillText('SISSE!!! 🔥',Wg/2+10,H*0.32);
+      x.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<14;i++){ const a=i/14*Math.PI*2+k; x.fillRect(Wg/2+10+Math.cos(a)*k*80,H*0.36+Math.sin(a)*k*60,3,3); } }
+    return; }
+  // meme
+  x.fillStyle='#fff'; x.fillRect(0,0,W,H); x.fillStyle='#111'; x.font='bold 15px sans-serif'; x.textAlign='center'; x.fillText('kui kala pole 3h võtnud',W/2,90);
+  const sh=Math.sin(t*20)*1.5; x.save(); x.translate(W/2+sh,H*0.5); x.fillStyle='#f2c9ab'; x.beginPath(); x.arc(0,0,48,0,7); x.fill(); x.fillStyle='#222'; x.fillRect(-22,-12,10,4); x.fillRect(12,-12,10,4);
+  x.fillStyle='#7fc4ff'; x.fillRect(-20,-6,6,14+(t*20%10)); x.fillRect(14,-6,6,14+((t*20+5)%10)); x.strokeStyle='#222'; x.lineWidth=3; x.beginPath(); x.arc(0,26,14,Math.PI*1.15,Math.PI*1.85); x.stroke(); x.restore();
+  x.fillStyle='#111'; x.font='bold 13px sans-serif'; x.fillText('*ujuk ei liigu*',W/2,H*0.72);
+}
+// shuffled playlist: every clip plays once before anything repeats, and a fresh shuffle never starts with the clip you just saw
+let feedBag=[];
+function feedPick(not){ if(!feedBag.length){ feedBag=CLIPS.map((c,i)=>i); for(let i=feedBag.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [feedBag[i],feedBag[j]]=[feedBag[j],feedBag[i]]; }
+    if(feedBag[feedBag.length-1]===not) feedBag.unshift(feedBag.pop()); }
+  return feedBag.pop(); }
+function feedEnter(f){ const bad=CLIPS[f.i].bad; f.quick=!!bad; f.next=bad?rand(0.35,0.8):rand(4,9); }
+function feedReset(){ PH.fd={i:feedPick(-1),nx:0,quick:false,off:0,t:0,next:rand(4,8),st:'watch',sw:0,liked:{},heart:0,tap:0}; PH.thumb={x:120,y:300,press:0}; PH.fd.nx=feedPick(PH.fd.i); feedEnter(PH.fd); }
+function feedSim(dt){ if(!PH.fd) feedReset(); const f=PH.fd, th=PH.thumb; f.t+=dt; f.heart=Math.max(0,f.heart-dt);
+  if(f.st==='watch'){ th.x=lerp(th.x,118,dt*4); th.y=lerp(th.y,300+Math.sin(f.t*1.3)*4,dt*4); th.press=Math.max(0,th.press-dt*5); f.next-=dt;
+    if(f.next<=0){ if(!f.quick&&!f.liked[f.i]&&Math.random()<0.3){ f.st='like'; f.sw=0; } else { f.st='swipe'; f.sw=0; } } }
+  else if(f.st==='like'){ f.sw+=dt; const k=Math.min(1,f.sw/0.3); th.x=lerp(th.x,90,k); th.y=lerp(th.y,190,k);
+    const p=f.sw-0.3; th.press=(p>0&&p<0.08)||(p>0.16&&p<0.24)?1:0; if(p>0.2&&!f.liked[f.i]){ f.liked[f.i]=1; f.heart=0.8; }
+    if(p>0.6){ f.st='watch'; f.next=rand(1.5,3); } }
+  else { f.sw+=dt; const pre=f.quick?0.05:0.2, dur=f.quick?0.15:0.38;
+    if(f.sw<pre){ th.y=lerp(th.y,300,dt*12); th.press=f.sw/pre; }
+    else { const k=Math.min(1,(f.sw-pre)/dur), e=k*k*(3-2*k); f.off=e; th.y=300-e*170; th.x=118+e*-8; th.press=1;
+      if(k>=1){ f.i=f.nx; f.nx=feedPick(f.i); f.off=0; f.t=0; f.st='watch'; feedEnter(f); } } }
+}
+function feedDraw(){ const x=phX, W=180, H=360, f=PH.fd; if(!f) feedReset();
+  const draw=(k,oy,t)=>{ x.save(); x.translate(0,oy); x.beginPath(); x.rect(0,0,W,H); x.clip(); clipScene(x,k,t,W,H); x.shadowColor='rgba(0,0,0,.6)'; x.shadowBlur=3;
+    const c=CLIPS[k%CLIPS.length], liked=f.liked[k];
+    x.fillStyle='rgba(0,0,0,.28)'; x.fillRect(0,H-74,W,74);
+    x.textAlign='left'; x.fillStyle='#fff'; x.font='bold 11px sans-serif'; x.fillText(c.u,8,H-52); x.font='10px sans-serif'; x.fillText(c.c,8,H-37);
+    x.font='9px sans-serif'; const mx=8-((t*25)%120); x.save(); x.beginPath(); x.rect(8,H-30,120,14); x.clip(); x.fillText(c.m+'    '+c.m,mx+8,H-20); x.restore();
+    // right rail: avatar, like, comment, share
+    const rx=W-20; x.fillStyle='#ddd'; x.beginPath(); x.arc(rx,H-190,12,0,7); x.fill(); x.fillStyle='#ff3d6e'; x.beginPath(); x.arc(rx,H-177,4,0,7); x.fill();
+    x.fillStyle=liked?'#ff2d55':'#fff'; x.beginPath(); x.moveTo(rx,H-140); x.bezierCurveTo(rx-14,H-150,rx-10,H-163,rx,H-155); x.bezierCurveTo(rx+10,H-163,rx+14,H-150,rx,H-140); x.fill();
+    x.fillStyle='#fff'; x.textAlign='center'; x.font='bold 8px sans-serif'; x.fillText(c.l,rx,H-128);
+    x.beginPath(); x.ellipse(rx,H-108,10,8,0,0,7); x.fill(); x.beginPath(); x.moveTo(rx-6,H-103); x.lineTo(rx-9,H-96); x.lineTo(rx-1,H-101); x.fill(); x.fillText(Math.floor(c.l.length*137)+'',rx,H-86);
+    x.beginPath(); x.moveTo(rx-9,H-62); x.lineTo(rx+9,H-70); x.lineTo(rx-9,H-78); x.lineTo(rx-5,H-70); x.fill(); x.fillText('Jaga',rx,H-52);
+    x.fillStyle='rgba(255,255,255,.3)'; x.fillRect(0,H-2,W,2); x.fillStyle='#fff'; x.fillRect(0,H-2,W*Math.min(1,t/9),2);
+    x.restore(); };
+  const yo=-f.off*H; draw(f.i,yo,f.t); if(f.off>0) draw(f.nx,yo+H,0);
+  // top tabs
+  x.textAlign='center'; x.font='bold 11px sans-serif'; x.fillStyle='rgba(255,255,255,.65)'; x.fillText('Jälgin',W/2-30,22); x.fillStyle='#fff'; x.fillText('Sulle',W/2+28,22); x.fillRect(W/2+18,27,20,2);
+  if(f.heart>0){ const k=f.heart/0.8, sz=30+(1-k)*20; x.globalAlpha=Math.min(1,k*2); x.fillStyle='#ff2d55'; const cx=90, cy=190;
+    x.beginPath(); x.moveTo(cx,cy+sz*0.6); x.bezierCurveTo(cx-sz,cy,cx-sz*0.6,cy-sz*0.7,cx,cy-sz*0.25); x.bezierCurveTo(cx+sz*0.6,cy-sz*0.7,cx+sz,cy,cx,cy+sz*0.6); x.fill(); x.globalAlpha=1; }
+  phTex.needsUpdate=true;
+}
+/* G: your left hand comes up and shows the middle finger; G again puts it away (like the phone).
+   It lives in its own little overlay scene drawn after the world with a cleared depth buffer,
+   so the boat's side can never cut the hand in half. */
+const FU={on:false,k:0};
+const hudScene=new T.Scene(), hudEye=new T.Object3D(); hudEye.rotation.order='YXZ'; hudScene.add(hudEye);
+hudScene.add(new T.HemisphereLight(0xffffff,0x334455,0.7));   // same as the world's hemi light
+const hudSun=new T.DirectionalLight(0xffffff,0.9); hudScene.add(hudSun); hudScene.add(hudSun.target);   // follows the world sun's direction
+const fuRig=new T.Group(); fuRig.visible=false; hudEye.add(fuRig); let fuHand=null;
+const FU_CYL=new T.CylinderGeometry(0.5,0.5,1,16), FU_SPH=new T.SphereGeometry(0.5,16,12);
+// a tapered capsule: a cone-ish cylinder between two balls of radius r1 and r2
+function fuCap(g,m,r1,A,B,r2){ r2=r2||r1; const geo=new T.CylinderGeometry(r2,r1,1,16); const c=new T.Mesh(geo,m);
+  _sgD.copy(B).sub(A); const L=_sgD.length()||0.0001; c.position.copy(A).add(B).multiplyScalar(0.5); c.scale.set(1,L,1); c.quaternion.setFromUnitVectors(_UP,_sgD.divideScalar(L)); g.add(c);
+  [[A,r1],[B,r2]].forEach(([P,r])=>{ const s=new T.Mesh(FU_SPH,m); s.scale.setScalar(r*2); s.position.copy(P); g.add(s); }); }
+function fuBlob(g,m,sx,sy,sz,x,y,z){ const s=new T.Mesh(FU_SPH,m); s.scale.set(sx,sy,sz); s.position.set(x,y,z); g.add(s); return s; }
+function fuBuild(){ if(fuHand&&fuHand.userData.ch===S.char) return; if(fuHand) fuRig.remove(fuHand);
+  // same blocky style + materials as the phone hand
+  const c=chD(), sk=new T.MeshLambertMaterial({color:new T.Color(c.skin)}), cr=new T.MeshLambertMaterial({color:new T.Color(shade(c.skin,-40))}),
+    arm=new T.MeshLambertMaterial({color:new T.Color(c.arm||c.skin)});
+  const g=new T.Group(), bx=(w,h,d,x,y,z,m)=>{ const o=new T.Mesh(UNIT_BOX,m||sk); o.scale.set(w,h,d); o.position.set(x,y,z); g.add(o); return o; };
+  bx(0.07,0.08,0.024,0,0,0);                                        // palm (facing you)
+  bx(0.05,0.03,0.026,-0.006,-0.045,0);                              // heel of the palm
+  // index, ring, little finger folded down: knuckle on top + curled finger lying on the palm
+  [[0.0255,0.016],[-0.0085,0.016],[-0.0255,0.014]].forEach(([fx,w])=>{
+    bx(w,0.018,0.03,fx,0.046,0.004);                                // knuckle
+    bx(w,0.024,0.011,fx,0.03,0.019);                                // curled finger
+    bx(w*0.7,0.003,0.004,fx,0.038,0.0255,cr); });                   // crease
+  // middle finger straight up
+  const mx=0.0085;
+  bx(0.017,0.04,0.019,mx,0.058,0);
+  bx(0.016,0.03,0.018,mx,0.093,0);
+  bx(0.015,0.022,0.017,mx,0.119,0);
+  bx(0.012,0.003,0.004,mx,0.078,0.0105,cr); bx(0.012,0.003,0.004,mx,0.108,0.0105,cr);
+  // thumb folded across the curled fingers
+  bx(0.02,0.034,0.02,0.04,-0.008,0.008);                            // thumb base
+  bx(0.046,0.017,0.016,0.016,0.016,0.026);                          // thumb across the front
+  bx(0.01,0.003,0.004,0.004,0.016,0.0345,cr);                       // thumbnail crease
+  bx(0.05,0.2,0.042,0,-0.15,-0.006,arm);                            // wrist / forearm going down out of view
+  g.userData.ch=S.char; fuHand=g; fuRig.add(g); }
+function flipOff(){ FU.on=true; }
+function updateFlip(dt){
+  const want=FU.on&&mode==='play'&&viewMode===0&&!HP.on&&!blocking();
+  FU.k=clamp(FU.k+(want?dt*5:-dt*5),0,1);
+  fuRig.visible=FU.k>0.01; if(!fuRig.visible) return; fuBuild();
+  hudEye.position.copy(eye.position); hudEye.rotation.copy(eye.rotation); hudEye.updateMatrixWorld(true);
+  // pop up with a little overshoot, then hang loose: slow sway + breathing + a small wrist wobble
+  const k=FU.k, e=FU.on?1+2.2*Math.pow(k-1,3)+1.2*Math.pow(k-1,2):k*k*(3-2*k), tm=performance.now()*0.001;
+  const sw=Math.sin(tm*1.3)*0.006, br=Math.sin(tm*2.1)*0.004, wob=Math.sin(tm*3.4)*0.04+Math.sin(tm*5.9)*0.015;
+  fuRig.position.set(-0.17+sw,lerp(-0.68,-0.17,e)+br,-0.4);
+  fuRig.rotation.set(-0.2+wob*0.3,0.3+sw*2,0.1+wob*0.6);
+  hudSun.position.copy(sunL.position).sub(sunL.target.position).normalize(); hudSun.target.position.set(0,0,0);
+  if(fistL) fistL.visible=false;
+}
+// canvas pixel -> phone-local position on the screen plane
+function phToLocal(cx,cy,z,out){ return out.set((cx/180-0.5)*0.067,(0.5-cy/360)*0.134,z); }
+const _thA=new T.Vector3(), _thB=new T.Vector3(), _thK=new T.Vector3();
+function phThumb(){ if(!phHand||!phHand.userData.tb) return; const th=PH.thumb||{x:40,y:330,press:0}, u=phHand.userData;
+  phToLocal(th.x,th.y,0.0085-th.press*0.0028,_thB);                    // tip just above (or pressing) the glass
+  _thA.set(-0.046,-0.062,-0.002);                                       // thumb root on the side of the palm
+  _thK.copy(_thA).lerp(_thB,0.5); _thK.z+=0.012; _thK.x-=0.006;         // knuckle bows out from the screen
+  setSeg(u.tb,_thA,_thK,0.021); setSeg(u.tm,_thK,_thB,0.018);
+  u.tt.position.copy(_thB); u.tn.position.set(_thB.x,_thB.y-0.004,_thB.z+0.0045); }
+function updatePhone(dt){
+  const waiting=mode==='play'&&!HP.on&&F.state==='waiting';
+  // a bite: the phone goes straight into your pocket so both hands are on the rod
+  if(PH.wasWait&&!waiting&&F.state==='bite'&&PH.k>0.3) toast('📱 Telefon taskusse — võtab!');
+     // next time you wait, it comes out again
+  PH.wasWait=waiting;
+  const busy=HP.on||['bite','fight','casting','loading'].includes(F.state);
+  if(F.state==='bite'||F.state==='fight') PH.manual=false;
+  // out by itself while waiting (unless pocketed), or any other time you took it out with T
+  const want=mode==='play'&&viewMode===0&&!busy&&!blocking()&&!FU.on&&(waiting?!PH.pocket:!!PH.manual);
+  PH.want=want;
+  PH.k=clamp(PH.k+(want?dt*3:-dt*(F.state==='bite'?7:4)),0,1);
+  phone.visible=PH.k>0.01; if(fistL) fistL.visible=PH.k<0.5;
+  if(!phone.visible) return;
+  phEnsureHand();
+  const e=PH.k*PH.k*(3-2*PH.k);
+  // slides up out of your pocket (bottom-left), and back down into it
+  phone.position.set(lerp(-0.3,-0.17,e),lerp(-0.62,-0.19,e),lerp(-0.22,-0.36,e)); phone.rotation.set(lerp(-1.5,-0.35,e),lerp(0.9,0.32,e),lerp(0.6,0.1,e));
+  feedSim(dt); phThumb(); PH.acc+=dt; if(PH.acc>=1/30){ PH.acc=0; feedDraw(); }
 }
 /* ================= HARPOON =================
    bought in the shop; H swaps rod <-> harpoon. Hold LMB to wind up, release to throw.
@@ -2954,14 +3426,14 @@ function updateFishing(dt){
       if(F.nibble>0) dunk=-0.05*Math.sin((0.35-F.nibble)/0.35*Math.PI);
       if(F.biteT<=0){
         const fish=rollFish();
-        if(!fish){ F.nibble=0.35; F.nibbleT=rand(1.0,2.6); F.biteT=rand(3,7)/L.bite; ripple(lurePos.x,lurePos.z,0.4,0.8); SFX.splash(0.12); }
+        if(!fish){ F.nibble=0.35; F.nibbleT=rand(1.0,2.6); F.biteT=rand(6,13)/L.bite; ripple(lurePos.x,lurePos.z,0.4,0.8); SFX.splash(0.12); }
         else { setState('bite'); F.biteWin=0.95+0.15*L.bite; F.fish=fish;
         ripple(lurePos.x,lurePos.z,0.9,1); splash(lurePos.x,lurePos.y,lurePos.z,14,0.5); SFX.bite(); bigcall('HAAGI!','org',0.8); }
       }
       if(F.dist<2.2){ toast('Lant on paadi juures tagasi. Keegi ei võtnud — viska uuesti.'); setState('ready'); }
     } else {
       F.biteWin-=dt; dunk=-0.22;
-      if(F.biteWin<=0){ toast('Jäi kahe silma vahele. Haagi kiiremini, kui ujuk vee alla läheb.','bad'); F.fish=null; setState('waiting'); F.biteT=rand(3,7)/L.bite; }
+      if(F.biteWin<=0){ toast('Jäi kahe silma vahele. Haagi kiiremini, kui ujuk vee alla läheb.','bad'); F.fish=null; setState('waiting'); F.biteT=rand(6,13)/L.bite; }
     }
     F.dunk=lerp(F.dunk,dunk,Math.min(1,dt*18));
     lurePos.y=waveH(lurePos.x,lurePos.z,time)+0.03+F.dunk;
@@ -3325,7 +3797,8 @@ function frame(now){
   else frame.prev=now;
   const rawDt=(now-last)/1000, dt=Math.min(0.05,rawDt); last=now; time+=dt; if(mode==='play') perfTick(rawDt); fpsTick(rawDt);
   try{ frameBody(dt); }catch(e){ if(frameErr++<3) console.error(e); }
-  try{ renderer.render(scene,camera); }catch(e){ if(frameErr++<3) console.error(e); }
+  try{ renderer.render(scene,camera);
+    if(fuRig.visible&&viewMode===0){ renderer.autoClear=false; renderer.clearDepth(); renderer.render(hudScene,camera); renderer.autoClear=true; } }catch(e){ renderer.autoClear=true; if(frameErr++<3) console.error(e); }
 }
 function frameBody(dt){
   updateBoat(dt);
@@ -3335,7 +3808,7 @@ function frameBody(dt){
   rodTip.getWorldPosition(tipPos);
   if(mode==='play'&&!blocking()) updateFishing(dt);
   else if(mode==='play'&&(F.state==='idle'||F.state==='ready'||F.state==='landed')){ const tg=tipPos.clone(); tg.y-=0.38; lurePos.copy(tg); }
-  updateLine(); updateHarpoon(dt);
+  updateLine(); updateHarpoon(dt); updatePhone(dt); updateFlip(dt);
   updateWater(time,camera.position.x,camera.position.z);
   updateFx(dt);
   updateHUD(); hpHUD(); updateNameTag(Math.min(0.05,dt));
@@ -3349,6 +3822,7 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape'){
     if(!$('settings').hidden){ closeSettings(); return; }
     if(!$('inv').hidden){ closeInv(); return; }
+    if(!$('miniScr').hidden){ miniBack(); return; }
     if(!$('pause').hidden){ resume(); return; }
     if(mode==='play'&&!catchOpen()){ openPause(); return; }
     return;
@@ -3360,6 +3834,9 @@ document.addEventListener('keydown',e=>{
   if(mode!=='play') return;
   if(catchOpen()){ if(a==='fish'||e.code==='Space'||e.code==='Enter') closeCatch(); return; }
   if(a==='inventory'){ if(!$('inv').hidden&&curTab!=='shop') closeInv(); else if($('pause').hidden&&$('settings').hidden) openInv('fish'); return; }
+  if(a==='flip'){ if(HP.on){ toast('Harpuun on mõlemas käes.'); return; } FU.on=!FU.on; SFX.ui(); return; }
+  if(a==='phone'){ const out=!PH.want; PH.pocket=!out; PH.manual=out; SFX.ui();
+    if(out&&(HP.on||viewMode!==0)) toast('📱 Telefoni näed esimeses vaates ja õngega.'); else toast(out?'📱 Telefon välja.':'📱 Telefon taskus (T = võta välja).'); return; }
   if(a==='harpoon'){ toggleHarpoon(); return; }
   if(a==='chars'){ if(!$('inv').hidden&&curTab==='chars') closeInv(); else if($('pause').hidden&&$('settings').hidden) openInv('chars'); return; }
   if(a==='shop'){ if(!$('inv').hidden&&curTab==='shop') closeInv(); else if($('pause').hidden&&$('settings').hidden) openInv('shop'); return; }
@@ -3415,6 +3892,9 @@ function renderTitle(){
   const k=S.settings.keys;
   $('ctrlMini').innerHTML='<span>'+K('forward')+K('left')+K('back')+K('right')+'sõua</span><span>'+K('fish')+'õng</span><span><kbd>LMB</kbd>viska / haagi / keri</span><span>'+K('inventory')+'seljakott</span><span>'+K('shop')+'pood</span><span>'+K('view')+'kaamera vaade</span><span><kbd>Esc</kbd>paus</span>';
   const caught=FISH_ORDER.filter(id=>S.catches[id]).length;
+  $('saveLine').textContent='💾 Salvestus: '+(ACC.name?'konto „'+ACC.name+'“ (mängu andmebaas) + see brauser':saveWhere());
+  $('accLine').innerHTML=ACC.name?'👤 Sisse logitud: <b>'+ACC.name.replace(/[<>&]/g,'')+'</b> · <a href="#" id="accOut" style="color:var(--brass)">Logi välja</a>':'👤 Mängid ilma kontota · <a href="#" id="accIn" style="color:var(--brass)">Logi sisse / loo konto</a>';
+  const ao=document.getElementById('accOut'), ai=document.getElementById('accIn'); if(ao) ao.onclick=e=>{ e.preventDefault(); accLogout(); }; if(ai) ai.onclick=e=>{ e.preventDefault(); show($('title'),false); accShowLogin(); };
   $('profileLine').textContent='Tase '+S.level+' · '+eur(S.cash)+' · '+S.total+' kala püütud · '+caught+'/'+FISH_ORDER.length+' liiki'+(S.catches.herring?' · Heeringas püütud!':'');
 }
 function startPlay(){
@@ -3452,7 +3932,133 @@ function beginTrip(){ SFX.init();
 $('icNext').onclick=introNext; $('icSkip').onclick=introDone;
 addEventListener('keydown',e=>{ if($('intro').hidden) return; e.stopPropagation(); if(e.code==='Enter'||e.code==='Space'||e.code==='KeyE'){ e.preventDefault(); introNext(); } else if(e.code==='Escape'){ e.preventDefault(); introDone(); } },true);
 $('btnPlay').onclick=startPlay;
-$('splashGo').onclick=()=>{ SFX.init(); SFX.ui(); show($('splash'),false); show($('title'),true); };
+/* ================= ADMIN (owner only) ================= */
+let admArm={};
+(async()=>{ try{ if(!window.claude||typeof window.claude.use!=='function') return; const user=await window.claude.use('user'); if(user&&user.isOwner&&await user.isOwner()) $('btnAdmin').hidden=false; }catch(e){} })();
+function saveStats(o){ const sl=Object.entries(o.slots||{}); if(o.slotKey&&!sl.some(([k])=>k===o.slotKey)) sl.push([o.slotKey,o]);
+  let best=1, fish=0, cash=0, herring=0; const per=[];
+  sl.forEach(([k,v])=>{ if(!v) return; const lv=v.level||1; best=Math.max(best,lv); fish+=v.total||0; cash+=v.cash||0; herring+=((v.catches||{}).herring||{n:0}).n+((v.catches||{}).mherring||{n:0}).n;
+    if(lv>1||(v.total||0)>0){ const [c,m]=k.split('|'); per.push((CHARS[c]||{name:c}).name+' · '+((MAPS[m]||{name:m}).name)+': tase '+lv+', '+(v.total||0)+' kala, '+eur(v.cash||0)); } });
+  return {best,fish,cash,herring,per}; }
+const admEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const admWhen=t=>t?new Date(t).toLocaleString('et-EE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+async function admLoad(){ const db=await accDB(); const A=$('admAcc'), Lb=$('admLb');
+  if(!db){ A.innerHTML=Lb.innerHTML='<p class="lb-note">Andmebaas pole kättesaadav.</p>'; return; }
+  A.innerHTML=Lb.innerHTML='<p class="lb-note">Laen…</p>';
+  try{ const snap=await db.collection('accounts').limit(500).get(); const rows=snap.docs.map(d=>{ const x=d.data(); let o={}; try{ o=JSON.parse(x.json||'{}'); }catch(e){} return {id:d.id,name:x.name||d.id,created:x.created,saved:x.savedAt,st:saveStats(o)}; }).sort((a,b)=>b.st.best-a.st.best||b.st.fish-a.st.fish);
+    if(!rows.length) A.innerHTML='<p class="lb-note">Kontosid pole veel loodud.</p>';
+    else { let h='<table class="lb-table"><thead><tr><th>Konto</th><th class="n">Parim tase</th><th class="n">Kalu</th><th class="n">Heeringaid</th><th class="n">Raha</th><th>Viimati</th><th></th></tr></thead><tbody>';
+      rows.forEach(r=>{ h+='<tr><td><b>'+admEsc(r.name)+'</b><div class="adm-det">Loodud '+admWhen(r.created)+(r.st.per.length?'<br>'+r.st.per.map(admEsc).join('<br>'):'')+'</div></td><td class="n">'+r.st.best+'</td><td class="n">'+r.st.fish+'</td><td class="n">'+r.st.herring+'</td><td class="n">'+eur(r.st.cash)+'</td><td>'+admWhen(r.saved)+'</td><td><button class="adm-del" data-acc="'+admEsc(r.id)+'">Kustuta</button></td></tr>'; });
+      A.innerHTML=h+'</tbody></table><p class="lb-note">Kokku '+rows.length+' kontot.</p>'; }
+  }catch(e){ A.innerHTML='<p class="lb-note">Kontosid ei saanud laadida.</p>'; }
+  try{ const snap=await db.collection('leaderboard').orderBy('score','desc').limit(200).get(); const rows=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+    if(!rows.length) Lb.innerHTML='<p class="lb-note">Edetabel on tühi.</p>';
+    else { let h='<table class="lb-table"><thead><tr><th></th><th>Nimi</th><th class="n">Tase</th><th class="n">Kalu</th><th class="n">Raha</th><th>Viimati</th><th></th></tr></thead><tbody>';
+      rows.forEach((r,i)=>{ h+='<tr><td class="rk">'+(i+1)+'.</td><td>'+admEsc(r.name||'?')+'</td><td class="n">'+(+r.level||1)+'</td><td class="n">'+(+r.fish||0)+'</td><td class="n">'+eur(+r.cash||0)+'</td><td>'+admWhen(r.at)+'</td><td><button class="adm-del" data-lb="'+admEsc(r.id)+'">Kustuta</button></td></tr>'; });
+      Lb.innerHTML=h+'</tbody></table>'; }
+  }catch(e){ Lb.innerHTML='<p class="lb-note">Edetabelit ei saanud laadida.</p>'; }
+  document.querySelectorAll('#adminScr .adm-del').forEach(b=>b.onclick=async()=>{ const key=(b.dataset.acc?'a:'+b.dataset.acc:'l:'+b.dataset.lb);
+    if(!admArm[key]||Date.now()-admArm[key]>3000){ admArm[key]=Date.now(); b.textContent='Kindel? Vajuta uuesti'; setTimeout(()=>{ if(b.isConnected) b.textContent='Kustuta'; },3000); return; }
+    try{ await db.doc((b.dataset.acc?'accounts/':'leaderboard/')+(b.dataset.acc||b.dataset.lb)).delete(); toast('Kustutatud.'); }catch(e){ toast('Kustutamine ebaõnnestus.','bad'); } admLoad(); }); }
+$('btnAdmin').onclick=()=>{ SFX.init(); SFX.ui(); show($('title'),false); show($('adminScr'),true); admLoad(); };
+$('admBack').onclick=()=>{ SFX.ui(); show($('adminScr'),false); show($('title'),true); };
+$('admRefresh').onclick=()=>{ SFX.ui(); admLoad(); };
+addEventListener('keydown',e=>{ if($('adminScr').hidden) return; e.stopPropagation(); if(e.code==='Escape'){ e.preventDefault(); $('admBack').click(); } },true);
+/* ================= IN-GAME ACCOUNTS =================
+   username + password; password is salted + hashed (PBKDF2) before it's stored; progress lives in accounts/<username> */
+const ACC={name:null,id:null,db:null,mode:'login',t:0,remember:null};
+const ACC_KEY='omad-kalamehed-account', GUEST_KEY='omad-kalamehed-guest-backup';
+try{ ACC.remember=JSON.parse(localStorage.getItem(ACC_KEY)||'null'); }catch(e){}
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function pwHash(pw,saltHex,iter){ const enc=new TextEncoder(), salt=new Uint8Array(saltHex.match(/../g).map(h=>parseInt(h,16)));
+  const key=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']);
+  return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},key,256)); }
+async function accDB(){ if(ACC.db) return ACC.db; try{ if(!window.claude||typeof window.claude.use!=='function') return null; const db=await window.claude.use('db'); ACC.db=db||null; return ACC.db; }catch(e){ return null; } }
+function accMsg(t,ok){ const m=$('accMsg'); m.textContent=t||''; m.classList.toggle('ok',!!ok); }
+function accMode(m){ ACC.mode=m; document.querySelectorAll('.acc-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.acc===m));
+  $('accPass2Row').hidden=m!=='new'; $('accCarryRow').hidden=m!=='new'; $('accGo').textContent=m==='new'?'Loo konto':'Logi sisse'; $('accPass').autocomplete=m==='new'?'new-password':'current-password'; accMsg(''); }
+document.querySelectorAll('.acc-tabs button').forEach(b=>b.onclick=()=>{ SFX.ui(); accMode(b.dataset.acc); });
+function accShowLogin(){ show($('accScr'),true); accMode('login'); $('accPass').value=''; $('accPass2').value='';
+  const r=ACC.remember; $('accResume').hidden=!(r&&r.name&&r.name!==ACC.name); if(r&&r.name) $('accResumeBtn').textContent='Jätka kui '+r.name; if(r&&r.name) $('accUser').value=r.name;
+  if(ACC.name){ $('accResume').hidden=true; } }
+function accEnterTitle(){ show($('accScr'),false); show($('title'),true); renderTitle(); }
+const accId=n=>n.trim().toLowerCase();
+async function accSubmit(){
+  const name=$('accUser').value.trim(), pw=$('accPass').value; accMsg('');
+  if(!/^[A-Za-z0-9_.\-]{3,16}$/.test(name)){ accMsg('Kasutajanimi: 3–16 tähemärki (tähed, numbrid, _ . -).'); return; }
+  if(pw.length<4){ accMsg('Parool peab olema vähemalt 4 tähemärki.'); return; }
+  const db=await accDB(); if(!db){ accMsg('Kontosid ei saa praegu kasutada: logi claude.ai-sse sisse (Contributor õigusega) või mängi ilma kontota.'); return; }
+  $('accGo').disabled=true; accMsg('Oota…',true);
+  try{
+    const ref=db.doc('accounts/'+accId(name)); const snap=await ref.get();
+    if(ACC.mode==='new'){
+      if(snap.exists){ accMsg('See kasutajanimi on juba võetud.'); return; }
+      if(pw!==$('accPass2').value){ accMsg('Paroolid ei ühti.'); return; }
+      const salt=hex(crypto.getRandomValues(new Uint8Array(16))), iter=120000, hash=await pwHash(pw,salt,iter);
+      const start=$('accCarry').checked?JSON.parse(JSON.stringify(S)):Object.assign(freshSave(),{settings:S.settings});
+      start.savedAt=Date.now(); start.lbName=name;
+      await ref.set({name,salt,iter,hash,json:JSON.stringify(start),savedAt:start.savedAt,created:Date.now()});
+      accBegin(name,start,'Konto loodud! Tere tulemast, <b>'+name+'</b>.');
+    } else {
+      if(!snap.exists){ accMsg('Sellist kontot pole. Vali „Loo konto“.'); return; }
+      const d=snap.data(); const h=await pwHash(pw,d.salt,d.iter||120000);
+      if(h!==d.hash){ accMsg('Vale parool.'); return; }
+      let o=null; try{ o=JSON.parse(d.json); }catch(e){}
+      accBegin(d.name||name,o||Object.assign(freshSave(),{settings:S.settings}),'Tere tagasi, <b>'+(d.name||name)+'</b>!');
+    }
+  }catch(e){ accMsg('Midagi läks valesti. Proovi uuesti.'); }
+  finally{ $('accGo').disabled=false; }
+}
+function accBegin(name,saveObj,msg){
+  // keep the guest progress of this browser safe, so logging out gives it back
+  if(!ACC.name){ try{ localStorage.setItem(GUEST_KEY,JSON.stringify(S)); }catch(e){} }
+  ACC.name=name; ACC.remember={name}; try{ localStorage.setItem(ACC_KEY,JSON.stringify({name})); }catch(e){}
+  adoptSave(saveObj,null); S.lbName=S.lbName||name; lbT=0; accEnterTitle(); toast(msg); setTimeout(()=>{ accSave(true); lbPush(true); },300);
+}
+async function accSave(force){ if(!ACC.name) return; const now=Date.now(); if(!force&&now-ACC.t<4000){ clearTimeout(ACC.tm); ACC.tm=setTimeout(()=>accSave(true),4000); return; } ACC.t=now;
+  const db=await accDB(); if(!db) return; try{ await db.doc('accounts/'+accId(ACC.name)).update({json:JSON.stringify(S),savedAt:S.savedAt||now}); }catch(e){} }
+function accLogout(){ accSave(true); const n=ACC.name; ACC.name=null; ACC.remember=null; try{ localStorage.removeItem(ACC_KEY); }catch(e){}
+  let g=null; try{ g=JSON.parse(localStorage.getItem(SAVE_KEY)||'null')||JSON.parse(localStorage.getItem(GUEST_KEY)||'null'); }catch(e){}
+  adoptSave(g||Object.assign(freshSave(),{settings:S.settings}),'Logisid välja kontolt '+(n||'')+'.'); save(); show($('title'),false); accShowLogin(); }
+$('accGo').onclick=()=>{ SFX.ui(); accSubmit(); };
+$('accGuest').onclick=()=>{ SFX.ui(); if(ACC.name){ accLogout(); return; } accEnterTitle(); };
+$('accResumeBtn').onclick=()=>{ SFX.ui(); $('accUser').value=ACC.remember.name; $('accPass').focus(); accMsg('Sisesta parool, et jätkata.',true); };
+addEventListener('keydown',e=>{ if($('accScr').hidden) return; e.stopPropagation(); if(e.code==='Enter'){ e.preventDefault(); accSubmit(); } },true);
+addEventListener('pagehide',()=>{ try{ accSave(true); }catch(e){} });
+/* ================= LEADERBOARD (shared database, one row per player) ================= */
+let lbDB=null, lbMe=null, lbSort='level', lbT=0;
+async function lbInit(){ if(lbDB!==null) return lbDB; try{ if(!window.claude||typeof window.claude.use!=='function'){ lbDB=false; return false; }
+  const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]); if(!db||!user){ lbDB=false; return false; }
+  lbMe=await user.id(); lbDB=lbMe?db:false; return lbDB; }catch(e){ lbDB=false; return false; } }
+function lbStats(){ // best of every angler/water combination you've played
+  const all=[S].concat(Object.entries(S.slots||{}).filter(([k])=>k!==S.slotKey).map(([,v])=>v)).filter(Boolean);
+  let level=1, fish=0, cash=0, herring=0, bestChar=S.char;
+  all.forEach(v=>{ if((v.level||1)>level){ level=v.level; } fish+=v.total||0; cash+=v.cash||0; herring+=((v.catches||{}).herring||{n:0}).n+((v.catches||{}).mherring||{n:0}).n; });
+  Object.entries(S.slots||{}).concat([[S.slotKey,S]]).forEach(([k,v])=>{ if(v&&(v.level||1)===level) bestChar=k.split('|')[0]; });
+  return {level,fish,cash,herring,char:bestChar}; }
+function lbName(){ return (S.lbName||'').trim()||ACC.name||('Kalamees-'+(lbMe||'xxxx').slice(-4)); }
+async function lbPush(force){ const now=Date.now(); if(!force&&now-lbT<15000) return; lbT=now;
+  const db=await lbInit(); if(!db) return; const st=lbStats();
+  try{ await db.doc('leaderboard/'+lbMe).set({name:lbName(),char:st.char,level:st.level,fish:st.fish,cash:st.cash,herring:st.herring,score:st.level*100000+st.fish,at:now}); }catch(e){} }
+async function lbOpen(){ show($('title'),false); show($('lbScr'),true); $('lbName').value=S.lbName||''; await lbLoad(); }
+async function lbLoad(){ const body=$('lbBody'); body.innerHTML='<p class="lb-note">Laen…</p>';
+  const db=await lbInit(); if(!db){ body.innerHTML='<p class="lb-note">Edetabel töötab ainult claude.ai-sse sisse logituna ja vähemalt Contributor õigusega.</p>'; return; }
+  await lbPush(true);
+  try{ const snap=await Promise.race([db.collection('leaderboard').orderBy(lbSort==='level'?'score':lbSort,'desc').limit(50).get(),new Promise((_,r)=>setTimeout(()=>r('timeout'),10000))]);
+    const rows=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+    if(!rows.length){ body.innerHTML='<p class="lb-note">Edetabel on veel tühi.</p>'; return; }
+    const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    let h='<table class="lb-table"><thead><tr><th></th><th>Mängija</th><th>Kalamees</th><th class="n">Tase</th><th class="n">Kalu</th><th class="n">Heeringaid</th><th class="n">Raha</th></tr></thead><tbody>';
+    rows.forEach((r,i)=>{ h+='<tr'+(r.id===lbMe?' class="me"':'')+'><td class="rk">'+(i+1)+'.</td><td>'+esc(r.name||'?')+(r.id===lbMe?' (sina)':'')+'</td><td>'+esc((CHARS[r.char]||{name:'—'}).name)+'</td><td class="n">'+(+r.level||1)+'</td><td class="n">'+(+r.fish||0)+'</td><td class="n">'+(+r.herring||0)+'</td><td class="n">'+eur(+r.cash||0)+'</td></tr>'; });
+    body.innerHTML=h+'</tbody></table>';
+    $('lbInfo').textContent='Tase = sinu parim tase ükskõik millise kalamehe ja veekoguga. Kalu, heeringaid ja raha on kokku kõigilt kalameestelt ja veekogudelt.';
+  }catch(e){ body.innerHTML='<p class="lb-note">Edetabelit ei saanud laadida. Proovi hiljem uuesti.</p>'; } }
+$('btnLb').onclick=()=>{ SFX.init(); SFX.ui(); lbOpen(); };
+$('lbBack').onclick=()=>{ SFX.ui(); show($('lbScr'),false); show($('title'),true); };
+$('lbSaveName').onclick=async()=>{ const v=$('lbName').value.replace(/\s+/g,' ').trim().slice(0,18); S.lbName=v; save(); SFX.ui(); toast(v?'Nimi salvestatud: <b>'+v.replace(/[<>&]/g,'')+'</b>':'Nimi eemaldatud.'); await lbPush(true); lbLoad(); };
+document.querySelectorAll('.lb-tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.lb-tabs button').forEach(x=>x.classList.toggle('on',x===b)); lbSort=b.dataset.sort; SFX.ui(); lbLoad(); });
+addEventListener('keydown',e=>{ if($('lbScr').hidden) return; if(e.code==='Escape'){ e.preventDefault(); e.stopPropagation(); $('lbBack').click(); } else e.stopPropagation(); },true);
+$('splashGo').onclick=()=>{ SFX.init(); SFX.ui(); show($('splash'),false); accShowLogin(); };
 $('splashFull').onclick=()=>{ SFX.init(); SFX.ui(); toggleFullscreen(); };
 addEventListener('keydown',e=>{ if($('splash').hidden) return; if(e.code==='Enter'||e.code==='Space'){ e.preventDefault(); e.stopPropagation(); $('splashGo').click(); } },true);
 $('btnChars').onclick=()=>{ SFX.init(); SFX.ui(); $('charsBody').innerHTML=charsHTML(); show($('title'),false); show($('charsScr'),true); initDeck($('charsBody')); };
@@ -3487,6 +4093,71 @@ $('pResume').onclick=resume;
 $('pInv').onclick=()=>{ show($('pause'),false); openInv('fish'); };
 $('pSet').onclick=()=>openSettings('pause');
 $('pMenu').onclick=toTitle;
+/* ================= MINIGAMES: Klotsipusle (8x8 block puzzle) ================= */
+$('pMini').onclick=()=>{ SFX.ui(); show($('pause'),false); show($('miniScr'),true); miniShowList(); };
+function miniShowList(){ $('miniTitle').textContent='Minimängud'; $('miniList').hidden=false; $('bbWrap').hidden=true; BB.active=false; }
+function miniBack(){ SFX.ui(); if(!$('bbWrap').hidden){ miniShowList(); return; } show($('miniScr'),false); show($('pause'),true); }
+$('miniBack').onclick=miniBack;
+$('miniBlocks').onclick=()=>{ SFX.ui(); $('miniTitle').textContent='Klotsipusle'; $('miniList').hidden=true; $('bbWrap').hidden=false; if(!BB.grid) bbNew(); BB.active=true; bbDraw(); };
+$('bbNew').onclick=()=>{ SFX.ui(); bbNew(); };
+const BB_COLS=['#ff8a3d','#4fc3ff','#7ee08f','#ffd24a','#c77dff','#ff5c7a','#3fe0c5'];
+const BB_SHAPES=[[[0,0]],[[0,0],[1,0]],[[0,0],[0,1]],[[0,0],[1,0],[2,0]],[[0,0],[0,1],[0,2]],[[0,0],[1,0],[2,0],[3,0]],[[0,0],[0,1],[0,2],[0,3]],
+  [[0,0],[1,0],[2,0],[3,0],[4,0]],[[0,0],[0,1],[0,2],[0,3],[0,4]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]],
+  [[0,0],[0,1],[0,2],[1,2]],[[1,0],[1,1],[1,2],[0,2]],[[0,0],[1,0],[2,0],[0,1]],[[0,0],[1,0],[2,0],[2,1]],[[0,0],[1,0],[1,1],[1,2]],[[0,0],[1,0],[0,1],[0,2]],
+  [[0,0],[1,0],[2,0],[1,1]],[[1,0],[0,1],[1,1],[2,1]],[[0,0],[1,0],[1,1],[2,1]],[[1,0],[2,0],[0,1],[1,1]],[[0,0],[0,1],[1,1]],[[0,0],[1,0],[1,1]],[[0,0],[1,0],[0,1]],
+  [[0,0],[0,1],[0,2],[1,0],[2,0]],[[0,0],[1,1],[2,2]]];
+const BB={grid:null,tray:[],score:0,drag:null,anim:[],over:false,active:false,combo:0};
+const BB_N=8, BB_X=20, BB_Y=20, BB_C=50, BB_TRAY_Y=450;   // canvas layout (440x600)
+function bbPiece(){ const sh=BB_SHAPES[Math.floor(Math.random()*BB_SHAPES.length)]; return {cells:sh,col:BB_COLS[Math.floor(Math.random()*BB_COLS.length)],used:false}; }
+function bbNew(){ BB.grid=Array.from({length:BB_N},()=>Array(BB_N).fill(null)); BB.score=0; BB.over=false; BB.combo=0; BB.anim=[]; BB.tray=[bbPiece(),bbPiece(),bbPiece()]; bbUI(); bbDraw(); }
+function bbUI(){ $('bbScore').textContent=BB.score; $('bbBest').textContent=Math.max(BB.score,S.miniBest||0); }
+function bbFits(p,gx,gy){ return p.cells.every(([x,y])=>{ const cx=gx+x, cy=gy+y; return cx>=0&&cy>=0&&cx<BB_N&&cy<BB_N&&!BB.grid[cy][cx]; }); }
+function bbCanAny(){ return BB.tray.some(p=>!p.used&&[...Array(BB_N*BB_N).keys()].some(i=>bbFits(p,i%BB_N,Math.floor(i/BB_N)))); }
+function bbPlace(p,gx,gy){
+  p.cells.forEach(([x,y])=>BB.grid[gy+y][gx+x]=p.col); p.used=true; BB.score+=p.cells.length;
+  const rows=[], cols=[]; for(let i=0;i<BB_N;i++){ if(BB.grid[i].every(Boolean)) rows.push(i); if(BB.grid.every(r=>r[i])) cols.push(i); }
+  const lines=rows.length+cols.length;
+  if(lines){ BB.combo++; const t=performance.now();
+    rows.forEach(r=>{ for(let x=0;x<BB_N;x++){ BB.anim.push({x,y:r,col:BB.grid[r][x],t}); } }); cols.forEach(c=>{ for(let y=0;y<BB_N;y++){ BB.anim.push({x:c,y,col:BB.grid[y][c],t}); } });
+    rows.forEach(r=>{ for(let x=0;x<BB_N;x++) BB.grid[r][x]=null; }); cols.forEach(c=>{ for(let y=0;y<BB_N;y++) BB.grid[y][c]=null; });
+    BB.score+=lines*10*lines*Math.max(1,BB.combo); SFX.splash(0.5); if(lines>=2) SFX.catch(); }
+  else BB.combo=0;
+  if(BB.tray.every(q=>q.used)) BB.tray=[bbPiece(),bbPiece(),bbPiece()];
+  if(BB.score>(S.miniBest||0)){ S.miniBest=BB.score; save(); }
+  if(!bbCanAny()){ BB.over=true; SFX.snap&&SFX.snap(); }
+  bbUI();
+}
+function bbTraySlot(i){ return {x:BB_X+i*140+70,y:BB_TRAY_Y+70}; }
+function bbBlock(x,cx,cy,sz,col,alpha){ x.globalAlpha=alpha==null?1:alpha; x.fillStyle=col; const r=Math.max(2,sz*0.14);
+  x.beginPath(); x.roundRect?x.roundRect(cx+1,cy+1,sz-2,sz-2,r):x.rect(cx+1,cy+1,sz-2,sz-2); x.fill();
+  x.fillStyle='rgba(255,255,255,.28)'; x.fillRect(cx+3,cy+3,sz-6,Math.max(2,sz*0.16)); x.fillStyle='rgba(0,0,0,.22)'; x.fillRect(cx+3,cy+sz-3-Math.max(2,sz*0.14),sz-6,Math.max(2,sz*0.14)); x.globalAlpha=1; }
+function bbDraw(){ const cv=$('bbCv'), x=cv.getContext('2d'); x.clearRect(0,0,cv.width,cv.height);
+  // board
+  x.fillStyle='#08171e'; x.fillRect(BB_X-6,BB_Y-6,BB_N*BB_C+12,BB_N*BB_C+12);
+  for(let y=0;y<BB_N;y++) for(let gx=0;gx<BB_N;gx++){ const px=BB_X+gx*BB_C, py=BB_Y+y*BB_C; x.fillStyle=(gx+y)%2?'#12303b':'#143643'; x.fillRect(px+1,py+1,BB_C-2,BB_C-2); if(BB.grid&&BB.grid[y][gx]) bbBlock(x,px,py,BB_C,BB.grid[y][gx]); }
+  // where the dragged piece would land
+  const d=BB.drag; if(d){ const g=bbGridAt(d); if(g&&bbFits(d.p,g.x,g.y)) d.p.cells.forEach(([cx,cy])=>bbBlock(x,BB_X+(g.x+cx)*BB_C,BB_Y+(g.y+cy)*BB_C,BB_C,d.p.col,0.35)); }
+  // clear burst
+  const now=performance.now(); BB.anim=BB.anim.filter(a=>now-a.t<420);
+  BB.anim.forEach(a=>{ const k=(now-a.t)/420, s=BB_C*(1+k*0.6); bbBlock(x,BB_X+a.x*BB_C+BB_C/2-s/2,BB_Y+a.y*BB_C+BB_C/2-s/2,s,a.col,1-k); });
+  // tray
+  BB.tray.forEach((p,i)=>{ if(p.used||(d&&d.i===i)) return; const c=bbTraySlot(i), sz=26, w=Math.max(...p.cells.map(q=>q[0]))+1, h=Math.max(...p.cells.map(q=>q[1]))+1;
+    const fits=!BB.grid||[...Array(BB_N*BB_N).keys()].some(k=>bbFits(p,k%BB_N,Math.floor(k/BB_N)));
+    p.cells.forEach(([cx,cy])=>bbBlock(x,c.x-w*sz/2+cx*sz,c.y-h*sz/2+cy*sz,sz,p.col,fits?1:0.3)); });
+  if(d) d.p.cells.forEach(([cx,cy])=>bbBlock(x,d.x-d.ox+cx*BB_C,d.y-d.oy+cy*BB_C,BB_C,d.p.col,0.95));
+  if(BB.over){ x.fillStyle='rgba(4,14,19,.78)'; x.fillRect(BB_X-6,BB_Y-6,BB_N*BB_C+12,BB_N*BB_C+12); x.fillStyle='#e0b867'; x.textAlign='center'; x.font='400 40px Bungee, Impact, sans-serif'; x.fillText('MÄNG LÄBI',220,200);
+    x.fillStyle='#eaf2ee'; x.font='600 20px sans-serif'; x.fillText('Skoor: '+BB.score,220,240); x.fillText('Vajuta „Uus mäng“',220,272); }
+  if(BB.active&&(BB.anim.length||BB.drag)) requestAnimationFrame(bbDraw);
+}
+function bbPos(e){ const cv=$('bbCv'), r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}; }
+function bbGridAt(d){ const gx=Math.round((d.x-d.ox-BB_X)/BB_C), gy=Math.round((d.y-d.oy-BB_Y)/BB_C); return {x:gx,y:gy}; }
+$('bbCv').addEventListener('pointerdown',e=>{ if(BB.over) return; const m=bbPos(e);
+  BB.tray.forEach((p,i)=>{ if(p.used||BB.drag) return; const c=bbTraySlot(i); if(Math.abs(m.x-c.x)<68&&Math.abs(m.y-c.y)<68){
+    const w=Math.max(...p.cells.map(q=>q[0]))+1, h=Math.max(...p.cells.map(q=>q[1]))+1;
+    BB.drag={p,i,x:m.x,y:m.y-40,ox:w*BB_C/2,oy:h*BB_C};   // piece floats above your finger/cursor
+    $('bbCv').setPointerCapture(e.pointerId); SFX.ui(); bbDraw(); } }); });
+$('bbCv').addEventListener('pointermove',e=>{ if(!BB.drag) return; const m=bbPos(e); BB.drag.x=m.x; BB.drag.y=m.y-40; });
+$('bbCv').addEventListener('pointerup',e=>{ const d=BB.drag; if(!d) return; BB.drag=null; const g=bbGridAt(d); if(bbFits(d.p,g.x,g.y)){ bbPlace(d.p,g.x,g.y); SFX.tick&&SFX.tick(); } bbDraw(); });
 $('btnFull1').onclick=()=>{ SFX.init(); toggleFullscreen(); };
 $('btnFull2').onclick=()=>{ toggleFullscreen(); };
 $('btnFull3').onclick=()=>{ toggleFullscreen(); };
@@ -3572,6 +4243,15 @@ function finishRebind(code){
 function cancelRebind(){ rebinding=null; }
 $('resetKeys').onclick=()=>{ S.settings.keys=Object.assign({},DEFAULT_KEYS); save(); renderBinds(); toast('Keybinds reset.'); };
 let resetArm=0;
+const b64e=t=>btoa(unescape(encodeURIComponent(t))), b64d=t=>decodeURIComponent(escape(atob(t)));
+$('saveCopy').onclick=async()=>{ save(); const code='OK1:'+b64e(JSON.stringify(S)); $('saveCode').value=code; $('saveCode').select();
+  try{ await navigator.clipboard.writeText(code); toast('Save code copied. Keep it somewhere safe!'); }catch(e){ toast('Save code is in the box — select it and copy (Ctrl+C).'); } };
+$('saveLoad').onclick=()=>{ const t=$('saveCode').value.trim(); if(!t){ toast('Paste a save code into the box first.','bad'); return; }
+  try{ const o=JSON.parse(b64d(t.replace(/^OK1:/,''))); if(!o||typeof o!=='object'||!o.settings) throw 0; o.savedAt=Date.now(); adoptSave(o,'Save loaded: level <b>'+(o.level||1)+'</b>.'); save(); renderSettings&&renderSettings(); }
+  catch(e){ toast('That save code is not valid.','bad'); } };
+$('saveFile').onclick=async()=>{ save(); const data=JSON.stringify(S); try{ const dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;
+    if(dl){ await dl.save({filename:'omad-kalamehed-save.txt',data:'OK1:'+b64e(data)}); return; } }catch(e){}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['OK1:'+b64e(data)],{type:'text/plain'})); a.download='omad-kalamehed-save.txt'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); };
 $('resetSave').onclick=()=>{
   const b=$('resetSave');
   if(Date.now()-resetArm<3000){ const st=S.settings; S=freshSave(); S.settings=st; save(); b.textContent='Reset all progress'; toast('Progress erased. Fresh start!'); buildMap('lake'); resetPlayer(); buildRod(); if(mode==='play') hudStatic(); resetArm=0; return; }
