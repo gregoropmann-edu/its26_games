@@ -189,6 +189,14 @@
                 <span>🪨 Rocks: <strong id="start-rocks-val" class="text-emerald-400">10</strong></span>
             </div>
 
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-left space-y-2">
+                <label for="seed-input" class="block text-[10px] font-bold uppercase tracking-widest text-sky-300">World seed (same seed = same world)</label>
+                <div class="flex gap-2">
+                    <input id="seed-input" type="number" min="0" max="4294967295" inputmode="numeric" placeholder="Random seed" class="min-w-0 flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100" />
+                    <button id="btn-copy-seed" type="button" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-xs font-bold text-sky-200">Copy seed link</button>
+                </div>
+                <p class="text-[10px] text-slate-500">Leave blank for a new random seed, or enter a seed shared by a friend.</p>
+            </div>
             <div class="flex flex-col sm:flex-row gap-2">
                 <button id="btn-fullscreen" class="hidden py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-1">
                     <span>📱</span> Fullscreen Mode
@@ -254,6 +262,7 @@
             </div>
 
             <div class="bg-slate-950 p-3.5 sm:p-4 rounded-xl border border-slate-800 text-left text-xs space-y-2 text-slate-300">
+                <div class="flex justify-between"><span>World Seed:</span> <span id="vic-seed" class="font-mono font-bold text-sky-300"></span></div>
                 <div class="flex justify-between"><span>Escape Time:</span> <span id="vic-time" class="font-bold text-amber-400">00:00.0</span></div>
                 <div class="flex justify-between"><span>Guards Defeated:</span> <span id="vic-kills" class="font-bold text-slate-200">0</span></div>
                 <div class="flex justify-between"><span>Secret Sword Found:</span> <span id="vic-sword" class="font-bold text-sky-400">No</span></div>

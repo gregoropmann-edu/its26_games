@@ -30,6 +30,35 @@ googleProvider.setCustomParameters({
 let currentUser = null;
 let isMobileDevice = false;
 
+// All gameplay randomness is driven by this run seed (Mulberry32 PRNG).
+let activeSeed = 0;
+let seededState = 0;
+function normalizeSeed(value) {
+    const n = Number(String(value).trim());
+    return Number.isSafeInteger(n) && n >= 0 && n <= 4294967295 ? n >>> 0 : null;
+}
+function createRandomSeed() {
+    if (window.crypto && crypto.getRandomValues) {
+        const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0];
+    }
+    return (Date.now() ^ Math.floor(performance.now() * 1000)) >>> 0;
+}
+function setRunSeed(seed) {
+    activeSeed = normalizeSeed(seed) ?? createRandomSeed();
+    seededState = activeSeed >>> 0;
+    const input = document.getElementById('seed-input');
+    if (input) input.value = String(activeSeed);
+    const display = document.getElementById('active-seed');
+    if (display) display.textContent = String(activeSeed);
+}
+function seededRandom() {
+    let t = seededState += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+
 // Escape text before putting it into innerHTML (prevents stored XSS from leaderboard names)
 function esc(s) {
     return String(s).replace(/[&<>"']/g, c => ({
@@ -182,7 +211,7 @@ class AudioSynth {
         } catch(e) {}
     }
     footstep(isCrouch) {
-        if (Math.random() < 0.3) {
+        if (seededRandom() < 0.3) {
             this.playTone(isCrouch ? 60 : 110, 'triangle', 0.08, isCrouch ? 0.02 : 0.08);
         }
     }
@@ -247,8 +276,8 @@ function generateCleanMazeGrid(rows, cols) {
 
     const gateCol = Math.floor(cols / 2);
     for (let i = 0; i < 12; i++) {
-        const tr = Math.floor(Math.random() * 3) + 1;
-        const tc = Math.floor(Math.random() * (cols - 4)) + 2;
+        const tr = Math.floor(seededRandom() * 3) + 1;
+        const tc = Math.floor(seededRandom() * (cols - 4)) + 2;
         if (Math.abs(tc - gateCol) > 3) {
             grid[tr][tc] = 7;
         }
@@ -300,7 +329,7 @@ function generateCleanMazeGrid(rows, cols) {
         }
 
         if (neighbors.length > 0) {
-            const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+            const next = neighbors[Math.floor(seededRandom() * neighbors.length)];
             grid[current.r + next.dr / 2][current.c + next.dc / 2] = 0;
             grid[next.r][next.c] = 0;
             stack.push({ r: next.r, c: next.c });
@@ -316,7 +345,7 @@ function generateCleanMazeGrid(rows, cols) {
 
     for (let r = mazeStartRow + 2; r < mazeEndRow; r += 3) {
         for (let c = 2; c < cols - 2; c += 3) {
-            if (grid[r][c] === 1 && Math.random() < 0.35) {
+            if (grid[r][c] === 1 && seededRandom() < 0.35) {
                 grid[r][c] = 0;
             }
         }
@@ -324,8 +353,8 @@ function generateCleanMazeGrid(rows, cols) {
 
     // Add a handful of optional loops so layouts are less corridor-like on replay.
     for (let i = 0; i < 9; i++) {
-        const rr = mazeStartRow + 2 + Math.floor(Math.random() * Math.max(1, mazeEndRow - mazeStartRow - 3));
-        const cc = 2 + Math.floor(Math.random() * Math.max(1, cols - 4));
+        const rr = mazeStartRow + 2 + Math.floor(seededRandom() * Math.max(1, mazeEndRow - mazeStartRow - 3));
+        const cc = 2 + Math.floor(seededRandom() * Math.max(1, cols - 4));
         if (grid[rr][cc] === 1 && (grid[rr-1][cc] === 0 || grid[rr+1][cc] === 0 || grid[rr][cc-1] === 0 || grid[rr][cc+1] === 0)) grid[rr][cc] = 0;
     }
 
@@ -655,7 +684,7 @@ class Guard {
         this.radius = 14;
         this.hp = 80;
         this.maxHp = 80;
-        this.angle = Math.random() * Math.PI * 2;
+        this.angle = seededRandom() * Math.PI * 2;
         this.targetAngle = this.angle;
         this.speed = 1.3;
         this.chaseSpeed = 2.3;
@@ -793,13 +822,13 @@ class Guard {
 
         this.patrolTimer += dt;
         if (this.patrolTimer > 3.5) {
-            if (Math.random() < 0.35) {
+            if (seededRandom() < 0.35) {
                 this.patrolState = 'WAIT';
-                this.waitTime = 1.2 + Math.random() * 1.5;
-                this.targetAngle = this.angle + (Math.random() - 0.5) * (Math.PI * 0.8);
+                this.waitTime = 1.2 + seededRandom() * 1.5;
+                this.targetAngle = this.angle + (seededRandom() - 0.5) * (Math.PI * 0.8);
                 return;
             } else {
-                this.targetAngle = this.angle + (Math.random() - 0.5) * (Math.PI * 0.7);
+                this.targetAngle = this.angle + (seededRandom() - 0.5) * (Math.PI * 0.7);
                 this.patrolTimer = 0;
             }
         }
@@ -924,7 +953,7 @@ function initLevel() {
     exitLockOpened = false;
     exitLockDismissed = false;
     window.exitLockNoticeShown = false;
-    lockSequence = Array.from({length: 3}, () => 1 + Math.floor(Math.random() * 4));
+    lockSequence = Array.from({length: 3}, () => 1 + Math.floor(seededRandom() * 4));
     lockProgress = 0;
     codeBlocks = [];
     particles = [];
@@ -940,7 +969,7 @@ function initLevel() {
 
     for (let r = 7; r < MAP_ROWS - 3; r += 4) {
         for (let c = 3; c < MAP_COLS - 3; c += 4) {
-            if (MAP_GRID[r][c] === 0 && Math.hypot(c * TILE_SIZE + TILE_SIZE/2 - margusNPC.x, r * TILE_SIZE + TILE_SIZE/2 - margusNPC.y) > TILE_SIZE * 2 && Math.random() < 0.6) {
+            if (MAP_GRID[r][c] === 0 && Math.hypot(c * TILE_SIZE + TILE_SIZE/2 - margusNPC.x, r * TILE_SIZE + TILE_SIZE/2 - margusNPC.y) > TILE_SIZE * 2 && seededRandom() < 0.6) {
                 guards.push(new Guard(c * TILE_SIZE + TILE_SIZE/2, r * TILE_SIZE + TILE_SIZE/2));
             }
         }
@@ -1026,9 +1055,9 @@ function createBloodParticles(x, y, count = 12) {
     for (let i = 0; i < count; i++) {
         particles.push({
             x, y,
-            vx: (Math.random() - 0.5) * 4.5,
-            vy: (Math.random() - 0.5) * 4.5,
-            radius: Math.random() * 3 + 1,
+            vx: (seededRandom() - 0.5) * 4.5,
+            vy: (seededRandom() - 0.5) * 4.5,
+            radius: seededRandom() * 3 + 1,
             color: '#dc2626',
             life: 0.55
         });
@@ -1037,15 +1066,15 @@ function createBloodParticles(x, y, count = 12) {
 
 function createSlashEffect(x, y, angle, range) {
     for (let i = 0; i < 18; i++) {
-        const spread = (Math.random() - 0.5) * 0.95;
+        const spread = (seededRandom() - 0.5) * 0.95;
         const pAngle = angle + spread;
-        const speed = Math.random() * 3.5 + 2;
+        const speed = seededRandom() * 3.5 + 2;
         particles.push({
             x: x + Math.cos(angle) * 16,
             y: y + Math.sin(angle) * 16,
             vx: Math.cos(pAngle) * speed,
             vy: Math.sin(pAngle) * speed,
-            radius: Math.random() * 2.5 + 1,
+            radius: seededRandom() * 2.5 + 1,
             color: '#fef08a',
             life: 0.28
         });
@@ -1748,7 +1777,6 @@ function update(dt) {
     const pRow = Math.floor(player.y / TILE_SIZE);
 
     if (pRow >= 0 && pRow < MAP_ROWS && pCol >= 0 && pCol < MAP_COLS) {
-        if (MAP_GRID[pRow][pCol] !== 2 && !exitLockOpened) exitLockDismissed = false;
         if (MAP_GRID[pRow][pCol] === 3 && !flagCaptured) {
             flagCaptured = true;
             sfx.itemPick();
@@ -1915,9 +1943,10 @@ async function fetchLeaderboard() {
             const data = docSnap.data();
             const safeName = esc(String(data.name || 'Anonymous').slice(0, 40));
             const safeTime = Number.isFinite(data.time) && data.time >= 0 && data.time < 86400 ? formatTime(data.time) : '--:--';
-            html += `<div class="flex justify-between border-b border-slate-900 pb-0.5 text-xs">
-                <span>#${rank++} <strong class="text-slate-200">${safeName}</strong></span>
-                <span class="text-amber-400 font-mono">${safeTime}</span>
+            const safeSeed = normalizeSeed(data.seed) === null ? 'unknown' : String(data.seed);
+            html += `<div class="flex justify-between items-center border-b border-slate-900 pb-1 text-xs gap-2">
+                <span class="min-w-0">#${rank++} <strong class="text-slate-200">${safeName}</strong><small class="block text-slate-500 pl-5">Seed: <span class="font-mono text-sky-300">${safeSeed}</span></small></span>
+                <span class="text-amber-400 font-mono shrink-0">${safeTime}</span>
             </div>`;
         });
         listElem.innerHTML = html;
@@ -1954,6 +1983,7 @@ async function submitScore() {
             name: String(currentUser.displayName || 'Anonymous').slice(0, 40),
             time: gameTime,
             kills: guardKills,
+            seed: activeSeed,
             timestamp: serverTimestamp()
         });
 
@@ -2008,6 +2038,7 @@ function triggerVictory() {
     localStorage.setItem('shadow_castle_v3_rocks', nextRocks.toString());
 
     document.getElementById('vic-time').innerText = formatTime(gameTime);
+    const vicSeed = document.getElementById('vic-seed'); if (vicSeed) vicSeed.innerText = String(activeSeed);
     document.getElementById('vic-kills').innerText = guardKills.toString();
     document.getElementById('vic-sword').innerText = swordEquipped ? 'Yes' : 'No';
 
@@ -2038,6 +2069,9 @@ function triggerVictory() {
 }
 
 function startGame() {
+    const params = new URLSearchParams(window.location.search);
+    const requestedSeed = params.has('seed') ? params.get('seed') : document.getElementById('seed-input')?.value;
+    setRunSeed(normalizeSeed(requestedSeed) ?? createRandomSeed());
     detectDevice();
     if (isMobileDevice) {
         try { requestFullscreenMode(); } catch(e) {}
@@ -2068,7 +2102,21 @@ document.getElementById('btn-menu-victory')?.addEventListener('click', returnToM
 document.getElementById('btn-google-login')?.addEventListener('click', handleGoogleLogin);
 document.getElementById('btn-submit-score')?.addEventListener('click', submitScore);
 
+document.getElementById('btn-copy-seed')?.addEventListener('click', async () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('seed', String(activeSeed));
+    try {
+        await navigator.clipboard.writeText(url.toString());
+        const btn = document.getElementById('btn-copy-seed');
+        if (btn) { btn.textContent = 'Seed link copied!'; setTimeout(() => btn.textContent = 'Copy seed link', 1600); }
+    } catch (e) {
+        window.prompt('Copy this seed link:', url.toString());
+    }
+});
+
 window.onload = () => {
+    const initialSeed = new URLSearchParams(window.location.search).get('seed');
+    setRunSeed(normalizeSeed(initialSeed) ?? createRandomSeed());
     resizeCanvas();
     detectDevice();
     loadHighScores();
