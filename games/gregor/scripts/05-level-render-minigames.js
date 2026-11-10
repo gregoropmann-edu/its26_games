@@ -12,7 +12,7 @@ let exitLockOpened = false;
 let exitLockDismissed = false;
 let lockSequence = [2, 4, 1];
 let lockProgress = 0;
-let codeBlocks = [];
+let pyodidePromise = null;
 
 function getStartingRocksForGame() {
     const saved = localStorage.getItem('shadow_castle_v3_rocks');
@@ -46,7 +46,6 @@ function initLevel() {
     window.exitLockNoticeShown = false;
     lockSequence = Array.from({length: 3}, () => 1 + Math.floor(seededRandom() * 4));
     lockProgress = 0;
-    codeBlocks = [];
     particles = [];
     rockProjectiles = [];
     noiseRipples = [];
@@ -518,9 +517,13 @@ function drawMargusNPC() {
 
 function talkToMargus() {
     if (!player || !margusNPC || margusFound || !margusNear || gameState !== 'PLAYING') return;
+    const editor = document.getElementById('margus-python-code');
+    const output = document.getElementById('margus-python-output');
+    const feedback = document.getElementById('code-feedback');
+    if (editor) editor.value = 'greeting = "Hello, Margus!"\nprint(greeting)';
+    if (output) output.textContent = 'Program output will appear here…';
+    if (feedback) feedback.textContent = 'Edit the code if you like, then run it.';
     openMiniGame('modal-margus-code');
-    codeBlocks = [];
-    renderCodeBlocks();
 }
 
 function openMiniGame(id) {
@@ -534,17 +537,69 @@ function closeMiniGame(id) {
     el.classList.add('hidden'); el.classList.remove('flex');
     if (gameState === 'MINIGAME') gameState = 'PLAYING';
 }
-function renderCodeBlocks() {
-    const workspace = document.getElementById('code-workspace');
-    const labels = {start:'🟢 When started',set:'🟦 Set greeting = "Hello, Margus!"',say:'🟪 Say greeting',jump:'🟥 Jump 10 times'};
-    workspace.innerHTML = codeBlocks.length ? codeBlocks.map((b,i)=>`<div class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-xs font-bold">${i+1}. ${labels[b]}</div>`).join('') : '<p class="text-slate-600 text-xs">Your blocks will appear here…</p>';
+
+// Load the real Python runtime only when Margus's challenge is first run.
+function loadMargusPythonRuntime() {
+    if (window.loadPyodide) return Promise.resolve();
+    if (pyodidePromise) return pyodidePromise;
+    pyodidePromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Could not load the Python runtime. Check your internet connection and try again.'));
+        document.head.appendChild(script);
+    });
+    return pyodidePromise;
+}
+
+async function runMargusPython() {
+    const editor = document.getElementById('margus-python-code');
+    const output = document.getElementById('margus-python-output');
+    const feedback = document.getElementById('code-feedback');
+    const runButton = document.getElementById('btn-code-run');
+    const source = editor?.value ?? '';
+    const expectedProgram = /^\s*greeting\s*=\s*(["'])Hello, Margus!\1\s*\r?\n\s*print\s*\(\s*greeting\s*\)\s*$/;
+
+    // Keep this tiny game exercise focused on assignment + print, while the
+    // accepted source is executed by CPython running in Pyodide in the browser.
+    if (!expectedProgram.test(source)) {
+        output.textContent = 'No output yet.';
+        feedback.textContent = 'Use two Python lines: assign "Hello, Margus!" to greeting, then print(greeting).';
+        return;
+    }
+
+    runButton.disabled = true;
+    runButton.textContent = 'Loading Python…';
+    feedback.textContent = 'Starting the Python runtime…';
+    try {
+        await loadMargusPythonRuntime();
+        const pyodide = await window.loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
+        });
+        let printed = '';
+        pyodide.setStdout({ batched: (line) => { printed += `${line}\n`; } });
+        await pyodide.runPythonAsync(source);
+        output.textContent = printed.trimEnd() || '(no output)';
+        if (printed.trim() === 'Hello, Margus!') {
+            feedback.textContent = 'Python ran successfully — Margus got your greeting!';
+            finishMargusChallenge();
+        } else {
+            feedback.textContent = 'The program ran, but Margus did not hear the right greeting.';
+        }
+    } catch (error) {
+        output.textContent = error?.message || String(error);
+        feedback.textContent = 'Python could not start. Check your connection and try again.';
+    } finally {
+        runButton.disabled = false;
+        runButton.textContent = '▶ Run Python';
+    }
 }
 function finishMargusChallenge() {
     margusChallengeDone = true; margusFound = true;
     player.rocksRemaining += 3; player.hp = Math.min(player.maxHp, player.hp + 15);
     sfx.itemPick();
     showFloatingText('+3 LURES  +15 HP', margusNPC.x, margusNPC.y - 28, '#fbbf24');
-    showBannerAlert('MARGUS: “Brilliant! A proper little program. The flag lies in the southern sanctum!”');
+    showBannerAlert('MARGUS: “Brilliant! Real Python! The flag lies in the southern sanctum!”');
     document.getElementById('btn-talk-margus')?.classList.add('hidden');
     closeMiniGame('modal-margus-code');
 }
