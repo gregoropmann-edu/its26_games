@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>IDENTITY.AI — admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/identity.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="shell shell--admin">
+    <div class="panel">
+      <div class="admin-bar">
+        <p class="admin-status" id="adminStatus">Ühendan…</p>
+        <div class="admin-actions">
+          <button type="button" class="btn-secondary" id="btnReveal" disabled>Paljasta mängijale</button>
+        </div>
+      </div>
+
+      <p class="lead" id="scanHint">Oota, kuni keegi vajutab „Alusta tuvastamist“.</p>
+
+      <div class="pill-grid" id="pillGrid" role="listbox" aria-label="Vali õpilane"></div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/players.js"></script>
+  <script src="js/admin.js" defer></script>
+</body>
+</html>
