@@ -99,14 +99,13 @@ document.getElementById('btn-touch-rock')?.addEventListener('pointerdown', (e) =
     if (player && gameState === 'PLAYING') player.throwRock();
 });
 document.getElementById('btn-talk-margus')?.addEventListener('pointerdown', (e) => { e.preventDefault(); talkToMargus(); });
-document.querySelectorAll('.code-block').forEach(btn => btn.addEventListener('click', () => { if (codeBlocks.length < 4) { codeBlocks.push(btn.dataset.block); renderCodeBlocks(); } }));
-document.getElementById('btn-code-clear')?.addEventListener('click', () => { codeBlocks = []; renderCodeBlocks(); document.getElementById('code-feedback').textContent = 'Hint: start → set greeting → say greeting.'; });
-document.getElementById('btn-code-close')?.addEventListener('click', () => closeMiniGame('modal-margus-code'));
-document.getElementById('btn-code-run')?.addEventListener('click', () => {
-    const correct = codeBlocks.length === 3 && codeBlocks[0] === 'start' && codeBlocks[1] === 'set' && codeBlocks[2] === 'say';
-    if (correct) { document.getElementById('code-feedback').textContent = '“Hello, Margus!” — It works!'; finishMargusChallenge(); }
-    else document.getElementById('code-feedback').textContent = 'Not quite. Use exactly: When started → Set greeting → Say greeting.';
+document.getElementById('btn-code-clear')?.addEventListener('click', () => {
+    document.getElementById('margus-python-code').value = 'greeting = "Hello, Margus!"\nprint(greeting)';
+    document.getElementById('margus-python-output').textContent = 'Program output will appear here…';
+    document.getElementById('code-feedback').textContent = 'Code reset. Run the program when you are ready.';
 });
+document.getElementById('btn-code-close')?.addEventListener('click', () => closeMiniGame('modal-margus-code'));
+document.getElementById('btn-code-run')?.addEventListener('click', runMargusPython);
 document.querySelectorAll('.lock-pin').forEach(btn => btn.addEventListener('click', () => chooseLockPin(Number(btn.dataset.pin))));
 document.getElementById('btn-lock-cancel')?.addEventListener('click', () => { exitLockDismissed = true; closeMiniGame('modal-lockpick'); });
 
@@ -212,10 +211,21 @@ function update(dt) {
             }
         }
 
-        if (MAP_GRID[pRow][pCol] === 2 && flagCaptured && !exitLockOpened && !exitLockDismissed) {
-            if (!window.exitLockNoticeShown) { window.exitLockNoticeShown = true; showBannerAlert('THE DOOR WAS FOUND OPEN… BUT A GUARD CLOSED IT! PICK THE LOCK.'); }
+        // Tile 9 marks the castle's north entrance gate. Solve the lock here,
+        // then continue outside to tile 2 (the getaway wagon) to finish.
+        if (MAP_GRID[pRow][pCol] === 9 && flagCaptured && !exitLockOpened && !exitLockDismissed) {
+            if (!window.exitLockNoticeShown) {
+                window.exitLockNoticeShown = true;
+                showBannerAlert('THE CASTLE DOOR IS LOCKED! Solve the sequence to get out.');
+            }
             startLockpick();
-        } else if (MAP_GRID[pRow][pCol] === 2 && flagCaptured && exitLockOpened) { triggerVictory(); }
+        } else if (MAP_GRID[pRow][pCol] !== 9) {
+            exitLockDismissed = false;
+        }
+
+        if (MAP_GRID[pRow][pCol] === 2 && flagCaptured && exitLockOpened) {
+            triggerVictory();
+        }
     }
 
     guards.forEach(g => g.update(dt));
@@ -296,7 +306,9 @@ function updateHUD() {
 
     document.getElementById('game-timer').innerText = formatTime(gameTime);
     const objective = document.getElementById('objective-status');
-    if (objective) objective.innerText = flagCaptured ? 'Escape through the north gate to the wagon' : 'Find the Royal Flag in the southern sanctum';
+    if (objective) objective.innerText = flagCaptured
+        ? (exitLockOpened ? 'Reach the getaway wagon outside' : 'Unlock the castle entrance door, then reach the wagon')
+        : 'Find the Royal Flag in the southern sanctum';
 }
 
 function formatTime(seconds) {
