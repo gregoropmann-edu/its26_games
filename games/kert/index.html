@@ -4287,46 +4287,7 @@ function mkGolem(){
   g.scale.set(1.32,1.42,1.32);
   return{g,body:g,head,armL,armR,legL,legR,mats,ov:[[],[],[],[]],pal:{fwd:false},ph:0,fl:false};
 }
-function mkAnimal(type,color){
-  const g=new THREE.Group(),mats=[],M=c=>{const m=new THREE.MeshBasicMaterial({color:c,map:grainTex});m.userData.base=c;mats.push(m);return m;};
-  const box=(w,h,d,mat,x,y,z,parent=g)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);parent.add(m);return m;};
-  if(type=="chicken"){
-    const bodyMat=M(0xf0eee5),wingMat=M(0xe0ddd2),headMat=M(0xf4f1e8),beakMat=M(0xe4a02d),legMat=M(0xd58a24),combMat=M(0xc83b32),eyeMat=M(0x171717);
-    box(.56,.48,.43,bodyMat,0,.73,0);
-    box(.20,.20,.18,wingMat,-.29,.78,.01);box(.20,.20,.18,wingMat,.29,.78,.01);
-    const tail= new THREE.Group();tail.position.set(0,.82,.22);g.add(tail);
-    box(.10,.28,.12,wingMat,0,.08,.02,tail);box(.09,.22,.1,wingMat,-.09,.07,.04,tail);box(.09,.22,.1,wingMat,.09,.07,.04,tail);
-    const head=new THREE.Group();head.position.set(0,1.03,-.16);g.add(head);
-    box(.27,.29,.27,headMat,0,.13,0,head);
-    box(.15,.09,.17,beakMat,0,.09,-.19,head);
-    box(.07,.14,.06,combMat,0,.34,.01,head);box(.055,.09,.05,combMat,-.045,.31,.015,head);
-    box(.055,.07,.035,combMat,0,-.055,-.14,head);
-    box(.035,.045,.025,eyeMat,-.09,.18,-.137,head);box(.035,.045,.025,eyeMat,.09,.18,-.137,head);
-    const limb=(x)=>{const q=new THREE.Group();q.position.set(x,.52,0);g.add(q);box(.075,.36,.075,legMat,0,-.18,0,q);box(.17,.055,.14,legMat,0,-.34,-.045,q);return q;};
-    const legL=limb(-.14),legR=limb(.14);
-    const wingL=new THREE.Group(),wingR=new THREE.Group();wingL.position.set(-.27,.82,0);wingR.position.set(.27,.82,0);g.add(wingL,wingR);
-    box(.10,.30,.27,wingMat,-.025,-.08,0,wingL);box(.10,.30,.27,wingMat,.025,-.08,0,wingR);
-    return{g,body:g,head,armL:wingL,armR:wingR,legL,legR,mats,ov:[[],[],[],[]],pal:{fwd:false,bow:false},ph:0,fl:false};
-  }
-  const colors=type=="cow"?{body:0xe8e5dc,head:0xe4e0d5,patch:0x302c2a,leg:0x51443c,snout:0x99776b}:type=="pig"?{body:0xe58eaa,head:0xe995b0,patch:0xd77996,leg:0x9a6575,snout:0xd77c98}:{body:color||0xeeeeea,head:0xc8a589,patch:color||0xeeeeea,leg:0x7a6658,snout:0x9c7864};
-  const body=M(colors.body),headMat=M(colors.head),patch=M(colors.patch),legMat=M(colors.leg),snout=M(colors.snout),dark=M(0x211b19),horn=M(0xd9d0b7);
-  const isSheep=type=="sheep";
-  box(.78,.62,.48,body,0,.92,0);
-  if(type=="cow"){
-    [[-.28,.20],[-.02,-.22],[.27,.18]].forEach(([x,z])=>box(.23,.28,.025,patch,x,.98,z));
-  }else if(isSheep){
-    for(let x=-1;x<=1;x++)for(let z=-1;z<=1;z++)if(x||z)box(.27,.28,.27,body,x*.22,1.12,z*.16);
-  }
-  const head=new THREE.Group();head.position.set(0,1.12,-.34);g.add(head);
-  box(.38,.38,.38,headMat,0,.08,0,head);box(.31,.19,.12,snout,0,-.03,-.22,head);
-  box(.055,.06,.02,dark,-.095,.14,-.197,head);box(.055,.06,.02,dark,.095,.14,-.197,head);
-  if(type=="cow"){box(.08,.2,.08,horn,-.16,.31,0,head);box(.08,.2,.08,horn,.16,.31,0,head);}
-  if(type=="pig"){box(.28,.18,.08,snout,0,-.08,-.27,head);box(.055,.06,.02,dark,-.07,-.08,-.315,head);box(.055,.06,.02,dark,.07,-.08,-.315,head);}
-  if(isSheep){box(.12,.16,.1,headMat,-.22,.10,.02,head);box(.12,.16,.1,headMat,.22,.10,.02,head);}
-  const limb=(x,z)=>{const q=new THREE.Group();q.position.set(x,.64,z);g.add(q);box(.16,.55,.16,legMat,0,-.26,0,q);return q;};
-  const legL=limb(.23,-.15),legR=limb(-.23,-.15),armL=limb(.23,.15),armR=limb(-.23,.15);
-  return{g,body:g,head,armL,armR,legL,legR,mats,ov:[[],[],[],[]],pal:{fwd:false,bow:false},ph:0,fl:false};
-}
+var mkAnimal=null; /* vana kastipõhine mudel eemaldatud, uus on allpool */
 
 function hitB(px,py,pz,r,hh){for(let x=Math.floor(px-r);x<=Math.floor(px+r);x++)for(let y=Math.floor(py);y<=Math.floor(py+hh);y++)for(let z=Math.floor(pz-r);z<=Math.floor(pz+r);z++)if(solid(x,y,z))return true;return false}
 
@@ -5579,21 +5540,6 @@ try{
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let mcMobAttack=false,pathBudget=1;
 
-  /* ---- Lehm vs lammas: väga erinev välimus ---- */
-  const _mkAnimal=mkAnimal;
-  mkAnimal=function(type,color){
-    const m=_mkAnimal(type,color);
-    if(type=="cow"){
-      m.g.scale.setScalar(1.28);
-      const cols=[0x4a2e1c,0x3b2416,0xf1ede4,0x2a1d15,0xd8b9a2,0x150f0d,0xe6dcc0];
-      m.mats.forEach((q,i)=>{if(cols[i]!=null){q.color.setHex(cols[i]);q.userData.base=cols[i]}});
-    }else if(type=="sheep"){
-      m.g.scale.setScalar(.84);
-      const set=(i,c)=>{const q=m.mats[i];if(q){q.color.setHex(c);q.userData.base=c}};
-      set(1,0x3a2f2a);set(3,0x2c2420);set(4,0x4a3a33);
-    }
-    return m;
-  };
 
   /* ---- Pathfinding (A*) ---- */
   const BAD=b=>b===31||b===37||b===38;
@@ -6055,14 +6001,42 @@ mkAnimal=function(type,color){
   const head=new THREE.Group();g.add(head);
   const ret=(a,b,c,d)=>({g,body:g,head,armL:c,armR:d,legL:a,legR:b,mats,ov:[[],[],[],[]],pal:{fwd:false,bow:false},ph:0,fl:false});
   if(type=="chicken"){
-    const P=.045,W=0xf2f2ee;
-    TB(g,mats,"chB",6,6,8,0,8,0,one(W),P,12);
-    head.position.set(0,12*P,-5*P);
-    TB(head,mats,"chH2",4,6,3,0,0,0,(k,x,y)=>k=="nz"&&y==1&&(x==0||x==3)?0x0a0a0a:W,P,10);
-    TB(head,mats,"chK2",2,1,2,0,0,-2.5,one(0xe4a02d),P,6);TB(head,mats,"chW2",1,2,1,0,-1.5,-2,one(0xc83b32),P,6);
-    TB(g,mats,"chG",1,4,6,-3.5,9,0,one(0xe3e0d6),P,10);TB(g,mats,"chG",1,4,6,3.5,9,0,one(0xe3e0d6),P,10);
-    const f=(k,x,y)=>0xe2a02c;
-    return ret(limb("chL",P,3,5,3,-2,5,0,f),limb("chL",P,3,5,3,2,5,0,f),dummy(),dummy());
+    /* ===== Kana: Minecrafti originaalmõõtudes (keha 6x6x8, pea 4x6x3, nokk 4x2x2, lõuasagar 2x2x2, tiivad 1x4x6, jalad 1x5x1 + 3x1x3 labad) ===== */
+    const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+    const fid=k=>k.charCodeAt(0)*5+k.charCodeAt(1);
+    const WH=[0xf7f7f7,0xefefef,0xe6e6e6,0xf2f2f2];
+    const white=(k,x,y)=>WH[Math.floor((.6*HH(x,y,4+fid(k))+.4*HH(x>>1,y>>1,8+fid(k)))*WH.length)%WH.length];
+    const HF=(k,x,y)=>{
+      if(k==="nz"&&y===2){if(x===0||x===3)return 0x0a0a0a;if(x===1||x===2)return 0xdcdcdc}
+      return white(k,x,y);
+    };
+    const BILL=(k,x,y,W,H)=>{
+      if(k==="py"){if((x===0&&y===0)||(x===3&&y===1))return 0x6e4a1f;return 0xcf9a3c}
+      if(k==="ny")return 0x8a5c28;
+      return y===H-1?0x6f4a22:0x92632b;
+    };
+    const FOOT=(k,x,y)=>{                                        /* labad: lõigatud (läbipaistev) tekstuur */
+      if(k==="py"||k==="ny"){
+        const front=k==="py"?0:2,row=(k==="py")?y:2-y;           /* row 0 = ees */
+        if(row===0)return(x===1)?0xe3cf73:(x===0||x===2)?0xe3cf73:null;
+        if(row===1)return 0xe3cf73;
+        return x===1?0xe3cf73:null;
+      }
+      return 0xe3cf73;
+    };
+    const cut=(m,dbl)=>{(Array.isArray(m.material)?m.material:[m.material]).forEach(q=>{q.alphaTest=.5;if(dbl)q.side=THREE.DoubleSide});return m};
+    TB(g,mats,"chB",6,6,8,0,8,0,white,P,4);
+    TB(g,mats,"chW",1,4,6,-3.5,9,0,white,P,4);TB(g,mats,"chW",1,4,6,3.5,9,0,white,P,4);
+    head.position.set(0,9*P,-4*P);
+    TB(head,mats,"chH",4,6,3,0,3,-.5,HF,P,4);
+    TB(head,mats,"chK",4,2,2,0,3,-3,BILL,P,4);
+    TB(head,mats,"chC",2,2,2,0,1,-2,one(0xd01010),P,4);
+    const climb=x=>{
+      const q=limb("chS",P,1,5,1,x,5,0,one(0xcdb260));          /* jalg */
+      cut(TB(q,mats,"chF",3,1,3,0,-4.5,-1,FOOT,P,4),true);      /* lapp varvastega */
+      return q;
+    };
+    return ret(climb(-1.5),climb(1.5),dummy(),dummy());
   }
   const P=.0625;
   if(type=="pig"){
@@ -6075,23 +6049,64 @@ mkAnimal=function(type,color){
     return ret(limb("pgL",P,4,6,4,3,6,-4,f),limb("pgL",P,4,6,4,-3,6,-4,f),limb("pgL",P,4,6,4,3,6,8,f),limb("pgL",P,4,6,4,-3,6,8,f));
   }
   if(type=="cow"){
-    const br=0x4b3523,wh=0xe0d8cc,pt=s=>(k,x,y)=>((x>>1)*31+(y>>1)*17+s)%7<2?wh:br;
-    TB(g,mats,"cwB",12,10,18,0,17,2,pt(3),P,12);TB(g,mats,"cwU",4,2,4,0,11,8,one(0xd9a0a0),P,8);
-    head.position.set(0,20*P,-11*P);
-    TB(head,mats,"cwH",8,8,6,0,0,0,(k,x,y)=>{if(k!="nz")return br;if(y==3)return x==1||x==6?0xffffff:x==2||x==5?0x111111:br;return y>5?0xd9b8a0:br},P,10);
-    TB(head,mats,"cwM",6,3,1,0,-2.5,-3.5,one(0xd9b8a0),P,8);
-    TB(head,mats,"cwO",1,3,1,-4.5,5.5,-1,one(0xcfc9b8),P,6);TB(head,mats,"cwO",1,3,1,4.5,5.5,-1,one(0xcfc9b8),P,6);
-    const f=one(0x3b2a1c);
-    return ret(limb("cwL",P,4,12,4,4,12,-5,f),limb("cwL",P,4,12,4,-4,12,-5,f),limb("cwL",P,4,12,4,4,12,9,f),limb("cwL",P,4,12,4,-4,12,9,f));
+    /* ===== Lehm: Minecrafti originaalmõõtudes (keha 12x10x18, pea 8x8x6, koon 6x3x1, jalad 4x12x4, sarved 1x3x1) ===== */
+    const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+    const BR=[0x35241a,0x3d2b1f,0x45321f,0x4e3a27,0x38281c];
+    const GR=[0xa9a9ab,0xbdbdbf,0xcfcfd1,0xdcdcde];
+    const fid=k=>k.charCodeAt(0)*5+k.charCodeAt(1);
+    const brown=(k,x,y)=>BR[Math.floor((.55*HH(x,y,3+fid(k))+.45*HH(x>>1,y>>1,9+fid(k)))*BR.length)%BR.length];
+    /* hallikasvalged laigud: suured plokid, servad tumedamad */
+    const patch=(k,x,y,s)=>{const v=.6*HH(x>>2,y>>2,s+fid(k))+.4*HH(x>>1,y>>1,s+11+fid(k));return v>.62};
+    const BF=(k,x,y)=>patch(k,x,y,21)?GR[Math.floor(HH(x,y,5)*GR.length)%GR.length]:brown(k,x,y);
+    const LF=(k,x,y,W,H)=>{if(y>=H-2)return 0x1d130d;if((k==="nz"||k==="pz"||k==="px"||k==="nx")&&patch(k,x,y,41)&&y<H-3)return GR[1+Math.floor(HH(x,y,6)*2)];return brown(k,x,y)};
+    const HF=(k,x,y)=>{
+      if(k==="nz"){
+        if(y===3){if(x===0||x===7)return 0xf0f0f0;if(x===1||x===6)return 0x111111}
+        if(y<=2&&x>=2&&x<=5)return GR[2+((x+y)&1)];          /* valge laup */
+        return brown(k,x,y);
+      }
+      if(k==="px"||k==="nx"){
+        const r=k==="px"?x:5-x;                              /* r=0: pea tagaserv */
+        if(r<=1&&y===2)return 0xc08a90;                      /* roosa kõrv */
+        if(r<=1&&(y===1||y===3))return 0x2a1a10;
+        return brown(k,x,y);
+      }
+      if(k==="py"&&x>=2&&x<=5&&y>=1&&y<=4)return GR[1+((x+y)&1)];
+      return brown(k,x,y);
+    };
+    const MF=(k,x,y)=>{if(k==="nz"){if(y===1&&(x===1||x===4))return 0x161616;return 0xb7b7b9}return 0x9c9c9e};
+    TB(g,mats,"cwB",12,10,18,0,17,1,BF,P,4);
+    TB(g,mats,"cwU",4,1,6,0,11.5,7,one(0xd9a0a0),P,4);
+    head.position.set(0,20*P,-8*P);
+    TB(head,mats,"cwH",8,8,6,0,0,-3,HF,P,4);
+    TB(head,mats,"cwM",6,3,1,0,-2.5,-6.5,MF,P,4);
+    TB(head,mats,"cwO",1,3,1,-4.5,3.5,-3.5,one(0xa9a9ab),P,3);TB(head,mats,"cwO",1,3,1,4.5,3.5,-3.5,one(0xa9a9ab),P,3);
+    return ret(limb("cwL",P,4,12,4,4,12,-5,LF),limb("cwL",P,4,12,4,-4,12,-5,LF),limb("cwL",P,4,12,4,4,12,7,LF),limb("cwL",P,4,12,4,-4,12,7,LF));
   }
-  const wl=color||0xeeeeea,id=wl.toString(16),sk=0xc2a58b;   // lammas
-  TB(g,mats,"shB"+id,11,10,18,0,16,2,one(wl),P,26);
-  head.position.set(0,17*P,-11*P);
-  TB(head,mats,"shH",6,6,8,0,0,0,(k,x,y)=>k=="nz"&&y==2&&(x==1||x==4)?0x1a1a1a:sk,P,10);
-  TB(head,mats,"shW"+id,7,2,7,0,3.5,1,one(wl),P,26);
-  TB(head,mats,"shE",2,1,3,-4,1,0,one(sk),P,6);TB(head,mats,"shE",2,1,3,4,1,0,one(sk),P,6);
-  const f=one(0xb89c82);
-  return ret(limb("shL",P,4,11,4,3,11,-5,f),limb("shL",P,4,11,4,-3,11,-5,f),limb("shL",P,4,11,4,3,11,9,f),limb("shL",P,4,11,4,-3,11,9,f));
+  /* ===== Lammas: Minecrafti originaalmõõtudes (keha 8x6x16 + vill, pea 6x6x8 + villamüts, jalad 4x12x4 + villasokk) ===== */
+  const wl=color||0xeeeeea,id=wl.toString(16);
+  const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const mulc=(c,f)=>{const r=Math.min(255,Math.round((c>>16&255)*f)),gg=Math.min(255,Math.round((c>>8&255)*f)),b=Math.min(255,Math.round((c&255)*f));return(r<<16)|(gg<<8)|b};
+  const wbase=(wl===0xeeeeea)?0xf7f7f5:wl;
+  const WF=(k,x,y)=>{const sd=k.charCodeAt(0)*3+k.charCodeAt(1);const v=.5*HH(x,y,7+sd)+.5*HH(x>>1,y>>1,13+sd);return mulc(wbase,v<.14?.82:v<.36?.91:v<.92?1:1.03)};
+  const FACE=[0x8d6e56,0xa18064,0xb08d70,0xb89578,0xc09d80,0xc6a488];
+  const HF=(k,x,y)=>{
+    if(k==="nz"){
+      if(y===2){if(x===0||x===5)return 0x141414;if(x===1||x===4)return 0xf0f0f0}
+      if((y===3||y===4)&&(x===2||x===3))return 0xe3a3a8;
+      return FACE[y];
+    }
+    return 0xb08d70;
+  };
+  const LF=(k,x,y,W,H)=>y>=H-2?0x4e3d30:(HH(x,y,31)<.2?0xa88e7a:0xb99f8a);
+  const sc=(m,a,b,c)=>{m.scale.set(a,b,c);return m};
+  /* keha: vill 11.5 x 9.5 x 19.5 px (nagu originaalis, tekstuur 8x6x16) */
+  sc(TB(g,mats,"shBw"+id,8,6,16,0,15,0,WF,P,4),11.5/8,9.5/6,19.5/16);
+  head.position.set(0,18*P,-8*P);
+  TB(head,mats,"shH",6,6,8,0,1,-2,HF,P,4);
+  sc(TB(head,mats,"shHw"+id,6,6,6,0,1,-1,WF,P,4),1.2,1.2,1.2);   /* villamüts pea peal ja taga */
+  const slimb=(x,z)=>{const q=limb("shL",P,4,12,4,x,12,z,LF);sc(TB(q,mats,"shLw"+id,4,6,4,0,-3,0,WF,P,4),1.25,7/6,1.25);return q};
+  return ret(slimb(3,-5),slimb(-3,-5),slimb(3,7),slimb(-3,7));
 };
 
 /* --- Vanade mobimudelite asendamine uutega (sh. LANi kaudu tulnud mobid) --- */
@@ -7519,7 +7534,7 @@ try{
 (function(){
 try{
   const KEY='mc_opts27';
-  const DEF={sfx:true,sfxVol:80,fov:75,fps:false,cross:true,shake:true};
+  const DEF={sfx:true,sfxVol:80,fov:70,fps:false,cross:true,shake:true};
   const S=Object.assign({},DEF);
   try{const j=JSON.parse(localStorage.getItem(KEY)||'{}');for(const k in DEF)if(typeof j[k]===typeof DEF[k])S[k]=j[k]}catch(e){}
   window.mcOpt=S;
@@ -9432,8 +9447,8 @@ try{
       const k=SKINS[skinIdx]||SKINS[0];
       mcFpLeft.scale.set(k.legacy?-.92:.92,.92,.92);
       mcBuildArm(mcFpRight,k,false);mcBuildArm(mcFpLeft,k,true);
-      mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));
-      mcFpLeft.visible=!!off;
+      mcFpRight.visible=((hotbar[cur]||0)===0);
+      mcFpLeft.visible=false;
       /* The old untextured placeholder must never cover the skin-mapped model. */
       arm.visible=false;
     }
@@ -9446,12 +9461,12 @@ try{
     updHeld=function(){
       mcUpdHeldOriginal.apply(this,arguments);
       arm.visible=false;
-      mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));
+      mcFpRight.visible=((hotbar[cur]||0)===0);
     };
     const mcUpdOffOriginal=updOff;
     updOff=function(){
       mcUpdOffOriginal.apply(this,arguments);
-      mcFpLeft.visible=!!off;
+      mcFpLeft.visible=false;
     };
     mcApplySkinArms();
 
@@ -9615,11 +9630,11 @@ try{
         q.mesh.scale.setScalar(sc);q.mat.opacity=.52*(1-u);
         if(u>=1){scene.remove(q.mesh);q.geo.dispose();q.mat.dispose();mcPlaceEffects.splice(i,1)}
       }
-      mcFpLeft.visible=!!off;
+      mcFpLeft.visible=false;
     };
 
     /* Keep the textured arm visible after item swaps and all existing animation wrappers. */
-    arm.visible=false;mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));mcFpLeft.visible=!!off;
+    arm.visible=false;mcFpRight.visible=((hotbar[cur]||0)===0);mcFpLeft.visible=false;
     try{addChat('Esimese isiku käsi kasutab nüüd valitud skinni; kaevamisel, asetamisel ja kasutamisel on eraldi animatsioonid.','sys')}catch(e){}
   }catch(err){
     console.error('First-person hand upgrade failed:',err);
@@ -10417,5 +10432,103 @@ try{
 }catch(err){console.error('Tööriistaikoonid:',err)}})();
 </script>
 
+
+<style id="mcLookV1css">
+/* Vanilla-Minecrafti tume tunne: õrn vinjett ekraani servades */
+#mcVig{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 52%,rgba(0,0,0,.30) 100%)}
+</style>
+<div id="mcVig"></div>
+<script id="mcLookV1">
+/* ===== Välimus nagu päris Minecraftis: gradient-taevas, kahvatum horisont, veidi tumedam maailm ===== */
+(function(){try{
+  if(window.__MC_LOOK_V1)return;window.__MC_LOOK_V1=true;
+  daySky.setHex(0x74a0e6);                       /* sügavam vanilla-sinine taevas */
+  const WHITE=new THREE.Color(1,1,1);
+  const g=new THREE.SphereGeometry(1,24,16);
+  const pos=g.attributes.position,colArr=new Float32Array(pos.count*3);
+  g.setAttribute('color',new THREE.BufferAttribute(colArr,3));
+  const dome=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false,depthTest:false}));
+  dome.renderOrder=-1000;dome.frustumCulled=false;scene.add(dome);
+  const hor=new THREE.Color(),top=new THREE.Color();let lightK=1;
+  const TINT=[.71,.835,.966];
+  function syncDome(){
+    const ow=(typeof worldDimension==='undefined')||worldDimension==='overworld';
+    dome.visible=ow;if(!ow)return;
+    hor.copy(scene.background);
+    const k=lightK;
+    top.setRGB(hor.r*(1+(TINT[0]-1)*k),hor.g*(1+(TINT[1]-1)*k),hor.b*(1+(TINT[2]-1)*k));
+    for(let i=0;i<pos.count;i++){
+      const y=pos.getY(i);const t=y<=0?0:Math.pow(Math.min(1,y),.55);
+      colArr[i*3]=hor.r+(top.r-hor.r)*t;colArr[i*3+1]=hor.g+(top.g-hor.g)*t;colArr[i*3+2]=hor.b+(top.b-hor.b)*t;
+    }
+    g.attributes.color.needsUpdate=true;
+    dome.position.copy(cam.position);dome.scale.setScalar(Math.max(150,cam.far*.8));
+  }
+  const _udc=updateDayCycle;
+  updateDayCycle=function(dt){
+    _udc.apply(this,arguments);
+    if(typeof worldDimension!=='undefined'&&worldDimension!=='overworld')return;
+    const a=dayTime*Math.PI*2,sunH=Math.sin(a);
+    lightK=Math.max(0,Math.min(1,(sunH+.12)/.38));
+    scene.background.lerp(WHITE,.34*lightK);      /* kahvatum horisont = udu värv */
+    worldMat.color.multiplyScalar(.9);             /* natuke tumedam maailm */
+  };
+  const _render=rd.render.bind(rd);
+  rd.render=function(s,c){if(s===scene)syncDome();return _render(s,c)};
+}catch(err){console.error('Välimuse plaaster:',err)}})();
+</script>
+
+<script id="mcVillagerV1">
+/* ===== Külaelanik: Minecrafti originaalmõõtudes (pea 8x10x8, nina 2x4x2, rüü 9x19x7, ristatud käed 3 kasti, jalad 4x12x4) ===== */
+(function(){try{
+  if(window.__MC_VILLAGER_V1)return;window.__MC_VILLAGER_V1=true;
+  const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const fid=k=>k.charCodeAt(0)*5+k.charCodeAt(1);
+  const pal4=(arr,k,x,y,s)=>arr[Math.floor((.5*HH(x,y,s+fid(k))+.5*HH(x>>1,y>>1,s+7+fid(k)))*arr.length)%arr.length];
+  const SKN=[0xb4846a,0xad7c61,0xb98b70,0xa97a60];
+  const ROBE=[0x5b4338,0x62493d,0x543c32,0x5f463b];
+  const SLV=[0x7d5d53,0x86665b,0x735448];
+  const HF=(k,x,y)=>{
+    if(k==="nz"){
+      if(y===5&&x>=1&&x<=6)return 0x3a2a1c;                        /* kulmud */
+      if(y===6){if(x===1||x===6)return 0xeeeeee;if(x===2||x===5)return 0x2fa84a}   /* silmad: valge + roheline */
+      return pal4(SKN,k,x,y,3);
+    }
+    if(k==="py"&&HH(x,y,77)<.22)return 0xa27257;
+    return pal4(SKN,k,x,y,3);
+  };
+  const NF=(k)=>k==="nz"?0x6b4529:k==="py"?0x8f5d3c:k==="ny"?0x5a3a22:0x7c5133;
+  const RF=(k,x,y,W,H)=>{
+    if(y>=H-1)return 0x3a2a24;                                     /* ääris all */
+    if(y===0)return 0x4a352d;
+    if(k==="nz"&&(x===3||x===4)&&y>=9)return 0x40302a;             /* rüü vahe */
+    return pal4(ROBE,k,x,y,5);
+  };
+  const AF=(k,x,y)=>pal4(SLV,k,x,y,9);
+  const LF=(k,x,y)=>y>=8?pal4([0x6f6f74,0x7c7c82,0x636368],k,x,y,11):0x4d3a33;
+  function mkVillagerV(pal){
+    const P=.05625,mats=[];
+    const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+    const sc=(m,a,b,c)=>{m.scale.set(a,b,c);return m};
+    sc(TB(body,mats,"vR",8,18,6,0,15,0,RF,P,5),9/8,19/18,7/6);      /* rüü */
+    const head=new THREE.Group();head.position.set(0,24*P,0);body.add(head);
+    TB(head,mats,"vH",8,10,8,0,5,0,HF,P,5);
+    TB(head,mats,"vN",2,4,2,0,1,-5,NF,P,3);                         /* suur nina */
+    const arms=new THREE.Group();arms.position.set(0,21*P,-1*P);arms.rotation.x=.75;body.add(arms);
+    TB(arms,mats,"vA1",4,8,4,-6,-2,0,AF,P,5);TB(arms,mats,"vA1",4,8,4,6,-2,0,AF,P,5);
+    TB(arms,mats,"vA2",8,4,4,0,-4,0,AF,P,5);                         /* ristatud käed */
+    const leg=x=>{const q=new THREE.Group();q.position.set(x*P,12*P,0);body.add(q);TB(q,mats,"vL",4,12,4,0,-6,0,LF,P,5);return q};
+    const legL=leg(2),legR=leg(-2);
+    const armL=new THREE.Group(),armR=new THREE.Group();            /* nähtamatud tühjad käed (animatsioonikood ootab neid) */
+    armL.visible=armR.visible=false;
+    return{g,body,head,armL,armR,legL,legR,mats,ov:[[],[],[],[]],pal:pal||{},ph:0,fl:false};
+  }
+  const _mk=mkHuman;
+  mkHuman=function(pal){
+    if(pal&&pal.eye==="villager")return mkVillagerV(pal);
+    return _mk.apply(this,arguments);
+  };
+}catch(err){console.error("Külaelaniku mudel:",err)}})();
+</script>
 </body>
 </html>
