@@ -175,7 +175,7 @@ function createBloodParticles(x, y, count = 12) {
     }
 }
 
-function createSlashEffect(x, y, angle, range) {
+function createSlashEffect(x, y, angle) {
     for (let i = 0; i < 18; i++) {
         const spread = (seededRandom() - 0.5) * 0.95;
         const pAngle = angle + spread;
@@ -538,17 +538,30 @@ function closeMiniGame(id) {
     if (gameState === 'MINIGAME') gameState = 'PLAYING';
 }
 
-// Load the real Python runtime only when Margus's challenge is first run.
+// Load and initialize the real Python runtime only when Margus's challenge is first run.
 function loadMargusPythonRuntime() {
-    if (window.loadPyodide) return Promise.resolve();
     if (pyodidePromise) return pyodidePromise;
+
+    const initializeRuntime = () => window.loadPyodide({
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
+    });
+
     pyodidePromise = new Promise((resolve, reject) => {
+        if (window.loadPyodide) {
+            Promise.resolve().then(initializeRuntime).then(resolve, reject);
+            return;
+        }
+
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js';
-        script.onload = resolve;
+        script.onload = () => Promise.resolve().then(initializeRuntime).then(resolve, reject);
         script.onerror = () => reject(new Error('Could not load the Python runtime. Check your internet connection and try again.'));
         document.head.appendChild(script);
+    }).catch(error => {
+        pyodidePromise = null;
+        throw error;
     });
+
     return pyodidePromise;
 }
 
@@ -570,10 +583,7 @@ async function runMargusPython() {
     runButton.textContent = 'Loading Python…';
     feedback.textContent = 'Starting the Python runtime…';
     try {
-        await loadMargusPythonRuntime();
-        const pyodide = await window.loadPyodide({
-            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
-        });
+        const pyodide = await loadMargusPythonRuntime();
         let printed = '';
         pyodide.setStdout({ batched: (line) => { printed += `${line}\n`; } });
         await pyodide.runPythonAsync(source);

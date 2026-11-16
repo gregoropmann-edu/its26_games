@@ -20,7 +20,12 @@ const firebaseConfig = {
 
 // Initialize Firebase Services
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+let analytics = null;
+try {
+    analytics = getAnalytics(app);
+} catch (error) {
+    console.warn("Firebase Analytics is unavailable:", error);
+}
 const db = getFirestore(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
