@@ -230,7 +230,16 @@ const BIOME_NAMES=["Tasandik","Mets","Kasemets","Kõrb","Savimaa","Lumine kuusem
 const isTorchB=b=>b===42||(b>=51&&b<=54);              // 42 = põrandatõrvik, 51-54 = seinatõrvik (suund ploki ID-s, et LAN-is sünkroniseeruks)
 const TSUP={51:[-1,0],52:[1,0],53:[0,-1],54:[0,1]};      // suund tõrvikust toetava plokini
 const COL=[null,[.35,.6,.25],[.47,.33,.23],[.5,.5,.5],[.7,.53,.31],[.85,.8,.59],[.8,.2,.15],[.6,.28,.22],[.38,.28,.17],[.2,.47,.16],[.75,.9,.95],[.5,.5,.5]];
+/* Päris Minecrafti tamme- ja kaseplankude 16x16 tekstuurid (1:1 viidatud piltidega) */
+const OAK_PAL=[0x644b27,0x785c32,0x886c3e,0x937746,0xa18350,0xa48859,0xaa8a56,0xae905f];const OAK_PX=["7466646667666642", "5644234444444643", "5344443222232231", "2212210022011111", "5737777366765445", "5664343234466454", "3345444255544333", "0011210000111310", "7776447767777753", "7465664333434332", "7644333344443353", "0012210001211000", "7357765377737577", "5466334336646444", "4334643256433333", "0110012221010000"];const BIRCH_PAL=[0x93815b,0x99895f,0xa1936d,0xaa9b6c,0xb9a971,0xc6b47c,0xc9b47d,0xc7bc82];const BIRCH_PX=["6467777767777752", "6644234665446633", "4655454333344652", "2112210011010010", "6737777377764435", "4654343234456664", "3346444255644332", "0011210000111210", "5776447777777753", "5466654333434332", "7644333344443353", "0012210001211000", "7367755377737575", "4456334336645444", "4334643266433333", "0110012221010000"];
+const SPRUCE_PAL=[0x28190a,0x2c1b0a,0x3d2812,0x3e2913,0x442b12,0x442c15,0x472e15,0x482e17];const SPRUCE_PX=["6332266537776773", "6751453222252672", "6722224517757772", "0001111111000011", "5233266262215456", "2214667255543222", "6675676322166776", "1100000111000011", "6777712665446762", "2332265532216222", "6654663222444452", "1011000111110001", "7667626321325777", "4316777275533335", "7723277376357666", "0111001011100001"];
+const REAL_PLANKS=(()=>{const mk=(P,X)=>X.map(r=>Array.from(r,ch=>P[+ch]));return{oak:mk(OAK_PAL,OAK_PX),birch:mk(BIRCH_PAL,BIRCH_PX),spruce:mk(SPRUCE_PAL,SPRUCE_PX)}})();
 function plankGrid(pal,seed){
+  if(typeof PLANK_PAL!=="undefined"){
+    if(pal===PLANK_PAL.oak)return REAL_PLANKS.oak.map(r=>r.slice());
+    if(pal===PLANK_PAL.birch)return REAL_PLANKS.birch.map(r=>r.slice());
+    if(pal===PLANK_PAL.spruce)return REAL_PLANKS.spruce.map(r=>r.slice());
+  }
   let sd=seed*7919+13;const rnd=()=>{sd=(sd*9301+49297)%233280;return sd/233280};
   const G=Array.from({length:16},()=>Array(16).fill(pal[2]));
   for(let b=0;b<4;b++){
@@ -305,13 +314,14 @@ const waterActive=new Set(),waterNetQueue=[];let waterClock=0;
 const idx=(x,y,z)=>(y*D+z)*W+x;
 const inb=(x,y,z)=>x>=0&&y>=0&&z>=0&&x<W&&y<H&&z<D;
 const get=(x,y,z)=>inb(x,y,z)?w[idx(x,y,z)]:0;
-function doorBaseKey(x,y,z){return x+","+(get(x,y,z)==36?y-1:y)+","+z}
+const isDoorTopB=b=>b==36||b==137||b==139,isDoorBotB=b=>b==35||b==136||b==138,isDoorB=b=>b==35||b==36||(b>=136&&b<=139);
+function doorBaseKey(x,y,z){return x+","+(isDoorTopB(get(x,y,z))?y-1:y)+","+z}
 let doorPass=false;function setDoorPass(v){doorPass=v}
 function solid(x,y,z){
   if(y<0)return false;if(y>=H)return false;if(x<0||z<0||x>=W||z>=D)return true;
   const b=w[idx(x,y,z)];
-  if(b==35||b==36)return !doorPass&&!doorStates.has(doorBaseKey(x,y,z));
-  if(b==41||b==43||b==65||(b>=69&&b<=76)||(b>=102&&b<=118))return false;
+  if(isDoorB(b))return !doorPass&&!doorStates.has(doorBaseKey(x,y,z));
+  if(b==41||b==43||b==65||b==97||b==98||(b>=69&&b<=76)||(b>=102&&b<=118))return false;
   return b>0&&b!=31&&b!=37&&b!=38;
 }
 function waterTopAt(x,z){const X=Math.floor(x),Z=Math.floor(z);if(X<0||Z<0||X>=W||Z>=D)return null;for(let y=H-1;y>=0;y--)if(get(X,y,Z)==31&&get(X,y+1,Z)!=31)return y+(waterLevels[idx(X,y,Z)]||8)/8;return null}
@@ -634,7 +644,7 @@ function gen(s){
     {wall:78,log:60,floor:78,stair:87,slab:93,fence:96,wallH:4,stone:true},
     {wall:4,log:8,floor:4,stair:87,slab:93,fence:96,wallH:5,stone:true}
   ];
-  const SMITH_STYLE={wall:3,log:60,floor:3,stair:87,slab:93,fence:96,wallH:4,stone:false};
+  const SMITH_STYLE={wall:11,log:60,floor:11,stair:87,slab:93,fence:96,wallH:4,stone:false};
   const CHURCH_STYLE={wall:25,log:60,floor:25,stair:87,slab:93,fence:96,wallH:6,stone:false};
   function buildVillageHouse(x0,z0,base,houseIndex,attempt,width=9,depth=9,kind='house'){
     const st=kind==='smith'?SMITH_STYLE:kind==='church'?CHURCH_STYLE:VILLAGE_STYLES[houseIndex%VILLAGE_STYLES.length],cx=Math.floor(width/2),wallH=st.wallH;
@@ -642,7 +652,7 @@ function gen(s){
     for(let dx=0;dx<width;dx++)for(let dz=0;dz<depth;dz++){
       const x=x0+dx,z=z0+dz,gy=terrainTop[col(x,z)];
       for(let yy=gy+1;yy<=Math.min(H-1,base+wallH+9);yy++)if(get(x,yy,z))put(x,yy,z,0);
-      for(let yy=gy+1;yy<base;yy++)put(x,yy,z,3);
+      for(let yy=gy+1;yy<base;yy++)put(x,yy,z,11);
       put(x,base,z,st.floor);
     }
     // Timber frame, mixed stone lower course, glass windows and an open doorway.
@@ -723,7 +733,7 @@ function gen(s){
       const fx=x0+1,fz=z0+2;
       put(fx,base+1,fz,33);furnaceData.set(fx+","+(base+1)+","+fz,{items:[0,0,0],counts:[0,0,0],burn:0,cook:0});
       put(fx+1,base+1,fz,33);furnaceData.set((fx+1)+","+(base+1)+","+fz,{items:[0,0,0],counts:[0,0,0],burn:0,cook:0});
-      for(let yy=base+2;yy<=roofY+5;yy++){put(fx,yy,fz,3);put(fx+1,yy,fz,3)}
+      for(let yy=base+2;yy<=roofY+5;yy++){put(fx,yy,fz,11);put(fx+1,yy,fz,11)}
       put(x0+3,base+1,z0+4,13);                       // anvil
       put(x0+5,base+1,z0+4,30);                       // workbench
       put(x0+3,base+1,z0+6,12+17);                    // glowing coals
@@ -1020,7 +1030,7 @@ function gen(s){
       if(fh(x,z,5)>=TUFTD[bm])continue;
       const y=terrainTop[c];if(y+1>=H)continue;
       if(w[idx(x,y,z)]!==1||w[idx(x,y+1,z)]!==0)continue;
-      w[idx(x,y+1,z)]=118;
+      const tall=(y+3<H&&fh(x,z,41)<.22&&w[idx(x,y+2,z)]===0);w[idx(x,y+1,z)]=tall?97:118;if(tall){w[idx(x,y+2,z)]=98;const ck2=Math.floor(z/CS)*NCX+Math.floor(x/CS);if(y+2>chunkMaxY[ck2])chunkMaxY[ck2]=y+2}
       const ck=Math.floor(z/CS)*NCX+Math.floor(x/CS);if(y+1>chunkMaxY[ck])chunkMaxY[ck]=y+1;
     }
   }
@@ -1091,7 +1101,7 @@ function updateDayCycle(dt){
   worldMat.color.setRGB(.36+.50*light,.40+.47*light,.54+.32*light);
 }
 
-const TS=32,NT=89,tiles=[];
+const TS=32,NT=93,tiles=[];
 const NB=[
   ["Kuldplokk",[246,208,60],"m"],["Rauaplokk",[216,216,220],"m"],["Teemantplokk",[93,236,245],"m"],["Smaragdiplokk",[60,210,100],"m"],
   ["Obsidiaan",[24,16,40],"o"],["Valge vill",[235,235,235],"w"],["Punane vill",[176,46,38],"w"],["Sinine vill",[50,70,170],"w"],
@@ -1185,6 +1195,18 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
       cp.forEach((q,i)=>{for(const ox of[-TS,0,TS])for(const oy of[-TS,0,TS]){const d=Math.hypot(x+1-q[0]-ox,y+1-q[1]-oy);if(d<d1){d2=d1;d1=d;i1=i}else if(d<d2)d2=d}});
       if(d2-d1<2.3)return band([0x4a4a4a,0x545454],rnd());
       return band(STONE,Math.min(.999,.12+((i1*37)%10)/10*.7+(rnd()-.5)*.3))});
+    /* === Päris Minecrafti cobblestone (16x16, 1:1 viidatud pildiga) – ilma servatumendamiseta === */
+    {const COBBLE_PAL=[0x515151,0x606060,0x696969,0x6d6d6d,0x858585,0x898989,0xa6a6a6,0xb5b5b5];const COBBLE_PX=["2166011676524765", "1674507765501435", "1646316446210143", "1153115343156510", "0214761511766651", "7267553105476534", "6414654211364217", "4522543147612415", "2176221575451103", "1764253355131461", "5343511013310667", "5221134761105774", "2476317646215525", "1764516435531143", "6643531354216511", "1511253121147653"];
+      const cc=document.createElement("canvas");cc.width=cc.height=TS;const cg=cc.getContext("2d"),cim=cg.createImageData(TS,TS);
+      for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){const v=COBBLE_PAL[+COBBLE_PX[y>>1][x>>1]],o=(y*TS+x)*4;cim.data[o]=(v>>16)&255;cim.data[o+1]=(v>>8)&255;cim.data[o+2]=v&255;cim.data[o+3]=255}
+      cg.putImageData(cim,0,0);tiles[13]=cc;
+    }
+    /* === Päris Minecrafti stone (16x16, 1:1 viidatud pildiga) – tavaline kivi kõikjal (koopad, mäed jne) === */
+    {const STONE_PAL=[0x656565,0x727272,0x7c7c7c,0x7d7d7d,0x7d7d7d,0x8b8b8b];const STONE_PX=["5555211310114434", "4312144434400141", "3100111011124432", "2255353255334111", "1221113125555132", "2524342441101015", "1345551551114322", "1100101123111334", "5552534555443241", "4353245553355554", "0312110013144111", "3232455433245525", "3111454113300101", "5531132111441115", "3112333243345555", "3433321145523144"];
+      const sc=document.createElement("canvas");sc.width=sc.height=TS;const sg=sc.getContext("2d"),sim=sg.createImageData(TS,TS);
+      for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){const v=STONE_PAL[+STONE_PX[y>>1][x>>1]],o=(y*TS+x)*4;sim.data[o]=(v>>16)&255;sim.data[o+1]=(v>>8)&255;sim.data[o+2]=v&255;sim.data[o+3]=255}
+      sg.putImageData(sim,0,0);tiles[3]=sc;
+    }
     const coalPts=Array.from({length:7},()=>[3+rnd()*26,3+rnd()*26]);
     tiles[33]=mk((x,y)=>{let m=1e9;coalPts.forEach(q=>{m=Math.min(m,Math.hypot(x+1-q[0],y+1-q[1]))});
       if(m<3.4&&rnd()<.92)return band([0x151517,0x232326,0x2f2f33],rnd());return band(STONE,tt(x,y,.6))});
@@ -1240,12 +1262,14 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
     tiles[70]=flower([ "................",".....p.p.p......",".....pPpPp......",".....pPPPp......","......pPp.......","................","................"],{p:0xc2478a,P:0xf07cb8});
 
     {const G=plankGrid(PLANK_PAL.oak,1);
-     tiles[4]=mk((x,y)=>{const h=G[y>>1][x>>1];return[(h>>16)&255,(h>>8)&255,h&255]});}
+     {const pc=document.createElement("canvas");pc.width=pc.height=TS;const pg=pc.getContext("2d"),pim=pg.createImageData(TS,TS);
+       for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){const h=G[y>>1][x>>1],o=(y*TS+x)*4;pim.data[o]=(h>>16)&255;pim.data[o+1]=(h>>8)&255;pim.data[o+2]=h&255;pim.data[o+3]=255}
+       pg.putImageData(pim,0,0);tiles[4]=pc}}
     /* --- Minecrafti-stiilis muru, muld ja lehed (16x16 pikslikunst, deterministlik) --- */
     {
       const hs=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
       const rgb=h=>[(h>>16)&255,(h>>8)&255,h&255];
-      const GT=[0x2c622c,0x377235,0x428540,0x4f9747,0x5fa954];
+      const GT=[0x3c6628,0x436e2d,0x4a7632,0x517f37,0x5b8a3e,0x649446];
       const DT=[0x4f3320,0x62402a,0x784f33,0x8e6140,0xa17048];
       const pick=(pal,v)=>pal[Math.max(0,Math.min(pal.length-1,Math.floor(v*pal.length)))];
       const grassPix=(x,y)=>pick(GT,.4*hs(x,y,11)+.36*hs(x>>1,y>>1,17)+.24*hs(x>>2,y>>2,19));
@@ -1315,6 +1339,48 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
       tiles[73+k*4+st]=mk((x,y)=>{const c=G[y>>1][x>>1];if(!c)return[0,0,0,0];const r=HXs(c);return[r[0],r[1],r[2],255]});
     }
   }
+
+  /* ===== Ahju tekstuurid (16x16 pikslikunst, 1:1 stiil): 34 = esikülg, 35 = pealt, 91 = põlev esikülg, 92 = külg ===== */
+  {
+    const H=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+    const pick=(pal,v)=>pal[Math.max(0,Math.min(pal.length-1,Math.floor(v*pal.length)))];
+    const ST=['#575757','#656565','#737373','#808080','#8d8d8d'];
+    const ST2=['#6f6f6f','#7d7d7d','#8b8b8b','#989898','#a6a6a6'];
+    const stone=(x,y,pal)=>pick(pal||ST,.5*H(x,y,3)+.3*H(x>>1,y>>1,5)+.2*H(x>>2,y>>2,9));
+    const up=fn=>{const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');
+      for(let y=0;y<16;y++)for(let x=0;x<16;x++){g.fillStyle=fn(x,y);g.fillRect(x,y,1,1)}
+      const o=document.createElement('canvas');o.width=o.height=TS;const q=o.getContext('2d');q.imageSmoothingEnabled=false;q.drawImage(c,0,0,TS,TS);return o};
+    const front=lit=>(x,y)=>{
+      if(x>=2&&x<=13){
+        if(y>=2&&y<=7){if(y==2)return'#0b0b0b';if(x==2||x==13)return'#1d1d1d';return y==7?'#2b2b2b':'#161616'}
+        if(y==8)return(x==2||x==13)?'#8c8c8c':'#a9a9a9';
+        if(y>=9&&y<=14){
+          if(x==2||x==13)return y==9?'#1d1d1d':'#262626';
+          if(y==9)return'#0b0b0b';
+          if(lit){
+            const fh=2+Math.floor(H(x,0,7)*3)+((x>=6&&x<=9)?1:0),d=14-y;
+            if(d<fh){const r=d/fh;return r<.34?'#ffe98a':r<.67?'#f6a82a':(H(x,y,2)<.4?'#b3341a':'#e0621a')}
+            return y==14?'#3a1a0c':'#120a07';
+          }
+          return y==14?'#2a2a2a':'#101010';
+        }
+      }
+      if(y==15)return pick(ST,.5*H(x,y,3));
+      return stone(x,y);
+    };
+    tiles[34]=up(front(false));
+    tiles[91]=up(front(true));
+    tiles[92]=up((x,y)=>{
+      if(y>=9&&y<=14)return(y==9)?'#a4a4a4':stone(x,y,ST2);
+      if(x==0||x==15||y==0)return pick(ST,.5*H(x,y,13));
+      return stone(x,y);
+    });
+    tiles[35]=up((x,y)=>{
+      if(x==0||y==0||x==15||y==15)return pick(ST,.4*H(x,y,17));
+      if(x==1||y==1||x==14||y==14)return pick(ST2,.3+.4*H(x,y,19));
+      return stone(x,y,ST2);
+    });
+  }
   tiles.forEach((c,i)=>{if(c)atlas.getContext("2d").drawImage(c,i*TS,0)});
 })();
 const atlasTex=new THREE.CanvasTexture(atlas);atlasTex.magFilter=THREE.NearestFilter;atlasTex.minFilter=THREE.NearestMipmapNearestFilter;atlasTex.generateMipmaps=false;
@@ -1352,7 +1418,15 @@ const CUT={118:1,102:1,103:1,104:1,105:1,106:1,107:1,108:1,109:1,110:1,111:1,112
 NB.forEach((_,i)=>{TT[12+i]=14+i});
 TT[44]=40;TT[45]=41;TT[46]=42;TT[47]=43;TT[48]=44;TT[49]=45;TT[50]=46;TT[51]=TT[52]=TT[53]=TT[54]=39;
 const tileNew=(b,f)=>{switch(b){case 55:return(f==2||f==3)?49:48;case 56:return 50;case 57:return(f==2||f==3)?52:51;case 58:return(f==2||f==3)?54:53;case 59:return 55;case 60:return(f==2||f==3)?57:56;case 61:return 58;case 62:return 59;case 63:return 60;case 64:return 61;case 65:return 3;case 66:return 62;case 67:return 63;case 68:return 64}return 0};
-const tileOf=(b,f)=>(b===100||b===101)?(f==2?71+(b-100):2):(b>=55&&b<=68)?tileNew(b,f):b==30?(f==2?36:f==4?37:38):b==1?(f==2?0:f==3?2:1):b==6?((f==2||f==3)?7:6):b==8?((f==2||f==3)?10:9):b==32?4:b==33?(f==2?35:34):b==34?33:(b==35||b==36)?3:b==38?47:b==39?5:b==40?31:TT[b];
+const tileOf=(b,f)=>(b===100||b===101)?(f==2?71+(b-100):2):(b>=55&&b<=68)?tileNew(b,f):b==30?(f==2?36:f==4?37:38):b==1?(f==2?0:f==3?2:1):b==6?((f==2||f==3)?7:6):b==8?((f==2||f==3)?10:9):b==32?4:b==33?(f==2?35:34):b==34?33:isDoorB(b)?3:b==97?89:b==98?90:b==38?47:b==39?5:b==40?31:TT[b];
+const blockFace=new Map(),furnaceLit=new Map();
+const furnaceTile=(x,y,z,f)=>{
+  if(f==2)return 35;if(f==3)return 35;
+  const key=x+","+y+","+z,fd=blockFace.get(key)||5;
+  if(f!==fd)return 92;
+  return furnaceLit.get(key)?91:34;
+};
+const facingFromYaw=()=>{const nx=Math.sin(p.yaw),nz=Math.cos(p.yaw);return Math.abs(nx)>Math.abs(nz)?(nx>0?0:1):(nz>0?4:5)};
 const CS=32,NCX=W/CS,NCZ=D/CS,chunkMesh=[],waterChunkMesh=[],lavaChunkMesh=[],doorVisualsByChunk=[],portalVisualsByChunk=[],bedVisualsByChunk=[],dirtyC=new Set();
 const chunkMaxY=new Uint8Array(NCX*NCZ),chunkBuilt=new Uint8Array(NCX*NCZ),decorByChunk=[],chestVisualsByChunk=[];
 let chunkQueue=[],lastPriorityChunk=-1,visibilityClock=0;
@@ -1384,27 +1458,44 @@ function bedPartner(x,y,z,id){const want=id==41?43:41;for(const d of BED_DIRS){c
 const bedTex=(()=>{
   const mk=f=>{const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');f(g);const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;return t};
   const px=(g,x,y,c)=>{g.fillStyle=c;g.fillRect(x,y,1,1)};
-  const reds=['#a6282c','#b5303a','#c23a3e','#9a2227'];
-  const blanket=g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){const k=((x+y*2)%6===0)?3:((x*3+y)%7===0)?2:((x+y)%2?1:0);px(g,x,y,reds[k])}};
-  const head=mk(g=>{blanket(g);for(let y=1;y<7;y++)for(let x=2;x<14;x++){const e=y===1||y===6||x===2||x===13;px(g,x,y,e?'#cdc6b8':(y>4?'#ddd7ca':'#ece7dc'))}});
-  const foot=mk(g=>{blanket(g);for(let x=0;x<16;x++){px(g,x,0,'#d04a4c');px(g,x,15,'#7d1c20');px(g,x,14,'#8c2024')}for(let y=0;y<16;y++){px(g,0,y,'#8c2024');px(g,15,y,'#8c2024')}});
-  const wood=plankGrid(PLANK_PAL.oak,3);
-  const side=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){if(y<8)px(g,x,y,reds[(x+y)%2?1:0]);else if(y===8)px(g,x,y,'#7d1c20');else{const h=wood[y][x];px(g,x,y,'#'+h.toString(16).padStart(6,'0'))}}});
-  const frame=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){const h=wood[y][x];px(g,x,y,'#'+h.toString(16).padStart(6,'0'))}});
-  const m=t=>new THREE.MeshBasicMaterial({map:t});
-  const sM=m(side),fM=m(frame);
-  return{headMats:[sM,sM,m(head),fM,sM,sM],footMats:[sM,sM,m(foot),fM,sM,sM],frameMat:fM,pillowMat:m(head)};
+  const H=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const R=['#a81a1e','#b21f23','#bb2327','#c42a2d'];
+  const RD=['#8a1216','#94161a'];
+  const rp=(x,y)=>R[Math.floor(H(x,y,5)*R.length)];
+  /* tekk: tume äär, heledam sisemine paneel (nagu originaalil) */
+  const blanket=(g,y0,y1)=>{for(let y=y0;y<=y1;y++)for(let x=0;x<16;x++){
+    let c=rp(x,y);
+    if(x==0||x==15||y==15||y==y0&&y0>0)c=RD[(x+y)&1];
+    else if(x>=2&&x<=13&&y>=Math.max(y0,0)+2&&y<=13){c='#d03236';if(x==2||y==Math.max(y0,0)+2)c='#dd4447';if(x==13||y==13)c='#b82226'}
+    px(g,x,y,c)}};
+  const W=['#e9e9e9','#f1f1f1','#fafafa'],WD=['#c9c9c9','#d4d4d4'];
+  const head=mk(g=>{
+    blanket(g,0,15);
+    for(let y=0;y<9;y++)for(let x=0;x<16;x++){
+      let c=W[Math.floor(H(x,y,9)*W.length)];
+      if(x==0||x==15||y==0)c=WD[(x+y)&1];else if(y==8)c='#bdbdbd';else if(x==1||x==14)c='#dcdcdc';
+      px(g,x,y,c)}
+    for(let x=0;x<16;x++)px(g,x,9,RD[x&1]);
+  });
+  const foot=mk(g=>{blanket(g,0,15);for(let x=0;x<16;x++)px(g,x,0,RD[x&1])});
+  const plank=(x,y)=>['#9a6f3a','#a87a41','#b68648','#8e6532'][Math.floor((.5*H(x>>2,y,31)+.5*H(x,y>>1,37))*4)];
+  const planks=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++)px(g,x,y,(y%4==3)?'#7a5528':plank(x,y))});
+  const side=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++)px(g,x,y,y>=14?RD[x&1]:(y<2?'#c42a2d':rp(x,y)))});
+  const endHead=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){let c=W[Math.floor(H(x,y,11)*W.length)];if(y>=13)c=WD[x&1];if(x==0||x==15)c='#d0d0d0';px(g,x,y,c)}});
+  const endFoot=mk(g=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++)px(g,x,y,y>=14?RD[x&1]:(y<2?'#c42a2d':rp(x,y)))});
+  const m=t=>{const q=new THREE.MeshBasicMaterial({map:t});q.color=worldMat.color;return q};
+  const sM=m(side),fM=m(planks),hM=m(head),ftM=m(foot),eH=m(endHead),eF=m(endFoot);
+  /* mattress: [+x,-x,+y,-y,+z(jalg),-z(pea)] */
+  return{headMats:[sM,sM,hM,fM,sM,eH],footMats:[sM,sM,ftM,fM,eF,sM],frameMat:fM,pillowMat:hM};
 })();
 function makeBedVisual(x,y,z,head){
   const id=head?43:41,pr=bedPartner(x,y,z,id);
-  // dir = suund jalutsilt pea poole
   let hx=0,hz=-1;if(pr){if(head){hx=-pr[3];hz=-pr[4]}else{hx=pr[3];hz=pr[4]}}
   const g=new THREE.Group();g.position.set(x+.5,y,z+.5);g.rotation.y=Math.atan2(-hx,-hz);
-  const zc=head?.015:-.015; // kaks poolt jagavad servas (z=-.5 jalg, z=+.5 pea)
-  const frame=new THREE.Mesh(new THREE.BoxGeometry(.94,.28,.97),bedTex.frameMat);frame.position.set(0,.22,head?.015:-.015);g.add(frame);
-  const matt=new THREE.Mesh(new THREE.BoxGeometry(.9,.22,.97),head?bedTex.headMats:bedTex.footMats);matt.position.set(0,.47,head?.015:-.015);g.add(matt);
-  /* padi ja tekk on nüüd tekstuuris (pea- ja jalaosa pealmine külg) */
-  for(const xx of [-.36,.36]){const leg=new THREE.Mesh(bedLegGeo,bedWoodMat);leg.position.set(xx,.11,head?-.4:.4);g.add(leg)}
+  const dz=head?.015:-.015;
+  const frame=new THREE.Mesh(new THREE.BoxGeometry(.94,.1,.97),bedTex.frameMat);frame.position.set(0,.27,dz);g.add(frame);
+  const matt=new THREE.Mesh(new THREE.BoxGeometry(.94,.27,.97),head?bedTex.headMats:bedTex.footMats);matt.position.set(0,.455,dz);g.add(matt);
+  for(const xx of [-.4,.4]){const leg=new THREE.Mesh(bedLegGeo,bedWoodMat);leg.position.set(xx,.11,head?-.4:.4);g.add(leg)}
   return g;
 }
 const bedBlanketMat=new THREE.MeshBasicMaterial({color:0x8c2024});
@@ -1417,21 +1508,95 @@ function makeDoorVisual(x,y,z){
   const knob=new THREE.Mesh(doorKnobGeo,doorKnobMat);knob.position.set(.78,1,-.12);knob.scale.setScalar(.8);pivot.add(knob);return g;
 }
 const decorGroup=new THREE.Group();scene.add(decorGroup);
-const chestWoodMat=new THREE.MeshBasicMaterial({color:0x95602f});
-const chestDarkMat=new THREE.MeshBasicMaterial({color:0x4c2e18});
-const chestGoldMat=new THREE.MeshBasicMaterial({color:0xe0b33f});
-const chestBodyGeo=new THREE.BoxGeometry(.82,.48,.76),chestLidGeo=new THREE.BoxGeometry(.82,.20,.76);
-const chestBandGeo=new THREE.BoxGeometry(.075,.62,.79),chestLatchGeo=new THREE.BoxGeometry(.14,.18,.045);
-const chestKeyGeo=new THREE.BoxGeometry(.035,.06,.012);
+/* ===== Kirst: tekstuuriga mudel (14x14x14 px, kaas liigub kui kirst on avatud) ===== */
+const chestTex=(()=>{
+  const H=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const pick=(pal,v)=>pal[Math.max(0,Math.min(pal.length-1,Math.floor(v*pal.length)))];
+  const OUT='#2a241d',OUT2='#352d23',W=['#8f5c17','#a26a1c','#b57a22','#c18a2f','#a8721f'];
+  const wood=(x,y,sd)=>pick(W,.55*H(x>>1,y,sd)+.45*H(x,y>>1,sd+4));
+  const tex=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){g.fillStyle=fn(x,y);g.fillRect(x,y,1,1)}
+    const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;return t};
+  const latch=(x,y,top)=>{ // 2 px lai riiv, ulatub kaanelt korpusele
+    if(x<6||x>7)return null;
+    if(top){if(y<2)return null;return y==2?'#c4c4c4':(x==6?'#9c9c9c':'#7c7c7c')}
+    if(y>2)return null;return x==6?'#9c9c9c':'#7c7c7c';
+  };
+  const lidSide=(front)=>(x,y)=>{
+    if(front){const l=latch(x,y,true);if(l)return l}
+    if(y==0||x==0||x==13)return(y==0)?OUT2:OUT;
+    if(y==4)return OUT;
+    return wood(x,y,3);
+  };
+  const bodySide=(front)=>(x,y)=>{
+    if(front){const l=latch(x,y,false);if(l)return l}
+    if(y==8||x==0||x==13)return OUT;
+    if(y==0)return OUT2;
+    return wood(x,y,7);
+  };
+  const top=tex(14,14,(x,y)=>(x==0||y==0||x==13||y==13)?OUT:wood(x,y,11));
+  const bottom=tex(14,14,(x,y)=>wood(x,y,13));
+  const lidFront=tex(14,5,lidSide(true)),lidBack=tex(14,5,lidSide(false)),lidSideT=tex(14,5,lidSide(false));
+  const bodyFront=tex(14,9,bodySide(true)),bodyBack=tex(14,9,bodySide(false)),bodySideT=tex(14,9,bodySide(false));
+  const dark=(x,y,sd)=>pick(['#1e1004','#240f05','#2a1608','#201006'],H(x,y,sd));
+  const lidUnder=tex(14,14,(x,y)=>{
+    if(x==0||y==0||x==13||y==13)return OUT;
+    if(x<3||y<3||x>10||y>10)return wood(x,y,17);
+    return dark(x,y,19);
+  });
+  const openTop=tex(14,14,(x,y)=>{
+    if(x==0||y==0||x==13||y==13)return OUT;
+    if(x<3||y<3||x>10||y>10)return wood(x,y,23);
+    if(x>=5&&x<=8&&y>=5&&y<=8)return'#000000';
+    return dark(x,y,29);
+  });
+  const m=t=>{const q=new THREE.MeshBasicMaterial({map:t});q.color=worldMat.color;return q};
+  const M={top:m(top),bottom:m(bottom),lidFront:m(lidFront),lidBack:m(lidBack),lidSide:m(lidSideT),bodyFront:m(bodyFront),bodyBack:m(bodyBack),bodySide:m(bodySideT),lidUnder:m(lidUnder),openTop:m(openTop)};
+  return{
+    lidMats:[M.lidSide,M.lidSide,M.top,M.lidUnder,M.lidBack,M.lidFront],
+    bodyMats:[M.bodySide,M.bodySide,M.openTop,M.bottom,M.bodyBack,M.bodyFront]
+  };
+})();
+const chestLidGeo=new THREE.BoxGeometry(14/16,5/16,14/16),chestBodyGeo=new THREE.BoxGeometry(14/16,9/16,14/16);
+const chestVis=new Map(),chestAng=new Map(),chestActive=new Set();
+const CHEST_ROT={5:0,4:Math.PI,0:-Math.PI/2,1:Math.PI/2};
 function makeChestVisual(x,y,z){
-  const g=new THREE.Group();g.position.set(x+.5,y,z+.5);
-  const body=new THREE.Mesh(chestBodyGeo,chestWoodMat);body.position.y=.29;g.add(body);
-  const lid=new THREE.Mesh(chestLidGeo,chestWoodMat);lid.position.y=.64;g.add(lid);
-  for(const xx of [-.28,.28]){const band=new THREE.Mesh(chestBandGeo,chestGoldMat);band.position.set(xx,.43,0);g.add(band);}
-  const latch=new THREE.Mesh(chestLatchGeo,chestGoldMat);latch.position.set(0,.49,-.405);g.add(latch);
-  const keyhole=new THREE.Mesh(chestKeyGeo,chestDarkMat);keyhole.position.set(0,.49,-.432);g.add(keyhole);
+  const key=x+","+y+","+z;
+  const g=new THREE.Group();g.position.set(x+.5,y,z+.5);g.rotation.y=CHEST_ROT[blockFace.get(key)||5]||0;
+  const body=new THREE.Mesh(chestBodyGeo,chestTex.bodyMats);body.position.y=4.5/16;g.add(body);
+  const pivot=new THREE.Group();pivot.position.set(0,9/16,7/16);g.add(pivot);
+  const lid=new THREE.Mesh(chestLidGeo,chestTex.lidMats);lid.position.set(0,2.5/16,-7/16);pivot.add(lid);
+  pivot.rotation.x=(chestAng.get(key)||0)*1.75;
+  g.userData.pivot=pivot;chestVis.set(key,g);
+  if((key===chestOpenKey?1:0)!==(chestAng.get(key)||0))chestActive.add(key);
   return g;
 }
+(function chestAnim(){
+  let last=performance.now(),lastOpen=null;
+  const loop=now=>{
+    requestAnimationFrame(loop);
+    const dt=Math.min(.1,(now-last)/1000);last=now;
+    try{
+      if(chestOpenKey!==lastOpen){if(lastOpen)chestActive.add(lastOpen);if(chestOpenKey)chestActive.add(chestOpenKey);lastOpen=chestOpenKey}
+      if(!chestActive.size)return;
+      for(const key of chestActive){
+        const tg=key===chestOpenKey?1:0;let a=chestAng.get(key)||0;
+        a+=(tg>a?1:-1)*dt*5;if((tg>a&&a>=tg)||(tg<a&&a<=tg)||Math.abs(a-tg)<.001)a=tg;
+        a=Math.max(0,Math.min(1,a));chestAng.set(key,a);
+        const g=chestVis.get(key);if(g&&g.userData.pivot)g.userData.pivot.rotation.x=(1-Math.pow(1-a,2))*1.75;
+        if(a===tg)chestActive.delete(key);
+      }
+    }catch(e){}
+  };
+  requestAnimationFrame(loop);
+})();
+/* ahju põlemise olek -> tekstuur (chunk ehitatakse uuesti ainult kui olek muutub) */
+setInterval(()=>{try{
+  for(const [k,d] of furnaceData){
+    const lit=!!(d&&d.burn>0);
+    if(!!furnaceLit.get(k)!==lit){furnaceLit.set(k,lit);const q=k.split(",");markDirty(+q[0],+q[2])}
+  }
+}catch(e){}},400);
 const decorMat=new THREE.MeshBasicMaterial({map:atlasTex,vertexColors:true,alphaTest:.5,side:THREE.DoubleSide});
 decorMat.color=worldMat.color; /* sama värv → öösel tumenevad koos maailmaga */
 function buildDecorChunk(cx,cz,k,maxY,flowerCells){
@@ -1462,6 +1627,10 @@ function buildDecorChunk(cx,cz,k,maxY,flowerCells){
   }
   if(flowerCells)for(let i=0;i<flowerCells.length;i+=4){
     const x=flowerCells[i],y=flowerCells[i+1],z=flowerCells[i+2],b=flowerCells[i+3];
+    if(b===97||b===98){   // pikk muru: 2 plokki, ristuvad tahvlid
+      quadPair(x+.5+(rnd(x,z,1)-.5)*.3,y,z+.5+(rnd(x,z,2)-.5)*.3,b===97?89:90,.5,1,rnd(x,z,3)*Math.PI,.9+rnd(x,z,4)*.1);
+      continue;
+    }
     if(b===118){   // päris kõrge muru: üks tuft samas kohas, kus ennem oli dekoratiivne
       quadPair(x+.5+(rnd(x,z,1)-.5)*.5,y,z+.5+(rnd(x,z,2)-.5)*.5,65,.5,.78+rnd(x,z,5)*.2,rnd(x,z,3)*Math.PI,.86+rnd(x,z,4)*.14);
       continue;
@@ -1534,11 +1703,11 @@ function* meshChunkGen(job){
     if(performance.now()>chunkDeadline)yield;
     for(let x=x0;x<x0+CS;x++){
       const i=(y*D+z)*W+x,b=w[i];if(!b)continue;
-      if((b>=72&&b<=76)||(b>=102&&b<=118)){flowerCells.push(x,y,z,b);continue;}
+      if((b>=72&&b<=76)||b===97||b===98||(b>=102&&b<=118)){flowerCells.push(x,y,z,b);continue;}
       if(b===42||(b>=51&&b<=54)||(b>=69&&b<=71)){torchCells.push({x,y,z,b});continue;}
       if(b==32){chestVisuals.push(makeChestVisual(x,y,z));continue;}
-      if(b==35){doorVisuals.push(makeDoorVisual(x,y,z));continue;}
-      if(b==36)continue;
+      if(isDoorBotB(b)){doorVisuals.push(makeDoorVisual(x,y,z,b));continue;}
+      if(isDoorTopB(b))continue;
       if(b==41||b==43){bedVisuals.push(makeBedVisual(x,y,z,b==43));continue;}
       if(b==37){const key=x+","+y+","+z,axis=portalFaces.get(key)||"x",portal=new THREE.Group();portal.position.set(x+(axis=="z"?.505:.5),y+.5,z+(axis=="x"?.505:.5));if(axis=="z")portal.rotation.y=Math.PI/2;const mesh=new THREE.Mesh(portalGeo,portalMat);mesh.renderOrder=4;portal.add(mesh);portalVisuals.push(portal);continue;}
       const v=((x*73856093^y*19349663^z*83492791)&255)/255*.05-.025;
@@ -1563,7 +1732,7 @@ function* meshChunkGen(job){
         else nb=nbAt(x+d[0],y+d[1],z+d[2]);
         if(nb&&nb!=37&&(!CUTA[nb]||(nb==b&&b==10)))continue;
         if(y+d[1]<0)continue;
-        const t=tileOf(b,f),u0=t/NT+.0008,u1=(t+1)/NT-.0008,shade=SH[f]*(1+v),fc=FC[f];
+        const t=b===33?furnaceTile(x,y,z,f):tileOf(b,f),u0=t/NT+.0008,u1=(t+1)/NT-.0008,shade=SH[f]*(1+v),fc=FC[f];
         if(pn+12>P.length){P=growF(P,pn+12);C=growF(C,pn+12);}
         if(un+8>U.length)U=growF(U,un+8);
         if(inn+6>I.length)I=growU(I,inn+6);
@@ -1804,13 +1973,14 @@ ICON[185]=mkIcon((px,g)=>{
   g.fillStyle="#4b3422";g.fillRect(6,12,4,8);g.fillStyle="#c18a4b";g.fillRect(6,13,2,6);
 });
 ICON[186]=mkIcon(px=>{
-  for(let k=0;k<8;k++) px(4+k,12-k,"#6b4a2a");
-  px(11,4,"#9aa0a6",2,2); px(2,13,"#ffffff",2,2);
+  for(let k=0;k<9;k++){px(3+k,12-k,"#9b7842");px(3+k,13-k,"#6e512a")}
+  px(11,4,"#7c7c7c");px(12,3,"#a8a8a8");px(13,2,"#d2d2d2");px(12,4,"#7c7c7c");px(11,3,"#a8a8a8");px(12,2,"#a8a8a8");px(13,3,"#7c7c7c");px(14,1,"#bdbdbd");
+  px(1,12,"#e4e4e4");px(2,11,"#e4e4e4");px(1,13,"#b9b9b9");px(2,12,"#b9b9b9");px(0,14,"#8c8c8c");px(1,14,"#b9b9b9");px(3,10,"#e4e4e4");px(2,13,"#e4e4e4");px(3,12,"#b9b9b9");px(4,11,"#b9b9b9");
 });
 ICON[188]=mkIcon(px=>{px(5,5,"#9da7ad",8,2);px(6,7,"#9da7ad",6,2);px(7,9,"#aeb8bf",4,3);px(6,12,"#77858d",6,2);px(7,14,"#64727a",4,2);px(4,4,"#d8e0e3",2,2);px(12,4,"#d8e0e3",2,2)});
 ICON[189]=mkIcon(px=>{px(5,5,"#9da7ad",8,2);px(6,7,"#9da7ad",6,2);px(7,9,"#299bd0",4,5);px(6,12,"#237eb0",6,2);px(7,14,"#64727a",4,2);px(4,4,"#d8e0e3",2,2);px(12,4,"#d8e0e3",2,2)});
 ICON[191]=mkIcon(px=>{px(3,8,"#777d83",10,7);px(4,7,"#c7cbd0",8,2);px(5,10,"#e5e8eb",5,2);px(4,15,"#555b61",8,1)});
-ICON[32]=mkIcon(px=>{px(3,7,"#8a552b",10,7);px(3,5,"#a46b39",10,4);px(4,6,"#d8ac55",2,7);px(10,6,"#d8ac55",2,7);px(7,8,"#e4bd55",2,4);px(8,9,"#4d321e",1,2)});
+ICON[32]=mkIcon(px=>{px(2,3,"#2a241d",12,11);px(3,4,"#b57a22",10,9);px(3,4,"#c8933a",10,2);px(3,11,"#8f5c17",10,2);px(3,8,"#2a241d",10,1);px(7,7,"#9c9c9c",2,3);px(7,7,"#c4c4c4",2,1);px(8,8,"#7c7c7c",1,2)});
 
 for(let t=0;t<4;t++){const T=TIERS[t],hx=T.hx,dk=shd(hx,.65),lt=shd(hx,1.2);
   ICON[120+t*4]=mkIcon(px=>{px(5,3,hx,6,1);px(4,4,hx,8,2);px(4,6,hx,3,5);px(9,6,hx,3,5);px(5,4,lt,3,1);px(4,10,dk,3,1);px(9,10,dk,3,1)});
@@ -2024,7 +2194,7 @@ function torchHit(b,fx,fy,fz){
   const cx=.5+s[0]*.3,cz=.5+s[1]*.3;
   return Math.abs(fx-cx)<.2&&Math.abs(fz-cz)<.2&&fy>.05&&fy<.95;
 }
-function torchSupportOK(b){return b>0&&!isTorchB(b)&&b!==31&&b!==37&&b!==38&&b!==35&&b!==36&&b!==41&&b!==43&&b!==32&&b!==9&&b!==10}
+function torchSupportOK(b){return b>0&&!isTorchB(b)&&b!==31&&b!==37&&b!==38&&!isDoorB(b)&&b!==97&&b!==98&&b!==41&&b!==43&&b!==32&&b!==9&&b!==10}
 function torchStillSupported(x,y,z,b){const s=TSUP[b];return s?torchSupportOK(get(x+s[0],y,z+s[1])):torchSupportOK(get(x,y-1,z))}
 function torchPlaceId(r){
   if(r.px===null||get(r.px,r.py,r.pz)!==0)return 0;
@@ -2078,7 +2248,7 @@ function updHeld(){
   else if(it==188||it==189){heldMesh=bucketModel(it==189);heldMesh.position.set(.16,.02,-.43);heldMesh.rotation.set(.12,-.18,.08);heldMesh.scale.setScalar(.82)}
   else if(it!=0&&ICON[it]){
     heldMesh=planeMesh(it,.55);
-    if(isSword(it) || isPick(it)) {
+    if(isSword(it) || isPick(it) || isAxe(it)) {
       heldMesh.position.set(0.15, 0.1, -0.4);
       heldMesh.rotation.set(0, -Math.PI/4, Math.PI/4);
     } else {
@@ -2300,7 +2470,7 @@ function checkPortalTouch(){
 
 const keys={};
 const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
-const ALL=[...Array.from({length:11+NB.length},(_,i)=>i+1),32,33,34,35,36,38,39,40,99,-1,140,141,142,143,144,145,146,147,148,149,180,181,182,183,184,185,186,187,188,189,190,191,...Array.from({length:16},(_,i)=>120+i),150,151,160,161,162,163,164,165,166,167,168,169,...Array.from({length:18},(_,i)=>200+i),218,219,220,221];
+const ALL=[...Array.from({length:11+NB.length},(_,i)=>i+1),32,33,34,35,136,138,97,38,39,40,99,-1,140,141,142,143,144,145,146,147,148,149,180,181,182,183,184,185,186,187,188,189,190,191,...Array.from({length:16},(_,i)=>120+i),150,151,160,161,162,163,164,165,166,167,168,169,...Array.from({length:18},(_,i)=>200+i),218,219,220,221];
 let hotbar=[1,2,3,4,6,-1,8,10,0], store=new Array(27).fill(0);
 let craftGrid = new Array(9).fill(0), craftQty = new Array(9).fill(0), craftIsTable = false;
 let invTab="inv",held=0,heldCre=false,heldCount=0;
@@ -2648,7 +2818,7 @@ function itemSearchText(it){
   if(it==219)extra="raw chicken toores kana liha meat";
   if(it==220)extra="cooked chicken kyps kana liha food meat";
   if(it==221)extra="feather sulg chicken";
-  if(it==35||it==36)extra="door uks wood wooden village";
+  if(it==35||it==36||it==136||it==138)extra="door uks wood wooden village oak birch spruce tamm kask kuusk";else if(it==97)extra="tall grass pikk rohi korge muru";
   if(it==38)extra="lava nether";
   if(it==39)extra="soul sand nether";
   if(it==40)extra="quartz ore nether";
@@ -2929,9 +3099,9 @@ const PROF={
   lava:{th:["sine",95,45,.15,.4],ck:["lowpass",520,.8,.05,.3],tl:["lowpass",900,230,.8,.25,.28]}
 };
 function matOf(b){
-  if(b==1||b==6)return"grass";
+  if(b==1||b==6||b==97||b==98)return"grass";
   if(b==38)return"lava";if(b==39)return"sand";if(b==40)return"nether";
-  if(b==32||b==35||b==36)return"wood";if(b==33||b==34)return"stone";
+  if(b==32||isDoorB(b))return"wood";if(b==33||b==34)return"stone";
   if(b==2)return"dirt";
   if(b==4||b==30)return"wood";
   if(b==8||b==55||b==60)return"log";
@@ -3242,7 +3412,7 @@ const Music=(()=>{
   function probeAll(){
     if(probeAll.done)return;probeAll.done=true;
     const bad=[],all=[...MUSIC_CFG.overworld,...MUSIC_CFG.nether];let left=all.length;
-    const fin=()=>{if(--left>0)return;if(bad.length){const m="Muusikafailid puuduvad või ei mängi: "+bad.join(", ")+" (pane mp3-failid index.html-iga samasse kausta või kausta music/; otsisin ka nime minecraft1.mp3 ja .ogg)";console.warn(m);try{addChat(m,"err")}catch(e){}}else{try{addChat("Kõik "+all.length+" muusikafaili laadisid OK.","sys")}catch(e){}}};
+    const fin=()=>{if(--left>0)return;if(bad.length){const m="Muusikafailid puuduvad või ei mängi: "+bad.join(", ")+" (pane mp3-failid index.html-iga samasse kausta või kausta music/; otsisin ka nime minecraft1.mp3 ja .ogg)";console.warn(m);try{const e=document.getElementById("musicNow");if(e)e.textContent="muusikafaile pole (pane mp3-d mänguga samasse kausta või music/ kausta)"}catch(e){}}};
     const cands=src=>{const m=src.match(/^(.*?)(\.[a-z0-9]+)$/i),base=m?m[1]:src,names=[base];if(/mineraft/i.test(base))names.push(base.replace(/mineraft/i,"minecraft"));const out=[];for(const f of ["","music/","muusika/"])for(const n of names)for(const e of [".mp3",".ogg"])out.push(f+n+e);return out};
     for(const t of all){
       const list=cands(t.src);let idx=0,d=false;
@@ -3317,7 +3487,23 @@ function ray(includeWater=false){
   return null;
 }
 
-const arrGeo=new THREE.BoxGeometry(.05,.05,.6),arrMat=new THREE.MeshBasicMaterial({color:0x8a6a3a});
+/* Minecrafti-stiilis nool: kaks ristuvat tasapinda pikslitekstuuriga (sulestik taga, hall otsak ees) */
+const arrMat=(()=>{
+  const rows=["WwW.............",".WwW........tT..","WwWSSsSSSsSSstTk",".WwW........tT..","gwW............."];
+  const col={W:"#e4e4e4",w:"#b9b9b9",g:"#8c8c8c",S:"#9b7842",s:"#6e512a",T:"#a8a8a8",t:"#7c7c7c",k:"#4d4d4d"};
+  const c=document.createElement("canvas");c.width=16;c.height=5;const g=c.getContext("2d");
+  rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch&&ch!=="."){g.fillStyle=col[ch];g.fillRect(x,y,1,1)}}});
+  const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;
+  return new THREE.MeshBasicMaterial({map:t,alphaTest:.5,side:THREE.DoubleSide});
+})();
+const arrGeo=(()=>{
+  const L=.66,H=L/16*5,hl=L/2,hh=H/2,g=new THREE.BufferGeometry();
+  const pos=[0,-hh,-hl, 0,hh,-hl, 0,hh,hl, 0,-hh,hl,  -hh,0,-hl, hh,0,-hl, hh,0,hl, -hh,0,hl];
+  const uv=[0,0, 0,1, 1,1, 1,0,  0,0, 0,1, 1,1, 1,0];
+  g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
+  g.setIndex([0,1,2,0,2,3,4,5,6,4,6,7]);g.computeVertexNormals();return g;
+})();
 function shootPlayerArrow(pow) {
   if(survival && inv[186] <= 0) return;
   if(survival) useItem(186);
@@ -3357,8 +3543,8 @@ addEventListener("mousedown",e=>{
   }
   const r=ray(it==187||it==188||it==189);if(!r)return;
   if(e.button==2){
-    if(get(r.x,r.y,r.z)==35||get(r.x,r.y,r.z)==36){
-      const dy=get(r.x,r.y,r.z)==36?r.y-1:r.y,key=r.x+","+dy+","+r.z;
+    if(isDoorB(get(r.x,r.y,r.z))){
+      const dy=isDoorTopB(get(r.x,r.y,r.z))?r.y-1:r.y,key=r.x+","+dy+","+r.z;
       if(doorStates.has(key))doorStates.delete(key);else doorStates.add(key);
       const ck=Math.floor(r.z/CS)*NCX+Math.floor(r.x/CS);if(chunkBuilt[ck])buildChunk(ck%NCX,Math.floor(ck/NCX));
       sfxDoor(r.x,r.y,r.z,doorStates.has(key));send({t:"door",x:r.x,y:dy,z:r.z,open:doorStates.has(key)});return;
@@ -3494,10 +3680,10 @@ function setBlock(x,y,z,b,net){
   if((old==41||old==43)&&b==0&&bedSpawnKey===key){bedSpawnPoint=null;bedSpawnKey=null;addChat("Voodi hävitati. Respawn-punkt eemaldati.","sys");}
   if(old==37)portalFaces.delete(key);
   if(b==37&&!portalFaces.has(key))portalFaces.set(key,"x");
-  if(old==35||old==36){
-    const dy=old==36?y-1:y,otherY=old==36?y-1:y+1,otherB=get(x,otherY,z),dk=x+","+dy+","+z;
+  if(isDoorB(old)){
+    const dy=isDoorTopB(old)?y-1:y,otherY=isDoorTopB(old)?y-1:y+1,otherB=get(x,otherY,z),dk=x+","+dy+","+z;
     doorStates.delete(dk);
-    if(b==0&&((old==35&&otherB==36)||(old==36&&otherB==35))){
+    if(b==0&&isDoorB(otherB)&&isDoorTopB(otherB)!==isDoorTopB(old)){
       const oi=idx(x,otherY,z);w[oi]=0;waterLevels[oi]=0;edits.set(x+","+otherY+","+z,0);markDirty(x,z);if(net)send({t:"edit",x,y:otherY,z,b:0});
     }
   }
@@ -3505,6 +3691,8 @@ function setBlock(x,y,z,b,net){
   markDirty(x,z);edits.set(key,b);waterEdits.delete(key);
   if(old==32&&b!=32)chestData.delete(key);
   if(b==32&&!chestData.has(key))chestData.set(key,{items:new Array(9).fill(0),counts:new Array(9).fill(0)});
+  if((b==32||b==33)&&old!=b){if(net)blockFace.set(key,facingFromYaw());else if(!blockFace.has(key))blockFace.set(key,5)}
+  if((old==32||old==33)&&b!=old){blockFace.delete(key);furnaceLit.delete(key);chestVis.delete(key);chestAng.delete(key)}
   if(old==33&&b!=33)furnaceData.delete(key);
   if(b==33&&!furnaceData.has(key))furnaceData.set(key,{items:[0,0,0],counts:[0,0,0],burn:0,cook:0});
   if((old==31&&b!=31)||b==0)activateWaterAround(x,y,z);
@@ -3726,7 +3914,7 @@ function dropHeld(all){
   swing=.6;try{sfxPickup()}catch(e){}
 }
 function drop(b,x,y,z){
-  if(b==31||b==37||b==38||b==36)return;
+  if(b==31||b==37||b==38||isDoorTopB(b))return;
   if((b>=44&&b<=46)||b==68){const tl=hotbar[cur]||0,lv=isPick(tl)?[0,1,0,2,3][tl-180]:-1;if(lv<(b==44?1:2)){addChat(b==44?"Rauamaagi saab kätte kivikirka või paremaga.":"Seda maaki saab kätte raudkirka või paremaga.","err");return}}
   const it=isTorchB(b)?42:b==44?222:b==45?223:b==46?224:(b==41||b==43)?218:b==1?2:b==3?11:(b==9||b==56||b==61)?(Math.random()<.15?99:0):b==10?0:b==34?200:b==68?227:b==40?40:b;
   if(it)spawnItemDrop(it,1,x??(p.x+(Math.random()-.5)*.6),y??(p.y+.7),z??(p.z+(Math.random()-.5)*.6));
@@ -3735,12 +3923,26 @@ function updateItemDrops(dt){
   for(let i=itemDrops.length-1;i>=0;i--){
     const d=itemDrops[i];d.age+=dt;if(d.y<-30){removeItemDropAt(i);continue;}
     if(d.age>300){removeItemDropAt(i);continue;}
-    d.vy=Math.max(-12,d.vy-17*dt);
-    const nx=d.x+d.vx*dt,ny=d.y+d.vy*dt,nz=d.z+d.vz*dt,foot=ny-.12;
-    if(solid(Math.floor(nx),Math.floor(foot),Math.floor(nz))){d.y=Math.floor(foot)+1.13;d.vy=0;d.vx*=Math.pow(.04,dt);d.vz*=Math.pow(.04,dt);}
-    else{d.x=nx;d.y=ny;d.z=nz;}
+    /* stabiilne maapind: ei kuku/ei hüppa iga kaadriga (varem tekitas snap+gravitatsioon üles-alla värinat) */
+    {
+      const bx=Math.floor(d.x),bz=Math.floor(d.z);
+      const gr=d.vy<=0&&solid(bx,Math.floor(d.y-.15),bz);
+      d.gr=gr;
+      if(gr){d.vy=0;d.y=Math.floor(d.y-.15)+1.12;const f=Math.pow(.04,dt);d.vx*=f;d.vz*=f;}
+      else d.vy=Math.max(-12,d.vy-17*dt);
+      const nx=d.x+d.vx*dt,nz=d.z+d.vz*dt,by=Math.floor(d.y);
+      if(solid(Math.floor(nx),by,bz)){d.vx=0}else d.x=nx;
+      if(solid(Math.floor(d.x),by,Math.floor(nz))){d.vz=0}else d.z=nz;
+      if(!gr){
+        const ny=d.y+d.vy*dt,cx=Math.floor(d.x),cz=Math.floor(d.z);
+        if(d.vy<0&&solid(cx,Math.floor(ny-.12),cz)){d.y=Math.floor(ny-.12)+1.12;d.vy=0;d.vx*=.6;d.vz*=.6}
+        else if(d.vy>0&&solid(cx,Math.floor(ny+.12),cz)){d.vy=0}
+        else d.y=ny;
+      }
+      if(solid(Math.floor(d.x),Math.floor(d.y),Math.floor(d.z)))d.y+=dt*3; /* kinni jäänud plokki -> upitame välja */
+    }
     const water=waterTopAt(d.x,d.z);if(water!==null&&d.y<water+.22){d.y=water+.22;d.vy=Math.max(0,d.vy);d.vx*=.92;d.vz*=.92;}
-    d.m.position.set(d.x,d.y+(Math.abs(d.vy)<.01?Math.sin(d.age*3.2)*.035:0),d.z);d.m.rotation.y+=dt*1.8;
+    d.m.position.set(d.x,d.y+(d.gr?Math.sin(d.age*3.2)*.035:0),d.z);d.m.rotation.y+=dt*1.8;
     const dx=d.x-p.x,dy=d.y-(p.y+.55),dz=d.z-p.z;
     if(d.age>.55&&dx*dx+dy*dy+dz*dz<1.55*1.55){giveItem(d.it,d.count);sfxPickup();const id=d.id;removeItemDropAt(i);send({t:"itemPickup",id});continue;}
     d.m.visible=dx*dx+dz*dz<RENDER_DISTANCE_SQ;
@@ -4007,7 +4209,40 @@ function mkHuman(pal){
   return{g,body,head,armL,armR,legL,legR,mats,ov,pal,ph:0,fl:false};
 }
 
-function setArmorVis(m,arr){for(let sl=0;sl<4;sl++){const id=arr[sl]|0;m.ov[sl].forEach(e=>{e.visible=id>0;if(id>0)e.material.color.setHex(TIERS[armTier(id)].c)})}}
+/* ===== Soomuse tekstuurid: iga tase (nahk/kuld/raud/teemant) saab oma 16x16 plaadi, serva varjundi ja kõrgpunktidega - mitte enam lame värv ===== */
+const ARM_PAL=[
+  {o:'#3b2412',d:'#6b4423',m:'#8a5a2b',l:'#a8723a',noise:.5},
+  {o:'#8a6a0a',d:'#d9a91a',m:'#f6d03c',l:'#fff59a',noise:.18},
+  {o:'#6e6e6e',d:'#a9a9a9',m:'#d8d8dc',l:'#ffffff',noise:.28},
+  {o:'#156355',d:'#25b59e',m:'#33ebcb',l:'#8ff7e6',noise:.3,spark:true},
+  {o:'#3b2412',d:'#6b4423',m:'#8a5a2b',l:'#a8723a',noise:.5}
+];
+const ARM_MATS={};
+function armMat(tier,kind){
+  const key=tier+kind;if(ARM_MATS[key])return ARM_MATS[key];
+  const P=ARM_PAL[tier]||ARM_PAL[0];
+  const H=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');
+  const sd=tier*13+kind.length*5+kind.charCodeAt(0);
+  for(let y=0;y<16;y++)for(let x=0;x<16;x++){
+    const v=H(x,y,sd);let col=P.m;
+    if(v<P.noise*.5)col=P.d;else if(v>1-P.noise*.5)col=P.l;
+    if(x==1||y==1)col=P.l;if(x==14||y==14)col=P.d;
+    if(x==0||y==0||x==15||y==15)col=P.o;
+    if(kind==='chest'&&(x==7||x==8)&&y>1&&y<14)col=P.d;           // rinnaplaadi keskõmmeldus
+    if(kind==='legs'&&y>=2&&y<=3)col=(y==2)?P.l:P.d;             // vöö
+    if(kind==='boot'&&y>=11&&y<=13)col=P.d;                       // saapasääre ääris
+    if(kind==='helm'&&y>=9&&y<=13)col=P.d;
+    if(P.spark&&v>.93&&x>1&&x<14&&y>1&&y<14)col='#ffffff';
+    g.fillStyle=col;g.fillRect(x,y,1,1);
+  }
+  const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;
+  const m=new THREE.MeshBasicMaterial({map:t});ARM_MATS[key]=m;return m;
+}
+function setArmorVis(m,arr){for(let sl=0;sl<4;sl++){const id=arr[sl]|0;m.ov[sl].forEach(e=>{e.visible=id>0;if(id>0){
+  const tier=armTier(id),kind=sl===0?'helm':sl===1?(e.geometry.parameters&&e.geometry.parameters.height>.5?'chest':'arm'):sl===2?'legs':'boot';
+  const mt=armMat(tier,kind);if(e.material!==mt)e.material=mt;
+}})}}
 function animHuman(m,speed,dt){
   m.ph+=dt*speed*2.2;const s=Math.sin(m.ph)*Math.min(1,speed/3)*.9;
   m.legL.rotation.x=s;m.legR.rotation.x=-s;
@@ -4453,14 +4688,15 @@ function loop(now){
       else{
         let sx=1,sy=1,sz=1,cx=r.x+.5,cy=r.y+.5,cz=r.z+.5;
         if(rb===32){sx=.84;sy=.72;sz=.78;cy=r.y+.395}
-        else if(rb===35||rb===36){
-          const by=rb===36?r.y-1:r.y,open=doorStates.has(doorBaseKey(r.x,r.y,r.z));
+        else if(isDoorB(rb)){
+          const by=isDoorTopB(rb)?r.y-1:r.y,open=doorStates.has(doorBaseKey(r.x,r.y,r.z));
           sy=2;cy=by+1;
           if(open){sx=.1875;sz=1;cx=r.x+.09375;cz=r.z+.5}else{sx=1;sz=.1875;cz=r.z+.90625}
         }
         else if(rb>=91&&rb<=93){sy=.5;cy=r.y+.25}
         else if(rb===65){sx=.875;sy=.0625;sz=.875;cy=r.y+.03}
         else if(rb===118){sx=.8;sy=.85;sz=.8;cy=r.y+.425}
+        else if(rb===97||rb===98){sx=.8;sy=1;sz=.8;cy=r.y+.5}
         else if(rb>=72&&rb<=76){sx=.45;sy=.8;sz=.45;cy=r.y+.4}
         else if(rb>=102&&rb<=117){sy=.95;cy=r.y+.475}
         sel.scale.set(sx,sy,sz);sel.position.set(cx,cy,cz);
@@ -6419,8 +6655,8 @@ mcV.doors=function(o,mx,mz,now){
   for(const dist of [.6,1.1]){
     const X=Math.floor(o.x+ux*dist),Z=Math.floor(o.z+uz*dist);
     for(let yy=y0;yy<=y0+1;yy++){
-      const b=get(X,yy,Z);if(b!==35&&b!==36)continue;
-      const by=b===36?yy-1:yy,key=X+","+by+","+Z;
+      const b=get(X,yy,Z);if(!isDoorB(b))continue;
+      const by=isDoorTopB(b)?yy-1:yy,key=X+","+by+","+Z;
       if(doorStates.has(key)){const r=managed.get(key);if(r)r.t=now;continue}
       doorStates.add(key);managed.set(key,{x:X,y:by,z:Z,t:now});
       rebuildAt(X,Z);sfxDoor(X,by,Z,true);send({t:"door",x:X,y:by,z:Z,open:true});
@@ -8867,9 +9103,14 @@ try{
     const c=document.createElement('canvas');c.width=c.height=32;
     const g=c.getContext('2d'),G=plankGrid(PLANK_PAL[type],type==='birch'?5:type==='spruce'?9:1);
     for(let y=0;y<16;y++)for(let x=0;x<16;x++){const h=G[y][x];g.fillStyle='#'+h.toString(16).padStart(6,'0');g.fillRect(x*2,y*2,2,2)}
-    const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestMipmapLinearFilter;t.generateMipmaps=true;try{t.anisotropy=Math.min(4,rd.capabilities.getMaxAnisotropy())}catch(e){}
+    const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.anisotropy=1;
     woodCanvas[type]=c;
     mcWoodMaterials[type]=new THREE.MeshBasicMaterial({map:t,color:worldMat.color.clone()});
+    /* sama külgede varjutus nagu atlase plokkidel (pealt 1, põhi .5, küljed .62/.8), muidu on trepid heledamad kui plangud */
+    {const m=mcWoodMaterials[type];m.onBeforeCompile=sh=>{
+      sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying float vWS;').replace('#include <begin_vertex>','#include <begin_vertex>\nvec3 wn=normal;\n#ifdef USE_INSTANCING\nwn=mat3(instanceMatrix)*wn;\n#endif\nwn=normalize(mat3(modelMatrix)*wn);\nvWS=wn.y>.5?1.:(wn.y<-.5?.5:(abs(wn.x)>.5?.62:.8));');
+      sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying float vWS;').replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb*=vWS;');
+    };m.customProgramCacheKey=()=>'mcWoodShade'}
     mcWoodMaterialsList.push(mcWoodMaterials[type]);
     return c;
   }
@@ -9191,7 +9432,7 @@ try{
       const k=SKINS[skinIdx]||SKINS[0];
       mcFpLeft.scale.set(k.legacy?-.92:.92,.92,.92);
       mcBuildArm(mcFpRight,k,false);mcBuildArm(mcFpLeft,k,true);
-      mcFpRight.visible=true;
+      mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));
       mcFpLeft.visible=!!off;
       /* The old untextured placeholder must never cover the skin-mapped model. */
       arm.visible=false;
@@ -9205,7 +9446,7 @@ try{
     updHeld=function(){
       mcUpdHeldOriginal.apply(this,arguments);
       arm.visible=false;
-      mcFpRight.visible=true;
+      mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));
     };
     const mcUpdOffOriginal=updOff;
     updOff=function(){
@@ -9214,38 +9455,97 @@ try{
     };
     mcApplySkinArms();
 
-    /* Rebuild the ten block-crack stages as connected, pixel-stepped fractures. */
-    for(let stage=0;stage<10;stage++){
-      const c=document.createElement('canvas');c.width=c.height=32;
-      const g=c.getContext('2d');
-      let seed=(0x51f15e+stage*7919)>>>0;
-      const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
-      const count=2+stage;
-      g.lineCap='square';g.lineJoin='miter';
-      function fracture(x,y,steps,angle,spread){
-        const pts=[[x,y]];
-        for(let j=0;j<steps;j++){
-          angle+=(rnd()-.5)*spread;
-          const len=2.4+rnd()*4.4;
-          x+=Math.cos(angle)*len;y+=Math.sin(angle)*len;
-          x=mcClamp(x,1,31);y=mcClamp(y,1,31);pts.push([x,y]);
-          if(x===1||x===31||y===1||y===31)break;
-        }
-        g.strokeStyle='rgba(12,12,12,.92)';g.lineWidth=1.75;g.beginPath();g.moveTo(...pts[0]);for(let j=1;j<pts.length;j++)g.lineTo(...pts[j]);g.stroke();
-        g.strokeStyle='rgba(235,235,235,.28)';g.lineWidth=.65;g.beginPath();g.moveTo(pts[0][0]-.65,pts[0][1]-.65);for(let j=1;j<pts.length;j++)g.lineTo(pts[j][0]-.65,pts[j][1]-.65);g.stroke();
-        return pts;
+    /* Minecrafti-stiilis purunemisanimatsioon: 10 etappi, 16x16 pikslit, praod kasvavad keskelt ja servadest */
+    {
+      let sd=0x2b7e15;const rr=()=>{sd=(Math.imul(sd,1664525)+1013904223)>>>0;return sd/4294967296};
+      const N=16,filled=new Uint8Array(N*N),order=[];
+      const nbr=(x,y)=>(x>0&&filled[y*N+x-1]?1:0)+(x<N-1&&filled[y*N+x+1]?1:0)+(y>0&&filled[(y-1)*N+x]?1:0)+(y<N-1&&filled[(y+1)*N+x]?1:0);
+      const add=(x,y)=>{filled[y*N+x]=1;order.push([x,y])};
+      add(7+((rr()*2)|0),7+((rr()*2)|0));
+      const seedAt={18:1,46:1,88:1};
+      while(order.length<150){
+        if(seedAt[order.length]){seedAt[order.length]=0;const e=(rr()*4)|0,t=(rr()*N)|0;const sx=e===0?0:e===1?N-1:t,sy=e===2?0:e===3?N-1:t;if(!filled[sy*N+sx]){add(sx,sy);continue}}
+        const cand=[];let tot=0;
+        for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(filled[y*N+x])continue;const n=nbr(x,y);if(!n)continue;const wgt=n===1?1:n===2?.22:.05;cand.push([x,y,wgt]);tot+=wgt}
+        if(!cand.length)break;
+        let r=rr()*tot,pick=cand[0];for(const c of cand){r-=c[2];if(r<=0){pick=c;break}}
+        add(pick[0],pick[1]);
       }
-      const roots=[];
-      const primary=fracture(15.5,15.5,3+Math.floor(stage*.65),rnd()*Math.PI*2,.8);roots.push(...primary.slice(1));
-      for(let j=0;j<count;j++){
-        const from=roots[(rnd()*roots.length)|0]||[16,16];
-        fracture(from[0],from[1],2+Math.floor(rnd()*(2+stage*.35)),rnd()*Math.PI*2,1.05);
+      const counts=[5,12,21,32,45,60,78,98,122,150];
+      for(let stage=0;stage<10;stage++){
+        const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');
+        const n=Math.min(order.length,counts[stage]);
+        for(let i=0;i<n;i++){const a=.55+((i*37)%7)/20;g.fillStyle='rgba(0,0,0,'+a.toFixed(2)+')';g.fillRect(order[i][0],order[i][1],1,1)}
+        const tex=new THREE.CanvasTexture(c);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;tex.transparent=true;
+        if(crackTex[stage]&&crackTex[stage].dispose)crackTex[stage].dispose();
+        crackTex[stage]=tex;
       }
-      const tex=new THREE.CanvasTexture(c);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;tex.transparent=true;
-      if(crackTex[stage]&&crackTex[stage].dispose)crackTex[stage].dispose();
-      crackTex[stage]=tex;
     }
     crackMesh.material.map=crackTex[0];crackMesh.material.needsUpdate=true;
+
+    /* Minecrafti-stiilis purustusosakesed: väikesed 4x4 tükid ploki enda tekstuurist (lehtedel lehe-, rohul mulla-osakesed jne) */
+    {
+      const maskCache={};
+      const getMask=t=>{if(t in maskCache)return maskCache[t];let m=null;try{const c=tiles[t];if(c&&c.getContext){const d=c.getContext('2d').getImageData(0,0,c.width,c.height);m={d:d.data,w:c.width,h:c.height}}}catch(e){}return maskCache[t]=m};
+      const pickTile=b=>{
+        const f=b===1?(Math.random()<.8?3:2):0;let t;
+        try{t=tileOf(b,f)}catch(e){}
+        return(Number.isInteger(t)&&t>=0&&t<NT&&tiles[t])?t:-1;
+      };
+      const partGeoCache=new Map(),partColMat=new Map(),unitBox=new THREE.BoxGeometry(1,1,1);
+      let partAtlasMat=null;
+      const noDispose=m=>{m.dispose=function(){};return m};
+      const mkPart=(b,px,py,pz,vx,vy,vz,size)=>{
+        const t=pickTile(b);let mat,geo;
+        if(t<0){
+          const c=COL[b];if(!c)return;
+          let mm=partColMat.get(b);if(!mm){mm=noDispose(new THREE.MeshBasicMaterial({color:new THREE.Color(c[0]*.8,c[1]*.8,c[2]*.8)}));partColMat.set(b,mm)}
+          mat=mm;geo=unitBox;
+        }else{
+          const mk=getMask(t);let lx=0,ly=0;
+          for(let tr=0;tr<14;tr++){
+            lx=(Math.random()*13)|0;ly=(Math.random()*13)|0;
+            if(!mk)break;
+            const o=(((ly+2)*mk.h/16|0)*mk.w+((lx+2)*mk.w/16|0))*4;
+            if(mk.d[o+3]>128)break;
+          }
+          const gk=t*256+lx*16+ly;geo=partGeoCache.get(gk);
+          if(!geo){
+            geo=new THREE.BoxGeometry(1,1,1);
+            const u0=(t+lx/16)/NT,u1=(t+(lx+4)/16)/NT,v1=1-ly/16,v0=1-(ly+4)/16,uv=geo.attributes.uv;
+            for(let i=0;i<uv.count;i+=4){uv.setXY(i,u0,v1);uv.setXY(i+1,u1,v1);uv.setXY(i+2,u0,v0);uv.setXY(i+3,u1,v0)}
+            uv.needsUpdate=true;partGeoCache.set(gk,geo);
+          }
+          if(!partAtlasMat)partAtlasMat=noDispose(new THREE.MeshBasicMaterial({map:atlasTex}));
+          partAtlasMat.color.copy(worldMat.color).multiplyScalar(.92);mat=partAtlasMat;
+        }
+        const m=new THREE.Mesh(geo,mat);m.scale.setScalar(size);m.position.set(px,py,pz);m.rotation.set(Math.random()*6.28,Math.random()*6.28,0);scene.add(m);
+        parts.push({m,vx,vy,vz,l:.35+Math.random()*.4});
+      };
+      const near=(x,y,z)=>Math.hypot(x-p.x,y-p.y,z-p.z)<28&&parts.length<70;
+      const spawnBreak=(b,cx,cy,cz)=>{
+        if(!b||b===31||!near(cx,cy,cz))return;
+        for(let i=0;i<6;i++){
+          const ox=Math.random()-.5,oy=Math.random()-.5,oz=Math.random()-.5;
+          mkPart(b,cx+ox*.9,cy+oy*.9,cz+oz*.9,ox*3.2+(Math.random()-.5)*1.2,1.5+Math.random()*3.5+oy*2,oz*3.2+(Math.random()-.5)*1.2,.09+Math.random()*.05);
+        }
+      };
+      const spawnHit=(b,cx,cy,cz)=>{
+        if(!b||b===31||!near(cx,cy,cz))return;
+        const dx=p.x-cx,dy=p.y+1.5-cy,dz=p.z-cz,ax=Math.abs(dx),ay=Math.abs(dy),az=Math.abs(dz);
+        let nx=0,ny=0,nz=0;if(ax>=ay&&ax>=az)nx=Math.sign(dx);else if(ay>=az)ny=Math.sign(dy);else nz=Math.sign(dz);
+        if(Math.random()<.5)return;
+        for(let i=0;i<1;i++){
+          const tx=Math.random()-.5,ty=Math.random()-.5,tz=Math.random()-.5;
+          mkPart(b,cx+nx*.55+(nx?0:tx*.9),cy+ny*.55+(ny?0:ty*.9),cz+nz*.55+(nz?0:tz*.9),nx*1.6+tx*1.4,1+Math.random()*1.8,nz*1.6+tz*1.4,.08+Math.random()*.04);
+        }
+      };
+      const prevBlockSfx=blockSfx;
+      blockSfx=function(b,kind,x,y,z,stage){
+        try{if(kind==="break")spawnBreak(b,x,y,z);else if(kind==="crack")spawnHit(b,x,y,z)}catch(e){}
+        return prevBlockSfx.apply(this,arguments);
+      };
+    }
 
     /* Separate action envelopes: repeated pick swings, a quick placement jab, and a softer use motion. */
     let mcHandAction='idle',mcHandAge=9,mcMinePulseAt=0;
@@ -9259,7 +9559,7 @@ try{
     const mcPlaceEffects=[];
     function mcPlacePop(x,y,z,b){
       /* Only full cube blocks have a matching first-person cube geometry in this renderer. */
-      if(!b||b===31||b===37||b===38||b===35||b===36||b===41||b===43||isTorchB(b)||(b>=79&&b<=96))return;
+      if(!b||b===31||b===37||b===38||isDoorB(b)||b===97||b===98||b===41||b===43||isTorchB(b)||(b>=79&&b<=96))return;
       let mesh,mat,geo;
       try{
         geo=cubeGeo(b);mat=blockMat.clone();mat.transparent=true;mat.opacity=.52;mat.depthWrite=false;mat.polygonOffset=true;mat.polygonOffsetFactor=-2;mat.polygonOffsetUnits=-2;
@@ -9319,7 +9619,7 @@ try{
     };
 
     /* Keep the textured arm visible after item swaps and all existing animation wrappers. */
-    arm.visible=false;mcFpRight.visible=true;mcFpLeft.visible=!!off;
+    arm.visible=false;mcFpRight.visible=!(isSword(hotbar[cur]||0)||isAxe(hotbar[cur]||0)||isPick(hotbar[cur]||0));mcFpLeft.visible=!!off;
     try{addChat('Esimese isiku käsi kasutab nüüd valitud skinni; kaevamisel, asetamisel ja kasutamisel on eraldi animatsioonid.','sys')}catch(e){}
   }catch(err){
     console.error('First-person hand upgrade failed:',err);
@@ -9821,6 +10121,300 @@ animHuman=function(m,speed,dt){
 try{addChat('V34: muru/plokkide tekstuurid teravamad, mobid nihkuvad aeglaselt kui neid lükata.','sys')}catch(e){}
 try{addChat('V33: mobide kokkupõrked, LAN locator, liigipõhised lehetekstuuri variandid ja kaugvaate virvenduse parandus.','sys')}catch(e){}
 })();
+</script>
+
+<script id="mcDoorsGrass">
+/* ================= UUED UKSED (tamm, kuusk, kask) + PIKK MURU (2 plokki kõrge) ================= */
+(function(){try{
+/* ---- uste ja pika muru tekstuurid (16x32 pikslikunst, deterministlik) ---- */
+const MCX_nz=(x,y,s)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(s*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+const MCX_rgb=h=>[(h>>16)&255,(h>>8)&255,h&255];
+function MCX_doorPix(kind){
+  const P=Array.from({length:32},()=>Array.from({length:16},()=>[0,0,0,0]));
+  const sh=(hex,f)=>{const c=MCX_rgb(hex);return [Math.min(255,c[0]*f)|0,Math.min(255,c[1]*f)|0,Math.min(255,c[2]*f)|0]};
+  const put=(x,y,c)=>{if(x<0||y<0||x>=16||y>=32)return;P[y][x]=[c[0],c[1],c[2],255]};
+  const set=(x,y,hex,f)=>put(x,y,sh(hex,f||1));
+  const clr=(x,y)=>{if(x>=0&&y>=0&&x<16&&y<32)P[y][x]=[0,0,0,0]};
+  const rect=(x,y,w,h,hex,amp,sd)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)set(x+i,y+j,hex,1+(MCX_nz(x+i,y+j,sd||3)-.5)*(amp||0))};
+  const hole=(x,y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)clr(x+i,y+j)};
+  if(kind==="oak"){
+    const FR=0xa27c46,FRD=0x7a5a2e,FRL=0xc09e62,PN=0x8a6633,PND=0x68492a,PNL=0xb28e54;
+    rect(0,0,16,32,FR,.14,1);
+    for(let x=0;x<16;x++){set(x,0,FRD);set(x,31,FRD)}
+    for(let y=0;y<32;y++){set(0,y,FRD);set(15,y,FRD)}
+    for(let x=1;x<15;x++)set(x,1,FRL);for(let y=1;y<31;y++)set(1,y,FRL);
+    for(let x=1;x<15;x++)set(x,30,FR,.8);for(let y=1;y<31;y++)set(14,y,FR,.8);
+    for(const wx of [3,9])for(const wy of [3,7]){
+      for(let i=-1;i<5;i++){set(wx+i,wy-1,FRD);set(wx+i,wy+3,FRL)}
+      set(wx-1,wy,FRD);set(wx-1,wy+1,FRD);set(wx-1,wy+2,FRD);set(wx+4,wy,FRL);set(wx+4,wy+1,FRL);set(wx+4,wy+2,FRL);
+      hole(wx,wy,4,3);
+    }
+    for(const [py,ph] of [[12,6],[19,6],[26,5]])for(const px of [3,9]){
+      rect(px,py,4,ph,PN,.16,7);
+      for(let i=0;i<4;i++){set(px+i,py,PND);set(px+i,py+ph-1,PNL)}
+      for(let j=0;j<ph;j++){set(px,py+j,PND);set(px+3,py+j,PNL)}
+    }
+    for(const hy of [4,15,27]){
+      for(const hx of [0,14]){
+        set(hx,hy,0x9a9a9a);set(hx+1,hy,0x7c7c7c);set(hx,hy+1,0x686868);set(hx+1,hy+1,0x4e4e4e);
+      }
+    }
+    set(10,15,0xb4b4b4);set(11,15,0x9c9c9c);set(12,15,0x8a8a8a);set(10,16,0x6a6a6a);set(11,16,0x5a5a5a);set(12,16,0x4a4a4a);
+  }else if(kind==="spruce"){
+    const base=[0x6b4a28,0x5c3f22,0x745230,0x634424,0x6f4e2a,0x5a3d20,0x78562f,0x66472a];
+    for(let x=0;x<16;x++)for(let y=0;y<32;y++){
+      const pi=x>>1,f=(x&1?1.06:.86)*(.94+MCX_nz(x,y>>2,5)*.14)*(.97+MCX_nz(x,y,9)*.06);
+      set(x,y,base[pi],f);
+    }
+    for(let x=0;x<16;x++){set(x,0,0x3a2813);set(x,31,0x3a2813)}
+    for(let y=0;y<32;y++){set(0,y,0x3a2813,.9);set(15,y,0x3a2813,.9)}
+    for(const by of [4,16,26]){
+      for(let x=1;x<15;x++){
+        set(x,by,x%3===0?0x7d838c:0x4a4f57);
+        set(x,by+1,x%3===0?0x5b6068:0x363a41);
+      }
+      set(1,by,0x8f959e);set(14,by,0x8f959e);
+    }
+    const ring=[[4,18],[5,18],[3,19],[6,19],[3,20],[6,20],[4,21],[5,21]];
+    for(const [x,y] of ring)set(x,y,y>=20||x>=6?0xb8b8b8:0xe2e2e2);
+    for(const [x,y] of [[4,19],[5,19],[4,20],[5,20]])set(x,y,0x2a211a);
+    set(4,22,0x2a1d10);set(5,22,0x2a1d10);set(6,21,0x2a1d10);
+  }else{ /* birch */
+    const BR=0xd9ca90,BD=0xae9d6b,BL=0xeadfae;
+    rect(0,0,16,32,BR,.1,11);
+    for(let x=0;x<16;x++){set(x,0,BD);set(x,31,BD)}
+    for(let y=0;y<32;y++){set(0,y,BD);set(15,y,BD)}
+    for(let x=1;x<15;x++)set(x,1,BL);for(let y=1;y<31;y++)set(1,y,BL);
+    for(let x=1;x<15;x++)set(x,30,BR,.84);for(let y=1;y<31;y++)set(14,y,BR,.84);
+    hole(3,2,10,18);
+    const BAR=0xcdbd84,BAR2=0xe4d6a0;
+    for(let x=3;x<=12;x++){set(x,2,BAR);set(x,19,BAR,.86)}
+    for(let y=2;y<=19;y++){set(3,y,BAR);set(12,y,BAR,.86)}
+    for(let x=5;x<=10;x++){set(x,5,BAR2);set(x,16,BAR2,.86)}
+    for(let y=5;y<=16;y++){set(5,y,BAR2);set(10,y,BAR2,.86)}
+    for(let y=3;y<=4;y++){set(7,y,BAR2);set(8,y,BAR2)}
+    for(let y=17;y<=18;y++){set(7,y,BAR2,.9);set(8,y,BAR2,.9)}
+    for(const y of [10,11]){set(4,y,BAR2);set(11,y,BAR2,.9)}
+    for(const x of [7,8])for(let y=6;y<=15;y++)set(x,y,BAR2,y>10?.92:1);
+    for(let x=6;x<=9;x++){set(x,10,BAR2);set(x,11,BAR2,.9)}
+    for(let y=20;y<31;y++)for(let x=2;x<14;x++){
+      const row=(y-20)%4;
+      set(x,y,BR,(row===3?.82:row===0?1.05:1)*(.95+MCX_nz(x+((y>>2)&1)*5,y,17)*.1));
+    }
+    for(let x=2;x<14;x++){set(x,20,BD,.9)}
+    for(const hy of [4,15,27]){set(0,hy,0x7a5a30);set(1,hy,0x93703d);set(0,hy+1,0x5e4423);set(1,hy+1,0x6e5029)}
+    for(const hy of [15,27]){set(14,hy,0x93703d);set(15,hy,0x7a5a30);set(14,hy+1,0x6e5029);set(15,hy+1,0x5e4423)}
+    set(11,21,0x8f7a48);set(12,21,0x6e5a30);
+  }
+  return P;
+}
+function MCX_doorCanvas(kind,flip){
+  const P=MCX_doorPix(kind),c=document.createElement("canvas");c.width=16;c.height=32;
+  const g=c.getContext("2d"),im=g.createImageData(16,32);
+  for(let y=0;y<32;y++)for(let x=0;x<16;x++){const s=P[y][flip?15-x:x],o=(y*16+x)*4;im.data[o]=s[0];im.data[o+1]=s[1];im.data[o+2]=s[2];im.data[o+3]=s[3]}
+  g.putImageData(im,0,0);return c;
+}
+/* pikk muru: alumine ja ülemine pool (16x16 → 32x32 tekstuuriks); terad kulgevad pidevalt alumisest ülemisse */
+function MCX_tallPix(top){
+  const GC=[0x2a6320,0x35752a,0x42862e,0x54a037,0x6bb946,0x86d058];
+  const px=Array.from({length:16},()=>Array(16).fill(0));
+  for(let bx=0;bx<16;bx++){
+    if(!(bx%2===1||MCX_nz(bx,1,71)<.4))continue;
+    const lean=MCX_nz(bx,2,73)<.5?-1:1,L=14+Math.floor(MCX_nz(bx,3,75)*17),wide=MCX_nz(bx,5,79)<.25,sway=.025+MCX_nz(bx,6,83)*.04;
+    for(let Hh=top?16:0;Hh<(top?32:16);Hh++){
+      if(Hh>=L)break;
+      const xx=bx+Math.round(lean*Hh*sway*1.6),row=top?31-Hh:15-Hh;
+      if(xx<0||xx>15)continue;
+      const t=Hh/L,ci=Math.min(5,Math.floor(t*4.6)+(MCX_nz(bx,Hh,81)<.15?1:0));
+      px[row][xx]=GC[ci];
+      if(wide&&t<.35&&xx<15)px[row][xx+1]=GC[Math.max(0,ci-1)];
+    }
+  }
+  return px;
+}
+
+const DOOR_KIND={35:'oak',136:'spruce',138:'birch'},TOP_OF={35:36,136:137,138:139};
+const EDGE={oak:'#7a5a2e',spruce:'#3a2813',birch:'#b2a173'};
+
+/* ---- nimed, värvid, kõvadus, nähtavus ---- */
+NAMES[35]='Tammeuks';NAMES[36]='Tammeukse ülaosa';NAMES[136]='Kuuseuks';NAMES[137]='Kuuseukse ülaosa';NAMES[138]='Kaseuks';NAMES[139]='Kaseukse ülaosa';
+NAMES[97]='Tall grass';NAMES[98]='Tall grass (ülaosa)';
+COL[35]=COL[36]=[.64,.49,.27];COL[136]=COL[137]=[.36,.25,.14];COL[138]=COL[139]=[.85,.79,.56];COL[97]=COL[98]=[.3,.6,.2];
+for(const b of [35,36,136,137,138,139])HARD[b]=1;
+HARD[97]=HARD[98]=.02;
+for(const q of [136,137,138,139]){OCC[q]=0;CUT[q]=1}
+for(const q of [97,98]){OCC[q]=0;CUT[q]=1;try{CUTA[q]=1}catch(e){}}
+
+/* ---- tekstuurid atlases: pikk muru (tiilid 89 ja 90) ---- */
+const tallTile=top=>{const c=document.createElement('canvas');c.width=c.height=TS;const g=c.getContext('2d');
+  MCX_tallPix(top).forEach((row,y)=>row.forEach((v,x)=>{if(v){g.fillStyle='#'+v.toString(16).padStart(6,'0');g.fillRect(x*2,y*2,2,2)}}));return c};
+tiles[89]=tallTile(false);tiles[90]=tallTile(true);
+{const ctx=atlas.getContext('2d');ctx.drawImage(tiles[89],89*TS,0);ctx.drawImage(tiles[90],90*TS,0);atlasTex.needsUpdate=true}
+
+/* ---- ikoonid (käes hoitav ese, inventar, loodud menüü) ---- */
+const doorIcon=kind=>{const ic=document.createElement('canvas');ic.width=ic.height=32;const g=ic.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(MCX_doorCanvas(kind,false),8,0);return ic};
+ICON[35]=doorIcon('oak');ICON[136]=doorIcon('spruce');ICON[138]=doorIcon('birch');
+{const ic=document.createElement('canvas');ic.width=ic.height=32;const g=ic.getContext('2d');g.drawImage(tiles[89],0,0);ICON[97]=ic}
+for(const k of [35,136,138,97])delete iconCache[k];
+
+/* ---- ukse 3D mudel: 16x32 tekstuur, sinine/hinged/käepide tekstuuris, aknad on päris läbipaistvad ---- */
+const DOORM={};
+const solidTex=hex=>{const c=document.createElement('canvas');c.width=c.height=2;const g=c.getContext('2d');g.fillStyle=hex;g.fillRect(0,0,2,2);return c};
+const mkTex=cv=>{const t=new THREE.CanvasTexture(cv);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;return t};
+function doorMats(kind){
+  if(DOORM[kind])return DOORM[kind];
+  const mk=(cv,cut)=>{const m=new THREE.MeshBasicMaterial({map:mkTex(cv),alphaTest:cut?.5:0});m.color=worldMat.color;return m};
+  const front=mk(MCX_doorCanvas(kind,false),true),back=mk(MCX_doorCanvas(kind,true),true),edge=mk(solidTex(EDGE[kind]),false);
+  return DOORM[kind]=[edge,edge,edge,edge,front,back];
+}
+const doorGeoNew=new THREE.BoxGeometry(1,2,.1875);
+makeDoorVisual=function(x,y,z,b){
+  const kind=DOOR_KIND[b||get(x,y,z)]||'oak',key=x+","+y+","+z,g=new THREE.Group();g.position.set(x+.5,y,z+.5);
+  const pivot=new THREE.Group();pivot.position.set(-.40625,0,.40625);pivot.rotation.y=doorStates.has(key)?Math.PI/2:0;g.add(pivot);
+  const panel=new THREE.Mesh(doorGeoNew,doorMats(kind));panel.position.set(.40625,1,0);pivot.add(panel);
+  return g;
+};
+
+/* ---- paigutamine: uks = alumine + ülemine pool korraga, pikk muru = 2 plokki ---- */
+addEventListener('mousedown',e=>{
+  if(e.button!==2||!locked()||ui||dead)return;
+  const it=hotbar[cur]||0,isDoor=DOOR_KIND[it]!==undefined,isTall=it===97;
+  if(!isDoor&&!isTall)return;
+  const r=ray();if(!r)return;
+  const hb=get(r.x,r.y,r.z);
+  if(isDoorB(hb)||hb===30||hb===32||hb===33||hb===41||hb===43)return;      // interaktiivne plokk: lase vana loogikal töötada
+  e.stopImmediatePropagation();
+  if(r.px===null||!inb(r.px,r.py+1,r.pz))return;
+  if(survival&&!inv[it])return;
+  const X=r.px,Y=r.py,Z=r.pz,below=get(X,Y-1,Z);
+  if(get(X,Y,Z)!==0||get(X,Y+1,Z)!==0)return;
+  let bot,top;
+  if(isDoor){
+    if(!solid(X,Y-1,Z)||below===97||below===98)return;
+    bot=it;top=TOP_OF[it];
+  }else{
+    if(!(below===1||below===2||below===100||below===101)){try{addChat('Tall grass kasvab ainult murul või mullal.','err')}catch(_){}return}
+    bot=97;top=98;
+  }
+  const i0=idx(X,Y,Z),i1=idx(X,Y+1,Z),o0=w[i0],o1=w[i1];
+  w[i0]=bot;w[i1]=top;const bad=isDoor&&hit(p.x,p.y,p.z);w[i0]=o0;w[i1]=o1;
+  if(bad)return;
+  setBlock(X,Y,Z,bot,true);setBlock(X,Y+1,Z,top,true);
+  try{blockSfx(bot,'place',X+.5,Y+.5,Z+.5)}catch(_){}
+  swing=1;if(survival)useItem(it);
+},true);
+
+/* ---- pika muru kaks poolt kuuluvad kokku, murukamar kadudes kaob ka muru ---- */
+const oSetTG=setBlock;setBlock=function(x,y,z,b,net){
+  const old=get(x,y,z);
+  const r=oSetTG.apply(this,arguments);
+  if(old===97&&b!==97&&get(x,y+1,z)===98)setBlock(x,y+1,z,0,net);
+  else if(old===98&&b!==98&&get(x,y-1,z)===97)setBlock(x,y-1,z,0,net);
+  if(y+1<H&&get(x,y+1,z)===97&&b!==1&&b!==2&&b!==100&&b!==101)setBlock(x,y+1,z,0,net);
+  return r};
+const oDropTG=drop;drop=function(b,x,y,z){
+  if(b===97){if(Math.random()<.12)spawnItemDrop(248,1,x,y,z);return}
+  if(b===98)return;
+  return oDropTG.apply(this,arguments)};
+
+/* ---- käes hoitav uks / muru on lame ikoon, mitte kuup ---- */
+const oUH=updHeld;updHeld=function(){
+  oUH.apply(this,arguments);
+  const it=hotbar[cur]||0;
+  if(DOOR_KIND[it]!==undefined||it===97){
+    if(heldMesh){handG.remove(heldMesh);heldMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});heldMesh=null}
+    heldMesh=planeMesh(it,.55);heldMesh.position.set(.12,-.02,-.42);heldMesh.rotation.set(0,-.4,0);handG.add(heldMesh);
+  }
+};
+
+/* ---- retseptid: 6 lauda = 3 ust ---- */
+try{
+  const has=o=>RECIPES_ALL.some(r=>r.out===o);
+  if(!has(35))RECIPES_ALL.push({out:35,qty:3,req:[4,4,4,4,4,4],_shape:[[4,4],[4,4],[4,4]]});
+  RECIPES_ALL.push({out:136,qty:3,req:[78,78,78,78,78,78],_shape:[[78,78],[78,78],[78,78]]},{out:138,qty:3,req:[77,77,77,77,77,77],_shape:[[77,77],[77,77],[77,77]]});
+}catch(e){}
+}catch(err){console.error('Uksed ja pikk muru:',err);try{addChat('Uste/muru viga: '+String(err.message||err),'err')}catch(_e){}}})();
+</script>
+
+<script id="mcLogTextures">
+/* ===== Palgid: tamm (8), kask (55), kuusk/tume tamm (60) - 16x16 pikslikunst referentspiltide järgi ===== */
+(function(){try{
+  const H=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const pick=(pal,v)=>pal[Math.max(0,Math.min(pal.length-1,Math.floor(v*pal.length)))];
+  const up=fn=>{const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');
+    for(let y=0;y<16;y++)for(let x=0;x<16;x++){g.fillStyle=fn(x,y);g.fillRect(x,y,1,1)}
+    const o=document.createElement('canvas');o.width=o.height=TS;const q=o.getContext('2d');q.imageSmoothingEnabled=false;q.drawImage(c,0,0,TS,TS);return o};
+  /* vertikaalsed koorejooned: 1-2 px laiused, pikad lõigud, selge kontrast (tume lõhe / kesk / hele) */
+  const bark=(pal,sd,hi)=>(x,y)=>{
+    const w=(x+Math.floor(H(x>>1,3,sd)*2))>>0; // naaberveerud jagavad sageli tooni
+    const off=Math.floor(H(x,0,sd)*14),len=3+Math.floor(H(x,1,sd)*8),seg=Math.floor((y+off)/len);
+    const r=H(x,seg,sd+3),q=H(x>>1,seg,sd+7);
+    const v=.6*r+.4*q;
+    let i=v<.22?0:v<.52?1:v<.8?2:3;
+    if(H(x,y,sd+11)<.08&&i>0)i--;                 // väike müra
+    return pal[i];
+  };
+  const ring=(rim,rings,sd)=>(x,y)=>{
+    const d=Math.max(Math.abs(x-7.5),Math.abs(y-7.5))|0; /* 0..7 */
+    if(d>=7)return rim[(x+y)&1?0:1];
+    return rings[d]||rings[rings.length-1];
+  };
+  /* TAMM (pilt 1): tume kooreteke + helekollane puidu sisu */
+  const OAKB=['#33261a','#4f3d23','#614b2a','#76603a'];
+  const oakSide=bark(OAKB,41);
+  const oakTop=ring(['#3a2d1a','#46361f'],['#c9ab6e','#c9ab6e','#b99a5f','#b99a5f','#a58650','#b99a5f','#c9ab6e'],0);
+  /* KASK (pilt 2): valge koor mustade märkidega */
+  const BK=['#d9d9d2','#cdcdc5','#c2c2ba','#e3e3dc','#b8b8b0'];
+  const birchMark=(x,y)=>{ // horisontaalsed tumedad laigud
+    for(let dx=0;dx<4;dx++){const xx=(x-dx+16)%16;
+      if(H(xx,y,61)<.045){const L=2+Math.floor(H(xx,y,62)*3);if(dx<L)return dx==0||dx==L-1?'#4d4d46':'#2b2b27'}}
+    return null;
+  };
+  const birchSide=(x,y)=>{const m=birchMark(x,y);if(m)return m;
+    if(H(x,y,66)<.07)return'#8a8a82';
+    return pick(BK,.6*H(x,y,67)+.4*H(x>>2,y>>1,68))};
+  const birchTop=ring(['#c9c9c0','#b9b9b0'],['#ac9c70','#c6b679','#c6b679','#d6c185','#c6b679','#c8b87f','#c6b679'],0);
+  /* KUUSK / TUME TAMM (pilt 3): peaaegu must koor, tume pruun ots */
+  const DKB=['#241a0e','#34271a','#42331f','#544229'];
+  const darkSide=bark(DKB,71);
+  const darkTop=ring(['#1d160c','#271e12'],['#5d4c34','#55432d','#55432d','#4c3a25','#55432d','#594731','#55432d'],0);
+  const OAK_SIDE_PX=["6c58374639256954346c57379b7a4c3d301d6e573894744641332166512f6853336752317d613e6d58387c613e695434", "6450303f321f65512f705c3b382b183e322097774941342066513199794a3f301d6653339a7a4b4b3d257b623f4c3d26", "685534392d1a5e4a2f6551304134216753329978493f301d6752329878493f301d6653327c623e4b3d267b623e4c3d26", "3d2f1f6c5938453825634f2e3f32207c623e7c623f3f301d6752329878473f301d6653319778483d301d9b7b4c413423", "6854336956354134216c58376753317c623e7c623f6c58366753326d5a394235226956349a7a4b3d301d9a7a4b3c2f1e", "6854346c57375e4a2f6c58376652319a7a4b6853326652316a56356c58373d301d6854348f6f403e311c7c613f3f321f", "3d301e6753327c623f4b3d266c5836977748624d2c6653323d301b9170413e301c7b623f58462b382a157b623e3e311e", "735f3f6c58379b7b4c3f311e6c58369b7b4c3e301c9b7a4c41342098794a3b2d1a7c613e4c3d246651317c613e3e311e", "68543469553499794a3f321f6f5b3a9373454134206854343f321e6954344235229271433d301d6c57366b57373e311f", "6854346955339c7c4d4639266753316d58389473444235216a56356a5635392c199475464235226c5737947445413422", "6854334537257e613f3f321f6955346753329776473a2d1863502f3e311e5e4a2f9f7f4f3f321f6a55359a7a4b433625", "64502f3e301e7c623f3f321f665231705c3b9b7a4b4135219a7a4b392c195e4a2f9d7d4d3d2f1d6c57369776473c2f1e", "3d301e3a2e1a9b7a4b392c196651306c58379b7a4b3a2c186956343f321f6550309677473d301c6a5534624d2c3f3220", "3d2f1e4034216d58385d4a2f6c57376752327c613f4b3d266e59396d5838634f2e6752323d301c6a55359473459c7b4c", "685434392d1a6753329776473e321f6b57377b623f4b3d263e301e9272436752329877483b2e1b65502f7b623f3c301e", "6854345e4a2e6752327c613e3e311e65502f6954346753323f321f6954346c5737675232372a1667523169543465512f"],OAK_TOP_PX=["5e4a2b4c3d245e4a2a7359345d4b2b493d245d4a2b5d4b2b7459374b3d235c4b2b5d4b2b4c3d245d4b2b5d4b2b5e4b2b", "4c3e24b6935db6935db6935db6935dae8f56b6935dae8f56c29d62ae8f56ae8f56b6935db6935db6935db6935d4c3e24", "5e4b2ab6935d7d61367d613697733f96733f9e844d95733e9f834d9f844d9f834d9f844d97733f97733fc19d625d4b2b", "5d4b2ab6935d7d6136c29e62c19d61b6925db6935db6935db6935dae8f56b6935db6935db6935d97733fb6935c5e4b2b", "5d4b2aae8f5697733fb6935dae8f56ae8f56ae8f56ae8f56ae8f56ae8f56ae8f56ae8f56b6935d9e844dac8f575e4b2b", "4b3e24b6935d9e844db6935cae8f5696734097733f9e844d9e844d97733f97733fae8f56b6935d96733eae8f554b3d23", "5d4b2aae8f5697733fae8f56ae8f567d6237ae8f56ae8f56ae8f56ae8f5696723eae8f56ae8f5696723eb6935c5e4b2b", "5d4b2aae8f569e844db5935cae8f5697733ead8e559f844c9f844dae8f569f844dae8f55b6935d9e844dad8f575c4b2b", "5e4b29ae8f569e844db6935dae8f5697733fad8e559f844d96733fae8f5695733eae8f56b6935d96733fad8f565e4b2a", "4c3d23ae8f569e844db6935dae8f5697733fae8f56ae8f56ae8f56ae8f569f844cae8f56ae8f5696723ead8e574c3e24", "5e4a2aae8f5697723fb6935dae8f5696733f97733f7c613696733e9f844d9f844dae8f56b6935d9e844cae8f555e4b2b", "5d4b2aae8f569f844db6935dae8f56ae8f56ae8f56ae8f55ae8f56ae8f57ae8f56ae8f56b6935d96733ead8f555e4b2a", "4c3d23b6935d9e844db6935db6935dae8f56b6935db6935db6935db6935db6935dc29e62b6935d96723ead8e554c3e24", "5e4a2ab6935d9e844d97733f9e844d96733f97733f97733f97733f97733f97733f97723f97733f97733fb5925c5e4b2b", "5d4b2ab6935cb5925eb6925eae8f57ae8e55b5935cae8f56ad8f55c29d61ae8e55ae8f55b6925cb5935cb5935c5e4b2b", "5e4b2b4c3e245d4b2a5e4b2b5e4b2b4a3e245e4b2b5e4b2b745a354c3e245d4a2b5d4b2b4c3e24735a335e4a2c5e4b2b"];
+  const fromPx=P=>(x,y)=>'#'+P[y].substr(x*6,6);
+  tiles[9]=up(fromPx(OAK_SIDE_PX));tiles[10]=up(fromPx(OAK_TOP_PX));
+  tiles[48]=up(birchSide);tiles[49]=up(birchTop);
+  tiles[56]=up(darkSide);tiles[57]=up(darkTop);
+  const ctx=atlas.getContext('2d');
+  for(const i of [9,10,48,49,56,57]){ctx.clearRect(i*TS,0,TS,TS);ctx.drawImage(tiles[i],i*TS,0)}
+  atlasTex.needsUpdate=true;
+  try{for(const k of [8,55,60])delete iconCache[k]}catch(e){}
+}catch(err){console.error('Palgitekstuurid:',err)}})();
+</script>
+
+<script id="mcSwordIcons">
+/* ===== Mõõgad: puit(140), kivi(141), kuld(142), raud(143), teemant(144) - 16x16 pikslid sinu pildi järgi ===== */
+(function(){try{
+  const SW={"wood": ["..............................................................................372910372910372910", "........................................................................372910866526755821372910", "..................................................................372910866526755821866526372910", "............................................................372910866526755821866526372910......", "......................................................372910866526755821866526372910............", "................................................372910866526755821866526372910..................", "............1e1d1e1e1d1e..................372910866526755821866526372910........................", "............1e1d1e4736141e1d1e......372910866526755821866526372910..............................", "..................1e1d1e5943191e1d1e866526755821866526372910....................................", "..................1e1d1e5943191e1d1e755821866526372910..........................................", "........................1e1d1e5943191e1d1e1e1d1e................................................", "..................382810553d161e160a5943194736141e1d1e..........................................", "............38281074541d1e160a......1e1d1e1e1d1e4736141e1d1e....................................", "1e1d1e1e1d1e553d161e160a........................1e1d1e1e1d1e....................................", "1e1d1e5943191e1d1e..............................................................................", "1e1d1e1e1d1e1e1d1e.............................................................................."], "stone": ["..............................................................................3c3c3c3c3c3c3c3c3c", "........................................................................3c3c3c9999998888883c3c3c", "..................................................................3c3c3c9999998888889999993c3c3c", "............................................................3c3c3c9999998888889999993c3c3c......", "......................................................3c3c3c9999998888889999993c3c3c............", "................................................3c3c3c9999998888889999993c3c3c..................", "............3c3c3c3c3c3c..................3c3c3c9999998888889999993c3c3c........................", "............3c3c3c5a5a5a3c3c3c......3c3c3c9999998888889999993c3c3c..............................", "..................3c3c3c6c6c6c3c3c3c9999998888889999993c3c3c....................................", "..................3c3c3c6c6c6c3c3c3c8888889999993c3c3c..........................................", "........................3c3c3c6c6c6c3c3c3c3c3c3c................................................", "..................382810553d163c3c3c6c6c6c5a5a5a3c3c3c..........................................", "............38281074541d1e160a......3c3c3c3c3c3c5a5a5a3c3c3c....................................", "3b3b3b3b3b3b553d161e160a........................3c3c3c3c3c3c....................................", "3b3b3b6b6b6b3b3b3b..............................................................................", "3b3b3b3b3b3b3b3b3b.............................................................................."], "iron": ["..............................................................................343434343434343434", "........................................................................343434ffffffcfcfcf343434", "..................................................................343434ffffffcfcfcfffffff343434", "............................................................343434ffffffcfcfcfffffff343434......", "......................................................343434ffffffcfcfcfffffff343434............", "................................................343434ffffffcfcfcfffffff343434..................", "............1e1d1e1e1d1e..................343434ffffffcfcfcfffffff343434........................", "............1e1d1e5858581e1d1e......343434ffffffcfcfcfffffff343434..............................", "..................1e1d1e8484841e1d1effffffcfcfcfffffff343434....................................", "..................1e1d1e8484841e1d1ecfcfcfffffff343434..........................................", "........................1e1d1e8484841e1d1e1e1d1e................................................", "..................382810553d161e160a8484845858581e1d1e..........................................", "............38281074541d1e160a......1e1d1e1e1d1e5858581e1d1e....................................", "1e1d1e1e1d1e553d161e160a........................1e1d1e1e1d1e....................................", "1e1d1e8484841e1d1e..............................................................................", "1e1d1e1e1d1e1e1d1e.............................................................................."], "gold": ["..............................................................................3c3c3c3c3c3c3c3c3c", "........................................................................3c3c3ceaee57cdd0503c3c3c", "..................................................................3c3c3ceaee57cdd050eaee573c3c3c", "............................................................3c3c3ceaee57cdd050eaee573c3c3c......", "......................................................3c3c3ceaee57cdd050eaee573c3c3c............", "................................................3c3c3ceaee57cdd050eaee573c3c3c..................", "............3c3c3c3c3c3c..................3c3c3ceaee57cdd050eaee573c3c3c........................", "............3c3c3c7c7e3e3c3c3c......3c3c3ceaee57cdd050eaee573c3c3c..............................", "..................3c3c3c9c9e453c3c3ceaee57cdd050eaee573c3c3c....................................", "..................3c3c3c9c9e453c3c3ccdd050eaee573c3c3c..........................................", "........................3c3c3c9c9e453c3c3c3c3c3c................................................", "..................382810553d163c3c3c9c9e457c7e3e3c3c3c..........................................", "............38281074541d1e160a......3c3c3c3c3c3c7c7e3e3c3c3c....................................", "3b3b3b3b3b3b553d161e160a........................3c3c3c3c3c3c....................................", "3b3b3b9c9e453b3b3b..............................................................................", "3b3b3b3b3b3b3b3b3b.............................................................................."], "diamond": ["..............................................................................343434343434343434", "........................................................................34343433ebcb2bc7ac343434", "..................................................................34343433ebcb2bc7ac33ebcb343434", "............................................................34343433ebcb2bc7ac33ebcb343434......", "......................................................34343433ebcb2bc7ac33ebcb343434............", "................................................34343433ebcb2bc7ac33ebcb343434..................", "............1e1d1e1e1d1e..................34343433ebcb2bc7ac33ebcb343434........................", "............1e1d1e1563551e1d1e......34343433ebcb2bc7ac33ebcb343434..............................", "..................1e1d1e1e8a771e1d1e33ebcb2bc7ac33ebcb343434....................................", "..................1e1d1e1e8a771e1d1e2bc7ac33ebcb343434..........................................", "........................1e1d1e1e8a771e1d1e1e1d1e................................................", "..................382810553d161e160a1e8a771563551e1d1e..........................................", "............38281074541d1e160a......1e1d1e1e1d1e1563551e1d1e....................................", "1e1d1e1e1d1e553d161e160a........................1e1d1e1e1d1e....................................", "1e1d1e1e8a771e1d1e..............................................................................", "1e1d1e1e1d1e1e1d1e.............................................................................."]};
+  const order=['wood','stone','gold','iron','diamond'];
+  order.forEach((k,n)=>{
+    const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');
+    SW[k].forEach((row,y)=>{for(let x=0;x<16;x++){const h=row.substr(x*6,6);if(h==='......')continue;g.fillStyle='#'+h;g.fillRect(x*2,y*2,2,2)}});
+    ICON[140+n]=c;
+    try{delete iconCache[140+n]}catch(e){}
+  });
+}catch(err){console.error('Mõõgaikoonid:',err)}})();
+</script>
+
+<script id="mcToolIcons">
+/* ===== Kirved (145-149) ja kirkad (180-184): puit, kivi, kuld, raud, teemant ===== */
+(function(){try{
+  const TL={"axe": [["................................................................................................", "........................372910372910372910372910372910..........................................", "............372910372910a07a30a07a30a07a30a07a30866526372910372910............553d16382810......", "......372910a07a30a07a308665268665268665268665268665268665268665263729107a5a22382810............", "......372910a07a30866526866526866526866526866526866526866526594319372910382810..................", "......372910372910866526866526866526866526866526866526594319372910372910........................", "..................372910372910866526866526866526594319372910372910..............................", "..............................372910372910372910372910372910....................................", "..........................................553d16382810..........................................", "....................................7a5a22382810................................................", "..............................553d16382810......................................................", "........................7a5a22382810............................................................", "..................553d16382810..................................................................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "........................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c..........................................", "............3c3c3c3c3c3cb0b0b0b0b0b0b0b0b0b0b0b09999993c3c3c3c3c3c............553d16382810......", "......3c3c3cb0b0b0b0b0b09999999999999999999999999999999999999999993c3c3c7a5a22382810............", "......3c3c3cb0b0b09999999999999999999999999999999999999999996c6c6c3c3c3c382810..................", "......3c3c3c3c3c3c9999999999999999999999999999999999996c6c6c3c3c3c3c3c3c........................", "..................3c3c3c3c3c3c9999999999999999996c6c6c3c3c3c3c3c3c..............................", "..............................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c....................................", "..........................................553d16382810..........................................", "....................................7a5a22382810................................................", "..............................553d16382810......................................................", "........................7a5a22382810............................................................", "..................553d16382810..................................................................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "........................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c..........................................", "............3c3c3c3c3c3cfbff75fbff75fbff75fbff75eaee573c3c3c3c3c3c............553d16382810......", "......3c3c3cfbff75fbff75eaee57eaee57eaee57eaee57eaee57eaee57eaee573c3c3c7a5a22382810............", "......3c3c3cfbff75eaee57eaee57eaee57eaee57eaee57eaee57eaee579c9e453c3c3c382810..................", "......3c3c3c3c3c3ceaee57eaee57eaee57eaee57eaee57eaee579c9e453c3c3c3c3c3c........................", "..................3c3c3c3c3c3ceaee57eaee57eaee579c9e453c3c3c3c3c3c..............................", "..............................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c....................................", "..........................................553d16382810..........................................", "....................................7a5a22382810................................................", "..............................553d16382810......................................................", "........................7a5a22382810............................................................", "..................553d16382810..................................................................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "........................343434343434343434343434343434..........................................", "............343434343434ffffffffffffffffffffffffcfcfcf343434343434............553d16382810......", "......343434ffffffffffffcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf3434347a5a22382810............", "......343434ffffffcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf848484343434382810..................", "......343434343434cfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf848484343434343434........................", "..................343434343434cfcfcfcfcfcfcfcfcf848484343434343434..............................", "..............................343434343434343434343434343434....................................", "..........................................553d16382810..........................................", "....................................7a5a22382810................................................", "..............................553d16382810......................................................", "........................7a5a22382810............................................................", "..................553d16382810..................................................................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "........................1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e..........................................", "............1e1d1e1e1d1e7ff5df7ff5df7ff5df7ff5df33ebcb1e1d1e1e1d1e............553d16382810......", "......1e1d1e7ff5df7ff5df33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb1e1d1e7a5a22382810............", "......1e1d1e7ff5df33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb1e8a771e1d1e382810..................", "......1e1d1e1e1d1e33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb1e8a771e1d1e1e1d1e........................", "..................1e1d1e1e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e1e1d1e..............................", "..............................1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e....................................", "..........................................553d16382810..........................................", "....................................7a5a22382810................................................", "..............................553d16382810......................................................", "........................7a5a22382810............................................................", "..................553d16382810..................................................................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."]], "pick": [["................................................................................................", "............372910372910372910372910372910372910372910372910372910..............................", "......372910a07a30a07a30a07a30a07a30a07a30866526866526866526866526372910372910..................", "......372910a07a30866526866526866526866526866526866526866526866526866526866526372910372910......", "......372910372910594319594319594319594319594319594319866526866526866526866526866526594319372910", "..................372910372910372910372910372910372910372910866526866526866526594319372910......", "......................................................372910866526866526866526594319372910......", "................................................7a5a22372910866526866526866526594319372910......", "..........................................553d16382810372910866526866526866526594319372910......", "....................................7a5a22382810......372910866526866526866526594319372910......", "..............................553d16382810............372910866526866526866526594319372910......", "........................7a5a22382810........................372910866526594319372910............", "..................553d16382810....................................372910372910..................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "............3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c..............................", "......3c3c3cb0b0b0b0b0b0b0b0b0b0b0b0b0b0b09999999999999999999999993c3c3c3c3c3c..................", "......3c3c3cb0b0b09999999999999999999999999999999999999999999999999999999999993c3c3c3c3c3c......", "......3c3c3c3c3c3c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c9999999999999999999999999999996c6c6c3c3c3c", "..................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c9999999999999999996c6c6c3c3c3c......", "......................................................3c3c3c9999999999999999996c6c6c3c3c3c......", "................................................7a5a223c3c3c9999999999999999996c6c6c3c3c3c......", "..........................................553d163828103c3c3c9999999999999999996c6c6c3c3c3c......", "....................................7a5a22382810......3c3c3c9999999999999999996c6c6c3c3c3c......", "..............................553d16382810............3c3c3c9999999999999999996c6c6c3c3c3c......", "........................7a5a22382810........................3c3c3c9999996c6c6c3c3c3c............", "..................553d16382810....................................3c3c3c3c3c3c..................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "............3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c..............................", "......3c3c3cfbff75fbff75fbff75fbff75fbff75eaee57eaee57eaee57eaee573c3c3c3c3c3c..................", "......3c3c3cfbff75eaee57eaee57eaee57eaee57eaee57eaee57eaee57eaee57eaee57eaee573c3c3c3c3c3c......", "......3c3c3c3c3c3c9c9e459c9e459c9e459c9e459c9e459c9e45eaee57eaee57eaee57eaee57eaee579c9e453c3c3c", "..................3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3ceaee57eaee57eaee579c9e453c3c3c......", "......................................................3c3c3ceaee57eaee57eaee579c9e453c3c3c......", "................................................7a5a223c3c3ceaee57eaee57eaee579c9e453c3c3c......", "..........................................553d163828103c3c3ceaee57eaee57eaee579c9e453c3c3c......", "....................................7a5a22382810......3c3c3ceaee57eaee57eaee579c9e453c3c3c......", "..............................553d16382810............3c3c3ceaee57eaee57eaee579c9e453c3c3c......", "........................7a5a22382810........................3c3c3ceaee579c9e453c3c3c............", "..................553d16382810....................................3c3c3c3c3c3c..................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "............343434343434343434343434343434343434343434343434343434..............................", "......343434ffffffffffffffffffffffffffffffcfcfcfcfcfcfcfcfcfcfcfcf343434343434..................", "......343434ffffffcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcf343434343434......", "......343434343434848484848484848484848484848484848484cfcfcfcfcfcfcfcfcfcfcfcfcfcfcf848484343434", "..................343434343434343434343434343434343434343434cfcfcfcfcfcfcfcfcf848484343434......", "......................................................343434cfcfcfcfcfcfcfcfcf848484343434......", "................................................7a5a22343434cfcfcfcfcfcfcfcfcf848484343434......", "..........................................553d16382810343434cfcfcfcfcfcfcfcfcf848484343434......", "....................................7a5a22382810......343434cfcfcfcfcfcfcfcfcf848484343434......", "..............................553d16382810............343434cfcfcfcfcfcfcfcfcf848484343434......", "........................7a5a22382810........................343434cfcfcf848484343434............", "..................553d16382810....................................343434343434..................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."], ["................................................................................................", "............1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e..............................", "......1e1d1e7ff5df7ff5df7ff5df7ff5df7ff5df33ebcb33ebcb33ebcb33ebcb1e1d1e1e1d1e..................", "......1e1d1e7ff5df33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb33ebcb1e1d1e1e1d1e......", "......1e1d1e1e1d1e1e8a771e8a771e8a771e8a771e8a771e8a7733ebcb33ebcb33ebcb33ebcb33ebcb1e8a771e1d1e", "..................1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e1e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "......................................................1e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "................................................7a5a221e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "..........................................553d163828101e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "....................................7a5a22382810......1e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "..............................553d16382810............1e1d1e33ebcb33ebcb33ebcb1e8a771e1d1e......", "........................7a5a22382810........................1e1d1e33ebcb1e8a771e1d1e............", "..................553d16382810....................................1e1d1e1e1d1e..................", "............7a5a22382810........................................................................", "......553d16382810..............................................................................", "......382810...................................................................................."]]};
+  const mk=rows=>{const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');
+    rows.forEach((row,y)=>{for(let x=0;x<16;x++){const h=row.substr(x*6,6);if(h==='......')continue;g.fillStyle='#'+h;g.fillRect(x*2,y*2,2,2)}});return c};
+  for(let n=0;n<5;n++){
+    ICON[145+n]=mk(TL.axe[n]);ICON[180+n]=mk(TL.pick[n]);
+    try{delete iconCache[145+n];delete iconCache[180+n]}catch(e){}
+  }
+}catch(err){console.error('Tööriistaikoonid:',err)}})();
 </script>
 
 </body>
