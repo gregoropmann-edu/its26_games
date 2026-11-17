@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="et">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.cdnfonts.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/minecraftia">
-<title>MineCraft LAN V33 (mobide kokkupõrked + lehed + locator)</title>
+<title>Minecraft LAN Edition</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font-family:system-ui,sans-serif}
@@ -123,14 +123,14 @@ fieldset{border:1px solid #555;margin:10px 0;border-radius:6px}
 @keyframes glb{to{transform:scaleX(.93)}}
 #genLoad small{font-size:13px;opacity:.75;max-width:80vw;text-align:center;margin-top:10px}
 </style>
-<div id="genLoad" style="display:none"><div class="gt">Genereerin maailma</div><div class="gs"><span>Genereerin maastikku...</span><span>Istutan puid ja kaevan koopaid...</span><span>Ehitan külasid...</span><span>Valmistan maailma ette...</span></div><div class="bar"><i></i></div><small id="glTip"></small></div>
+<div id="genLoad" style="display:none"><div class="gt">Generating World</div><div class="gs"><span>Generating terrain...</span><span>Growing trees and carving caves...</span><span>Building villages...</span><span>Preparing your world...</span></div><div class="bar"><i></i></div><small id="glTip"></small></div>
 <script>(function(){try{
 var c=document.createElement("canvas");c.width=c.height=16;var g=c.getContext("2d"),r=7;
 function rnd(){r=(r*9301+49297)%233280;return r/233280}
 var cols=["#866043","#79553a","#6b4a31","#94704d","#5c3f29"];
 for(var y=0;y<16;y++)for(var x=0;x<16;x++){g.fillStyle=cols[Math.floor(rnd()*cols.length)];g.fillRect(x,y,1,1)}
 var o=document.getElementById("genLoad");o.style.backgroundImage="url("+c.toDataURL()+")";o.style.backgroundSize="64px 64px";
-var tips=["Näpunäide: parem klõps külaelanikul avab kauplemise.","Näpunäide: külaelanikud lähevad öösel magama.","Näpunäide: zombid ründavad väljas olevaid külaelanikke.","Näpunäide: topelt-Space loomingus = lend.","Näpunäide: voodis magamine jätab respawn-punkti."];
+var tips=["Tip: Right-click a Villager to trade.","Tip: Villagers go to sleep at night.","Tip: Zombies attack Villagers who are outside.","Tip: Double-tap Space in Creative Mode to fly.","Tip: Sleeping in a Bed sets your spawn point."];
 document.getElementById("glTip").textContent=tips[Math.floor(Math.random()*tips.length)];
 }catch(e){}})();
 window.mcHideLoad=function(){var ov=document.getElementById("genLoad");if(!ov)return;var b=ov.querySelector(".bar i");if(b){b.style.animation="none";b.style.transform="scaleX(1)"}setTimeout(function(){ov.style.transition="opacity .4s";ov.style.opacity="0";setTimeout(function(){ov.style.display="none"},450)},150)};
@@ -138,17 +138,17 @@ window.mcHideLoad=function(){var ov=document.getElementById("genLoad");if(!ov)re
 <div id="cross"></div>
 <div id="underwaterFx" aria-hidden="true"></div>
 <div id="status"></div>
-<div id="hud"><div id="iname"></div><div id="armrow"></div><div id="stats"><div id="hearts"></div><div id="food"></div></div><div id="airMeter" aria-label="Hapnik"></div><div id="locatorBar" aria-label="Teiste mängijate suunamärgid"></div><div id="bar"></div></div>
+<div id="hud"><div id="iname"></div><div id="armrow"></div><div id="stats"><div id="hearts"></div><div id="food"></div></div><div id="airMeter" aria-label="Oxygen"></div><div id="locatorBar" aria-label="Other players"></div><div id="bar"></div></div>
 <div id="hurt"></div>
-<div id="dead"><div><h1>Sa surid!</h1><p class="dscore">Skoor: <b id="dscore">0</b></p><p class="dscore" id="dtime"></p><div class="dbtns"><button id="respawn" class="dbtn">Ärka uuesti</button></div></div></div>
+<div id="dead"><div><h1>You Died!</h1><p class="dscore">Score: <b id="dscore">0</b></p><p class="dscore" id="dtime"></p><div class="dbtns"><button id="respawn" class="dbtn">Respawn</button></div></div></div>
 <div id="cur"><i></i></div>
 <div id="chatlog"></div>
-<input id="chatIn" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Kirjuta sõnum või /käsk (Enter saadab, Esc sulgeb)">
-<div id="inv"><div id="invWrap"><div id="rbPanel"><div class="rbHead">Retseptiraamat</div><input id="rbSearch" type="search" autocomplete="off" placeholder="Otsi retsepti..."><div id="rbTabs"></div><div id="rbGrid"></div><div id="rbOnly"></div></div><div class="ibox">
+<input id="chatIn" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Type a message or command (Enter to send, Esc to close)">
+<div id="inv"><div id="invWrap"><div id="rbPanel"><div class="rbHead">Recipe Book</div><input id="rbSearch" type="search" autocomplete="off" placeholder="Search recipes..."><div id="rbTabs"></div><div id="rbGrid"></div><div id="rbOnly"></div></div><div class="ibox">
 <h2 id="invT"></h2>
 <div class="tabs">
-  <button id="tabInv">🎒 Inventar</button>
-  <button id="tabCre">✨ Loomingu menüü</button>
+  <button id="tabInv">🎒 Inventory</button>
+  <button id="tabCre">✨ Creative Inventory</button>
 </div>
 
 <div id="topArea">
@@ -159,25 +159,25 @@ window.mcHideLoad=function(){var ov=document.getElementById("genLoad");if(!ov)re
   </div>
   <div id="craftArea">
     <div id="craftBox">
-      <small id="craftTitle">Meisterdamine</small>
+      <small id="craftTitle">Crafting</small>
       <div id="craftRow">
         <div id="cGrid" class="cgrid g2"></div>
         <div class="craftArrow">➔</div>
         <div id="cOut"></div>
       </div>
-      <div id="rbBtn" title="Retseptiraamat">📗</div>
+      <div id="rbBtn" title="Recipe Book">📗</div>
     </div>
   </div>
 </div>
-<div id="chestArea"><small class="inv-label">KIRST · klõpsa saagi võtmiseks</small><div id="chestGrid"></div></div>
-<div id="furnaceArea"><small class="inv-label">AHI · sisend / kütus / väljund</small><div id="furnaceSlots"><div><small>TOORES</small><div id="furnaceInput"></div></div><div class="furnaceArrow">＋</div><div><small>KÜTUS</small><div id="furnaceFuel"></div></div><div class="furnaceArrow">➜</div><div><small>VALMIS</small><div id="furnaceOutput"></div></div></div><small id="furnaceProgress" class="inv-label">Lisa liha ja kivisüsi.</small></div>
-<div id="creativeItems"><small class="inv-label">LOOMINGU ESEMED · klõpsa, et valida</small><input id="creativeSearch" type="search" autocomplete="off" placeholder="Otsi esemeid... nt pick, dirt, axe, water"><div id="creativeSearchHint">Otsing töötab kohe, nii eesti- kui ingliskeelsete nimetustega.</div><div id="creativeCatalog"></div></div>
-<small id="storageLabel" class="inv-label">INVENTAR</small>
+<div id="chestArea"><small class="inv-label">CHEST · click to take items</small><div id="chestGrid"></div></div>
+<div id="furnaceArea"><small class="inv-label">FURNACE · input / fuel / output</small><div id="furnaceSlots"><div><small>INPUT</small><div id="furnaceInput"></div></div><div class="furnaceArrow">＋</div><div><small>FUEL</small><div id="furnaceFuel"></div></div><div class="furnaceArrow">➜</div><div><small>OUTPUT</small><div id="furnaceOutput"></div></div></div><small id="furnaceProgress" class="inv-label">Add food and Coal.</small></div>
+<div id="creativeItems"><small class="inv-label">CREATIVE ITEMS · click to select</small><input id="creativeSearch" type="search" autocomplete="off" placeholder="Search items... e.g. pickaxe, dirt, axe, water"><div id="creativeSearchHint">Search works with item names.</div><div id="creativeCatalog"></div></div>
+<small id="storageLabel" class="inv-label">INVENTORY</small>
 <div id="igrid"></div>
 <div class="sep"></div>
 <div id="ihot"></div>
 <div id="iname2"></div>
-<small>Vasak klõps = pane terve stack / võta tagasi. Parem klõps meisterdamises = pane 1 plokk.</small>
+<small>Left click = place or take a full stack. Right click in crafting = place one item.</small>
 </div></div></div>
 
 <style>
@@ -192,40 +192,40 @@ window.mcHideLoad=function(){var ov=document.getElementById("genLoad");if(!ov)re
 .gbox button.ghost{background:#2a2a2a;border-color:#555;font-size:20px}
 #nameErr{color:#ff8a80;font-size:21px;min-height:24px;margin:6px 0 4px}
 </style>
-<div id="nameGate"><div class="gbox"><h2>⛏ MineCraft</h2><p>Vali oma mängijanimi. Teised mängijad näevad seda sinu pea kohal.</p><input id="nameIn" maxlength="16" placeholder="Sinu nimi" autocomplete="off" spellcheck="false"><div id="nameErr"></div><button id="nameOk">Jätka</button></div></div>
-<div id="modeAsk"><div class="gbox"><h2>Looming ➜ Ellujäämine</h2><p>Sul on loomingu esemeid kaasas. Kas jätad need alles või alustad survivali päris nullist?</p><button id="maKeep">Jäta asjad alles</button><button id="maFresh" class="alt">Alusta nullist</button><br><button id="maCancel" class="ghost">Tühista</button></div></div>
+<div id="nameGate"><div class="gbox"><h2>⛏ Minecraft</h2><p>Choose your player name. Other players will see it above your head.</p><input id="nameIn" maxlength="16" placeholder="Your name" autocomplete="off" spellcheck="false"><div id="nameErr"></div><button id="nameOk">Continue</button></div></div>
+<div id="modeAsk"><div class="gbox"><h2>Creative ➜ Survival</h2><p>You have Creative items in your inventory. Do you want to keep them or start Survival with an empty inventory?</p><button id="maKeep">Keep Items</button><button id="maFresh" class="alt">Start Fresh</button><br><button id="maCancel" class="ghost">Cancel</button></div></div>
 <div id="menu" style="display:none"><div class="box">
-<h1>⛏ MineCraft LAN V33</h1>
-<small>1536×1536 maailm · 6 biomi (kõrb, kasemets, savimaa, lumine kuusemets...) · päeva/öö tsükkel, järved, mäed, koopad (raud/kuld/teemant), külad, villagerid, iron golemid, farmiloomad, ahi ja Nether. WASD: liikumine / paat / ujumine, Space: hüppa või uju pinnale, vee all Space + W liigub pinnale edasi, Shift: sukeldu, loomingus topelt-Space = lend, lennates Space: üles, Shift: alla, hiire vasak: lõhu / ründa, parem: pane / kasuta / ava uks-kirst, flint and steel obsidianraamil = Nether portal, E: inventar, T: chat, Esc: menüü</small>
-<p><button id="play">▶ Mängi / jätka</button></p>
-<p><button id="settingsBtn" class="alt">⚙ Seaded</button></p>
-<fieldset><legend>Režiim</legend>
-<button id="mCre">Looming</button><button class="alt" id="mSur">Ellujäämine</button><br><small id="modeTxt"></small>
+<h1>⛏ Minecraft LAN Edition</h1>
+<small>1536×1536 world · 6 biomes (Plains, Forest, Birch Forest, Desert, Badlands, Snowy Taiga) · day/night cycle, lakes, mountains, caves (Iron, Gold and Diamond Ore), villages, Villagers, Iron Golems, farm animals, Furnaces and the Nether. WASD: move / steer boat / swim, Space: jump or swim up, underwater Space + W: swim forward and up, Shift: dive, Creative: double-tap Space to fly, while flying Space: up, Shift: down, left click: mine / attack, right click: place / use / open doors and chests, use Flint and Steel on an Obsidian frame to open a Nether Portal, E: inventory, T: chat, Esc: menu</small>
+<p><button id="play">▶ Play / Continue</button></p>
+<p><button id="settingsBtn" class="alt">⚙ Settings</button></p>
+<fieldset><legend>Game Mode</legend>
+<button id="mCre">Creative</button><button class="alt" id="mSur">Survival</button><br><small id="modeTxt"></small>
 </fieldset>
-<fieldset><legend>Nimi</legend><input id="nameMenu" maxlength="16" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;text-transform:none;color:#fff;font-size:24px"></fieldset>
+<fieldset><legend>Name</legend><input id="nameMenu" maxlength="16" autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;text-transform:none;color:#fff;font-size:24px"></fieldset>
 <fieldset><legend>Skin</legend><div id="skins"></div></fieldset>
-<fieldset id="netset"><legend>Mäng mitmele (internet vajalik)</legend>
-<button class="alt" id="hostBtn">Loo mäng</button> <input id="code" readonly placeholder="kood ilmub siia"><br>
-<small>Teine mängija sisestab selle koodi:</small><br>
-<input id="joinCode" maxlength="5" placeholder="KOOD"> <button class="alt" id="joinBtn">Liitu</button>
+<fieldset id="netset"><legend>Multiplayer (Internet Required)</legend>
+<button class="alt" id="hostBtn">Host Game</button> <input id="code" readonly placeholder="code appears here"><br>
+<small>The other player enters this code:</small><br>
+<input id="joinCode" maxlength="5" placeholder="CODE"> <button class="alt" id="joinBtn">Join</button>
 </fieldset>
-<small id="net">Võrk: pole ühendatud (üksi mäng)</small>
+<small id="net">Network: Not connected (singleplayer)</small>
 </div></div>
-<div id="settingsPanel" role="dialog" aria-modal="true" aria-label="Mängu seaded"><div class="settings-box">
-  <h2>⚙ Mängu seaded</h2>
-  <div class="setting-row"><label for="sensitivityRange">Hiire tundlikkus</label><span id="sensitivityValue" class="setting-value">0.0022</span><input id="sensitivityRange" type="range" min="0.0006" max="0.0060" step="0.0001" value="0.0022"></div>
-  <div class="setting-row"><label for="renderRange">Render distance</label><span id="renderValue" class="setting-value">112 plokki</span><input id="renderRange" type="range" min="48" max="240" step="16" value="112"></div>
+<div id="settingsPanel" role="dialog" aria-modal="true" aria-label="Game Settings"><div class="settings-box">
+  <h2>⚙ Game Settings</h2>
+  <div class="setting-row"><label for="sensitivityRange">Mouse Sensitivity</label><span id="sensitivityValue" class="setting-value">0.0022</span><input id="sensitivityRange" type="range" min="0.0006" max="0.0060" step="0.0001" value="0.0022"></div>
+  <div class="setting-row"><label for="renderRange">Render distance</label><span id="renderValue" class="setting-value">112 blocks</span><input id="renderRange" type="range" min="48" max="240" step="16" value="112"></div>
   <div class="setting-row"><label for="musicRange">Music Volume</label><span id="musicValue" class="setting-value">50%</span><input id="musicRange" type="range" min="0" max="100" step="1" value="50"></div>
-  <p style="margin:-6px 0 8px"><button id="musicMuteBtn" class="alt">🔊 Muusika: sees</button> <small id="musicNow"></small></p>
-  <p>Väiksem render distance ja madalam tundlikkus võivad muuta juhtimise ning mängu sujuvamaks aeglasemates kooliarvutites.</p>
-  <button id="settingsBack">Tagasi</button>
+  <p style="margin:-6px 0 8px"><button id="musicMuteBtn" class="alt">🔊 Music: ON</button> <small id="musicNow"></small></p>
+  <p>Lower render distance and mouse sensitivity can improve performance on slower computers.</p>
+  <button id="settingsBack">Back</button>
 </div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const W=1536,H=64,D=1536;
+const W=1536,H=80,D=1536;
 const BIOME_NAMES=["Tasandik","Mets","Kasemets","Kõrb","Savimaa","Lumine kuusemets"];
 const isTorchB=b=>b===42||(b>=51&&b<=54);              // 42 = põrandatõrvik, 51-54 = seinatõrvik (suund ploki ID-s, et LAN-is sünkroniseeruks)
 const TSUP={51:[-1,0],52:[1,0],53:[0,-1],54:[0,1]};      // suund tõrvikust toetava plokini
@@ -360,14 +360,14 @@ function gen(s){
     const j=(fJit(x,z)-.5)*.16;t+=j;m-=j*.8;
     biomeMap[c]=t<.28?5:t>.68?(m<.55?3:4):(m<.37?0:m<.64?1:2);
     const hot=sstep(.60,.72,t),desW=hot*(1-sstep(.48,.62,m)),badW=hot-desW;
-    let hf=10+(fBase(x,z)-.5)*9+(fHills(x,z)-.5)*5;
+    let hf=24+(fBase(x,z)-.5)*14+(fHills(x,z)-.5)*8;
     let mm=clamp01((fMask(x,z)-.57)/.17);
     if(mm>0){
       mm=mm*mm*(3-2*mm);
       mm*=clamp01((Math.hypot(x-W/2,z-D/2)-45)/55)*(1-desW*.8);
-      if(mm>0){const ridge=1-Math.abs(fRidge(x,z)*2-1);hf+=mm*(9+ridge*ridge*32+(fDetail(x,z)-.5)*6)}
+      if(mm>0){const ridge=1-Math.abs(fRidge(x,z)*2-1);hf+=mm*(12+ridge*ridge*44+(fDetail(x,z)-.5)*8)}
     }
-    if(desW>0)hf+=(11-hf)*.55*desW+(fDetail(x,z)-.5)*3.2*desW;              // laugjad düünid
+    if(desW>0)hf+=(25-hf)*.55*desW+(fDetail(x,z)-.5)*3.2*desW;              // laugjad düünid
     if(badW>0){const st=Math.floor(hf/5)*5+3;hf+=(st-hf)*.85*badW+badW*3}    // mesa-terrassid
     terrainTop[c]=Math.max(3,Math.min(H-6,Math.floor(hf)));
   }
@@ -376,21 +376,21 @@ function gen(s){
     const c=col(x,z),h=terrainTop[c],ck=Math.floor(z/CS)*NCX+Math.floor(x/CS);
     const hl=x>0?terrainTop[col(x-1,z)]:h,hr=x<W-1?terrainTop[col(x+1,z)]:h,hu=z>0?terrainTop[col(x,z-1)]:h,hd=z<D-1?terrainTop[col(x,z+1)]:h;
     const slope=Math.max(Math.abs(h-hl),Math.abs(h-hr),Math.abs(h-hu),Math.abs(h-hd));
-    const snowY=36+Math.floor(ihash(x>>2,z>>2,sd+5)*4);
+    const snowY=54+Math.floor(ihash(x>>2,z>>2,sd+5)*4);
     const bm=biomeMap[c];
     if(bm===3){for(let y=0;y<=h;y++){const d=h-y;w[idx(x,y,z)]=d<=2?5:d<=6?57:3}}
-    else if(bm===4){for(let y=0;y<=h;y++){const d=h-y;w[idx(x,y,z)]=(d===0&&slope<3&&h>6)?59:d<=16?BAND[y%BAND.length]:3}}
+    else if(bm===4){for(let y=0;y<=h;y++){const d=h-y;w[idx(x,y,z)]=(d===0&&slope<3&&h>20)?59:d<=16?BAND[y%BAND.length]:3}}
     else{
       let top,sub;
       if(h>=snowY){top=23;sub=3}
-      else if(h>=31||slope>=3){top=3;sub=3}
-      else if(h<=6){top=5;sub=2}
+      else if(h>=46||slope>=3){top=3;sub=3}
+      else if(h<=20){top=5;sub=2}
       else{top=bm===5?23:1;sub=2}
       for(let y=0;y<=h;y++)w[idx(x,y,z)]=y==h?top:(y>h-3?sub:3);
     }
     if(h>chunkMaxY[ck])chunkMaxY[ck]=h;
   }
-  const SEA=8;
+  const SEA=22;
   // Natural ponds: choose relatively even lowland, then carve a shallow bowl below the surrounding ground.
   const lakeRnd=(a,b)=>{const t=Math.sin(a*12.9898+b*78.233+s*3.1)*43758.5453;return t-Math.floor(t)};
   const lakeSpots=[];
@@ -413,13 +413,13 @@ function gen(s){
         const h=terrainTop[col(x,z)];minRim=Math.min(minRim,h);maxRim=Math.max(maxRim,h);sum+=h;samples++;
       }
       // Reject steep slopes and very low ground: water must sit visibly below an intact grassy bank.
-      if(minRim<6||maxRim-minRim>5)continue;
+      if(minRim<20||maxRim-minRim>5)continue;
       site={x:cx,z:cz,rx,rz,minRim,maxRim,avg:sum/samples};
     }
     if(!site)continue;
     lakeSpots.push(site);
     const {x:cx,z:cz,rx,rz}=site;
-    const waterY=Math.max(4,site.minRim-1);
+    const waterY=Math.max(18,site.minRim-1);
     const depth=2+Math.floor(lakeRnd(n+101,n+307)*2);
     for(let dx=-rx-1;dx<=rx+1;dx++)for(let dz=-rz-1;dz<=rz+1;dz++){
       const x=cx+dx,z=cz+dz;if(x<2||z<2||x>=W-2||z>=D-2)continue;
@@ -473,7 +473,7 @@ function gen(s){
     if(!(top===1||(bm===5&&top===23)))continue;
     let kind=bm===2?1:bm===5?2:0;
     if(bm===1&&hh(x*3+1,z*7+5)<.2)kind=1;                  // metsas on ka kaski
-    {                                                      // puud ei tohi olla teineteise sees ega liiga lähedal
+    {                                                      // puud ei tohi olla teineteise ON ega liiga lähedal
       if(!treeFree(x,z))continue;
       const need=kind===0?7:kind===1?9:11;let clear=y+need<H-2;
       for(let i=1;clear&&i<=need;i++)if(get(x,y+i,z)!==0)clear=false;
@@ -510,107 +510,271 @@ function gen(s){
       }
     }
   }
-  // --- Koopad: looklevad tunnelid + suuremad koopasaalid, osa tunneleid avaneb maapinnale ---
+  // ===== Koobaste süsteem v2: ühendatud koopavõrgustik (saalid + looklevad tunnelid + kuristikud + järved) =====
   const mb32=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
   const CR=mb32(sd*7919+13);
-  // Koopapiirkonnad: koopad on ainult ~30% maailmast (sujuv müra), ülejäänud kivi on terve ja sealt saab sügavale kaevata
-  const CT=.6,cm=(x,z)=>{const s=90,gx=x/s,gz=z/s,x0=Math.floor(gx),z0=Math.floor(gz),fx=gx-x0,fz=gz-z0,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),a=ihash(x0,z0,sd+501),b=ihash(x0+1,z0,sd+501),c=ihash(x0,z0+1,sd+501),d=ihash(x0+1,z0+1,sd+501);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v};
-  const carve=(cx,cy,cz,r,extra)=>{
-    const cmv=cm(cx,cz);if(cmv<CT)return;r*=Math.min(1,.55+(cmv-CT)*8);
-    const x0=Math.max(2,Math.floor(cx-r)),x1=Math.min(W-3,Math.ceil(cx+r)),z0=Math.max(2,Math.floor(cz-r)),z1=Math.min(D-3,Math.ceil(cz+r)),y0=Math.max(3,Math.floor(cy-r)),y1=Math.ceil(cy+r),r2=r*r;
-    for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){
-      const lim=Math.min(H-3,terrainTop[x*D+z]-extra);
-      for(let y=y0;y<=y1&&y<=lim;y++){
-        const dx=x+.5-cx,dy=(y+.5-cy)*1.2,dz=z+.5-cz;
-        if(dx*dx+dy*dy+dz*dz>r2)continue;
-        const k=idx(x,y,z),b=w[k];
-        if(!b||b==31||b==38||b==8||b==9||b==32||b==33||b==55||b==56||b==58||b==60||b==61)continue;
-        if(w[k+1]==31||w[k-1]==31||w[k+W]==31||w[k-W]==31||w[k+W*D]==31||w[k-W*D]==31)continue;   // ära ava järvi
-        w[k]=(y<=3&&ihash(x>>3,z>>3,sd+9)<.3)?38:0;     // päris põhjas väikesed laavalombid
-      }
-    }
+  const GRAVEL=230,WD=W*D,AREA=W*D/262144,ROOF=3;
+  // Koopapiirkonnad: sujuv müra, ~45% maailmast; ülejäänud kivi on terve
+  const CT=.5,cm=(x,z)=>{const s=90,gx=x/s,gz=z/s,x0=Math.floor(gx),z0=Math.floor(gz),fx=gx-x0,fz=gz-z0,u=fx*fx*(3-2*fx),v=fz*fz*(3-2*fz),a=ihash(x0,z0,sd+501),b=ihash(x0+1,z0,sd+501),c=ihash(x0,z0+1,sd+501),d=ihash(x0+1,z0+1,sd+501);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v};
+  // 3D väärtusmüra (perioodiline 32³ võre, seed'ist) – arvutatakse ainult kaevatavates kohtades
+  const TILE=new Float32Array(32768*3);{const NR=mb32(sd*48271+5);for(let i=0;i<TILE.length;i++)TILE[i]=NR()}
+  const nz3=(o,fx,fy,fz)=>{
+    const ix=Math.floor(fx),iy=Math.floor(fy),iz=Math.floor(fz);
+    let tx=fx-ix,ty=fy-iy,tz=fz-iz;tx=tx*tx*(3-2*tx);ty=ty*ty*(3-2*ty);tz=tz*tz*(3-2*tz);
+    const x0=ix&31,x1=(ix+1)&31,a=o+((iz&31)<<10)+((iy&31)<<5),b=o+((iz&31)<<10)+(((iy+1)&31)<<5),c=o+(((iz+1)&31)<<10)+((iy&31)<<5),d=o+(((iz+1)&31)<<10)+(((iy+1)&31)<<5),T=TILE;
+    const c00=T[a+x0]+(T[a+x1]-T[a+x0])*tx,c10=T[b+x0]+(T[b+x1]-T[b+x0])*tx,c01=T[c+x0]+(T[c+x1]-T[c+x0])*tx,c11=T[d+x0]+(T[d+x1]-T[d+x0])*tx;
+    const e0=c00+(c10-c00)*ty,e1=c01+(c11-c01)*ty;return e0+(e1-e0)*tz;
   };
-  // Lae paksus: koobas ei tohi kunagi jõuda pinnale lähemale kui MINROOF plokki (v.a. sissepääsud)
-  const MINROOF=6;
-  const lowTop=(x,z,r)=>{let m=1e9;const k=Math.max(2,Math.ceil(r));
-    for(const q of [[0,0],[k,0],[-k,0],[0,k],[0,-k],[k,k],[-k,-k],[k,-k],[-k,k]]){
-      const xx=Math.max(0,Math.min(W-1,(x+q[0])|0)),zz=Math.max(0,Math.min(D-1,(z+q[1])|0));
-      m=Math.min(m,terrainTop[xx*D+zz]);
-    }return m};
-  const worm=(x,y,z,yaw,pitch,len,baseR,entr,depth,n)=>{
-    const MOUTH=entr?26:0;
+  let carved=new Int32Array(1<<21),nCarved=0;
+  const pushC=k=>{if(nCarved===carved.length){const n=new Int32Array(carved.length*2);n.set(carved);carved=n}carved[nCarved++]=k};
+  const SKIP=new Uint8Array(256);[0,31,38,8,9,32,33,55,56,58,60,61].forEach(b=>SKIP[b]=1);
+  // Ühe ploki kaevamine: lagi paksus, ära ava järvi, ära riku puid
+  const cutCell=(x,y,z,roof)=>{
+    const top=terrainTop[x*D+z];
+    if(y>top-roof)return;
+    const k=idx(x,y,z);if(SKIP[w[k]])return;
+    if(w[idx(x,top,z)]===31)return;
+    if(roof<2&&y>=top-1&&w[idx(x,top+1,z)]!==0)return;
+    if(w[k+1]===31||w[k-1]===31||w[k+W]===31||w[k-W]===31||w[k+WD]===31||w[k-WD]===31)return;
+    w[k]=0;pushC(k);
+  };
+  // Müraga moonutatud ellipsoid (koopa põhielement)
+  const carveBlob=(cx,cy,cz,rx,ry,rz,roof,amp,nf)=>{
+    const ex=rx*(1+amp)+1,ey=ry*(1+amp)+1,ez=rz*(1+amp)+1;
+    const x0=Math.max(2,Math.floor(cx-ex)),x1=Math.min(W-3,Math.ceil(cx+ex)),z0=Math.max(2,Math.floor(cz-ez)),z1=Math.min(D-3,Math.ceil(cz+ez)),y0=Math.max(2,Math.floor(cy-ey)),y1=Math.min(H-3,Math.ceil(cy+ey));
+    const lo=(1-amp)*(1-amp),hi=(1+amp)*(1+amp);
+    for(let x=x0;x<=x1;x++){const dx=(x+.5-cx)/rx;for(let z=z0;z<=z1;z++){const dz=(z+.5-cz)/rz,dd=dx*dx+dz*dz;if(dd>hi)continue;
+      for(let y=y0;y<=y1;y++){
+        const dy=(y+.5-cy)/ry,d=dd+dy*dy;if(d>hi)continue;
+        if(d>lo){const n=nz3(0,x*nf,y*nf*1.35,z*nf),th=1+amp*(n*2-1);if(d>th*th)continue}
+        cutCell(x,y,z,roof);
+      }}}
+  };
+  const nodes=new Map(),chambers=[],puddles=[];
+  const addNode=(x,y,z,r)=>{const key=(x>>5)*100+(z>>5);let a=nodes.get(key);if(!a)nodes.set(key,a=[]);a.push({x,y,z,r})};
+  const nodeNear=(x,y,z,rng,minD)=>{const out=[];for(let gx=((x-rng)>>5);gx<=((x+rng)>>5);gx++)for(let gz=((z-rng)>>5);gz<=((z+rng)>>5);gz++){const a=nodes.get(gx*100+gz);if(a)for(const n of a){const d=Math.hypot(n.x-x,n.z-z);if(d<=rng&&d>=minD)out.push(n)}}return out};
+  const lowTop=(x,z,r)=>{let m=1e9;const k=Math.max(2,Math.ceil(r));for(const q of [[0,0],[k,0],[-k,0],[0,k],[0,-k]]){const xx=Math.max(0,Math.min(W-1,(x+q[0])|0)),zz=Math.max(0,Math.min(D-1,(z+q[1])|0));const t=terrainTop[xx*D+zz];if(t<m)m=t}return m};
+  // Koopasaal: 4-9 kattuvat moonutatud blobi, sügavus lae all
+  const chamber=(cx,cy,cz,R,Hh,mega)=>{
+    const nb=mega?8+((CR()*5)|0):4+((CR()*5)|0);
+    for(let b=0;b<nb;b++){
+      const bx=cx+(CR()-.5)*R*1.5,bz=cz+(CR()-.5)*R*1.5,rx=R*(.5+CR()*.5),rz=R*(.5+CR()*.5),ry=Hh*(.55+CR()*.45);
+      let by=cy+(CR()-.5)*Hh*.5;
+      by=Math.min(by,lowTop(bx,bz,Math.max(rx,rz))-ROOF-ry*.85);if(by-ry<2.5)by=ry+2.5;
+      carveBlob(bx,by,bz,rx,ry,rz,ROOF,.4,.22);
+    }
+    addNode(cx,cy,cz,R);return {x:cx,y:cy,z:cz,R,Hh,mega};
+  };
+  // Looklev tunnel: sujuv pööre, siht-sõlm (ühendab koopad), hargnemine, kitsad/laiad lõigud
+  const worm=(x,y,z,yaw,pitch,len,r0,o)=>{
+    const ph1=CR()*6.28,ph2=CR()*6.28,ph3=CR()*6.28,fv=.8+CR()*.6,vy=o.vy||1;let steer=0,reached=false;
     for(let i=0;i<len;i++){
-      x+=Math.cos(yaw)*Math.cos(pitch);z+=Math.sin(yaw)*Math.cos(pitch);y+=Math.sin(pitch);
-      yaw+=(CR()-.5)*.55;
-      if(i<MOUTH)pitch=-.5+(CR()-.5)*.12;            // sissepääs laskub järsult maa alla, mitte ei jookse pinna all
-      else pitch=pitch*.88+(CR()-.5)*.32;
-      if(x<6||z<6||x>W-7||z>D-7)return;
-      const r=baseR*(.8+.3*Math.sin(i*.17+n)+.15*Math.sin(i*.05+n*3));
-      if(y<5.5){y=5.5;pitch=Math.abs(pitch)*.5}
-      if(i>=MOUTH){
-        const maxY=lowTop(x,z,r+2)-MINROOF-r*.85;
-        if(y>maxY){y=maxY;pitch=-Math.abs(pitch)*.6}
-        if(y<5.5){y=5.5;pitch=Math.abs(pitch)*.5}
+      yaw+=.1*Math.sin(i*.043*fv+ph1)+.07*Math.sin(i*.019+ph2)+(CR()-.5)*.07;
+      pitch+=.035*Math.sin(i*.05+ph3)+(CR()-.5)*.05-pitch*.07;
+      if(o.tgt&&i>=o.mouth){
+        const dx=o.tgt.x-x,dz=o.tgt.z-z,dy=o.tgt.y-y,dh=Math.hypot(dx,dz);
+        if(dh+Math.abs(dy)<3){reached=true;break}
+        steer=Math.min(1,steer+.025);
+        let da=Math.atan2(dz,dx)-yaw;while(da>Math.PI)da-=6.2832;while(da<-Math.PI)da+=6.2832;
+        yaw+=Math.max(-.15,Math.min(.15,da*.3))*steer;
+        const dp=Math.atan2(dy,dh+1e-3)-pitch;pitch+=Math.max(-.08,Math.min(.08,dp*.25))*steer;
       }
-      carve(x,y,z,r,i<MOUTH?0:MINROOF);
-      if(i>=MOUTH&&i%45===44&&CR()<.5){               // suurem koopasaal, keskpunkt vajutatud nii, et lagi jääb paksuks
-        const rr=3.4+CR()*2.8,cy=Math.min(y,lowTop(x,z,rr+2)-MINROOF-rr*.85);
-        if(cy>6)carve(x,cy,z,rr,MINROOF);
+      if(i<o.mouth)pitch=-.42+(CR()-.5)*.08;
+      pitch=Math.max(-.55,Math.min(.55,pitch));
+      const cp=Math.cos(pitch);x+=Math.cos(yaw)*cp;z+=Math.sin(yaw)*cp;y+=Math.sin(pitch);
+      if(x<8||z<8||x>W-9||z>D-9)return;
+      const r=Math.max(.85,r0*(.78+.3*Math.sin(i*.09+ph1)+.18*Math.sin(i*.031+ph3))),rv=r*vy,inMouth=i<o.mouth;
+      if(!inMouth){
+        const maxY=lowTop(x,z,r+1)-ROOF-rv*.85;
+        if(maxY<3+rv)return;                       // maapind liiga madal – tunnel lõppeb
+        if(y>maxY){y=maxY;pitch=-Math.abs(pitch)*.5-.04}
+        if(y<2.5+rv){y=2.5+rv;pitch=Math.abs(pitch)*.5+.04}
       }
-      if(depth<2&&i>=MOUTH+10&&i%30===29&&CR()<.4){    // harunevad tunnelid
-        worm(x,y,z,yaw+(CR()<.5?1:-1)*(.9+CR()*.9),(CR()-.5)*.4,35+CR()*70,baseR*(.65+CR()*.3),false,depth+1,n+7);
+      carveBlob(x,y,z,r,rv,r,inMouth?0:ROOF,.33,.28);
+      if(i%12===6){addNode(x,y,z,r);if(!inMouth&&CR()<.1)puddles.push({x:x|0,y:y|0,z:z|0})}
+      if(!inMouth&&o.depth<2&&i>12&&CR()<.016){
+        const cand=nodeNear(x,y,z,110,28),tg=cand.length&&CR()<.55?cand[(CR()*cand.length)|0]:null;
+        worm(x,y,z,yaw+(CR()<.5?-1:1)*(.6+CR()*.8),pitch*.5,45+CR()*120,r*(.7+CR()*.25),{tgt:tg,mouth:0,depth:o.depth+1,vy});
       }
+      if(!inMouth&&o.depth===0&&i>20&&CR()<.004){                      // vahepealne koopasaal tunneli ääres
+        const R=3.5+CR()*3,Hh=2.6+CR()*1.8,cy=Math.min(y,lowTop(x,z,R)-ROOF-Hh*.85);
+        if(cy>3+Hh)chambers.push(chamber(x,cy,z,R,Hh,false));
+      }
+    }
+    if(!reached&&o.depth<2&&len>60&&CR()<.55){                          // ummiktunnel lõpeb väikese kambriga
+      const R=3+CR()*3.2,Hh=2.4+CR()*1.6,cy=Math.min(y,lowTop(x,z,R)-ROOF-Hh*.85);
+      if(cy>3+Hh&&x>14&&z>14&&x<W-14&&z<D-14)chambers.push(chamber(x,cy,z,R,Hh,false));
     }
   };
-  for(let n=0,NW=Math.round(480*W*D/262144);n<NW;n++){
-    const entr=n%7===0;
-    let x=8+CR()*(W-16),z=8+CR()*(D-16);
-    const top0=terrainTop[(x|0)*D+(z|0)];
-    if(top0<9||w[idx(x|0,top0,z|0)]==31||cm(x,z)<CT)continue;
-    let y=entr?top0-1:4+CR()*Math.max(2,top0-MINROOF-4);
-    const yaw=CR()*6.2832,pitch=entr?-.5:(CR()-.5)*.5;
-    const len=entr?100+CR()*90:110+CR()*190,baseR=1.25+CR()*1.35;
-    worm(x,y,z,yaw,pitch,len,baseR,entr,0,n);
+  // Maa-alune kuristik: kitsas, väga kõrge lõhe
+  const ravine=()=>{
+    let x=20+CR()*(W-40),z=20+CR()*(D-40);
+    if(cm(x,z)<CT||terrainTop[(x|0)*D+(z|0)]<26)return;
+    let yaw=CR()*6.2832;const len=90+CR()*150,ph1=CR()*6.28,ph2=CR()*6.28,ph3=CR()*6.28,hw0=1.3+CR()*1.5,ht0=14+CR()*24,open=CR()<.2;let yb=3+CR()*2;
+    for(let i=0;i<len;i++){
+      yaw+=.045*Math.sin(i*.03+ph1)+(CR()-.5)*.05;x+=Math.cos(yaw);z+=Math.sin(yaw);
+      if(x<10||z<10||x>W-11||z>D-11)return;
+      const ti=terrainTop[(x|0)*D+(z|0)];if(ti<16){if(i>25)break;continue}
+      yb=Math.max(3,Math.min(6,yb+(CR()-.5)*.3));
+      const yt=Math.min(yb+ht0*(.75+.25*Math.sin(i*.05+ph2)),open?ti:ti-ROOF-1),hw=hw0*(.78+.3*Math.sin(i*.1+ph3));
+      for(let yy=yb;yy<yt;yy+=1.8){const t=(yy-yb)/Math.max(1,yt-yb),wd=Math.max(.9,hw*(1-.55*t*t));carveBlob(x,yy,z,wd,1.6,wd,open?0:ROOF,.3,.3)}
+      if(i%14===7)addNode(x,yb+3,z,hw);
+    }
+  };
+  // 1) koopasaalid (osa väga suured)
+  for(let n=0,NC=Math.round(42*AREA);n<NC;n++){
+    const x=14+CR()*(W-28),z=14+CR()*(D-28);if(cm(x,z)<CT)continue;
+    const ti=lowTop(x,z,8),mega=ti>=34&&CR()<.16,R=mega?13+CR()*9:4+CR()*5,Hh=mega?7+CR()*4:3+CR()*2.2;
+    const maxY=ti-ROOF-Hh*.85,minY=3+Hh*.9;if(maxY<minY)continue;
+    chambers.push(chamber(x,minY+CR()*(maxY-minY),z,R,Hh,mega));
   }
-  // Suured maa-alused koopad (mitu kattuvat palli), alati sügaval ja paksu laega
-  for(let n=0,NC=Math.round(22*W*D/262144);n<NC;n++){
-    const x=14+CR()*(W-28),z=14+CR()*(D-28),top0=lowTop(x,z,10);
-    if(top0<26||cm(x,z)<CT)continue;
-    const R0=4.5+CR()*3,cy0=9+CR()*Math.max(1,top0-MINROOF-R0-12);
-    const blobs=5+((CR()*4)|0);
-    for(let b=0;b<blobs;b++){
-      const bx=x+(CR()-.5)*R0*2.2,bz=z+(CR()-.5)*R0*2.2,rr=R0*(.55+CR()*.45);
-      let by=cy0+(CR()-.5)*R0*.5;
-      by=Math.min(by,lowTop(bx,bz,rr+2)-MINROOF-rr*.85);
-      if(by<7)continue;
-      carve(bx,by,bz,rr,MINROOF);
+  const baseChambers=chambers.slice();
+  // 2) tunnelid: iga saal ühendub 2-4 teise saaliga, lisaks vabad looklevad tunnelid ja sissepääsud pinnalt
+  for(const c of baseChambers){
+    const others=baseChambers.filter(o=>o!==c&&Math.hypot(o.x-c.x,o.z-c.z)<230).sort((a,b)=>Math.hypot(a.x-c.x,a.z-c.z)-Math.hypot(b.x-c.x,b.z-c.z)).slice(0,5);
+    const nT=others.length?2+((CR()*3)|0):1;
+    for(let t=0;t<nT;t++){
+      const tg=others.length?others[(CR()*others.length)|0]:null,ty=CR(),kind=ty<.7?0:ty<.9?1:2;
+      const r0=kind===0?1.6+CR()*.9:kind===1?.9+CR()*.4:3+CR()*1.2,vy=kind===1?1.35:kind===2?.8:.9+CR()*.4;
+      const yaw=tg?Math.atan2(tg.z-c.z,tg.x-c.x)+(CR()-.5)*1.2:CR()*6.2832,len=tg?Math.min(340,Math.hypot(tg.x-c.x,tg.z-c.z)*1.7+40):120+CR()*200;
+      worm(c.x+Math.cos(yaw)*c.R*.5,c.y-c.Hh*.3,c.z+Math.sin(yaw)*c.R*.5,yaw,(CR()-.5)*.2,len,r0,{tgt:tg,mouth:0,depth:0,vy});
+    }
+    if(CR()<.3){                                               // sissepääs maapinnalt
+      const a=CR()*6.2832,dd=40+CR()*80,sx=(c.x+Math.cos(a)*dd)|0,sz=(c.z+Math.sin(a)*dd)|0;
+      if(sx>14&&sz>14&&sx<W-14&&sz<D-14){const ti=terrainTop[sx*D+sz];
+        if(ti>=18&&w[idx(sx,ti,sz)]!==31&&cm(sx,sz)>=CT)worm(sx,ti-1,sz,Math.atan2(c.z-sz,c.x-sx)+(CR()-.5),-.42,dd*1.7+60,1.7+CR()*.9,{tgt:c,mouth:24+((CR()*14)|0),depth:0,vy:1});}
     }
   }
-  // --- Maagid: kivisüsi, raud, kuld, teemant (veenidena, ainult kivi sees) ---
+  for(let n=0,NF=Math.round(80*AREA);n<NF;n++){               // vabad pikad tunnelid olemasolevatest sõlmedest (loovad ristmikke)
+    const x=14+CR()*(W-28),z=14+CR()*(D-28),c=nodeNear(x,0,z,90,0);if(!c.length)continue;
+    const s=c[(CR()*c.length)|0],tg=nodeNear(s.x,0,s.z,200,40);
+    worm(s.x,s.y,s.z,CR()*6.2832,(CR()-.5)*.3,110+CR()*200,1.3+CR()*1.2,{tgt:tg.length&&CR()<.5?tg[(CR()*tg.length)|0]:null,mouth:0,depth:0,vy:.9+CR()*.4});
+  }
+  for(let n=0,NR2=Math.round(7*AREA);n<NR2;n++)ravine();
+  // 3) koristus: hõljuvad/üksikud plokid ära
+  const NATURAL=b=>b!==0&&b!==31&&b!==38&&!SKIP[b];
+  for(let i=0;i<nCarved;i++){                                    // ahelreaktsioon: eemaldatud plokk kontrollib ka oma naabreid
+    const k=carved[i];
+    for(let f=0;f<6;f++){
+      const nk=k+(f===0?1:f===1?-1:f===2?W:f===3?-W:f===4?WD:-WD),b=w[nk];
+      if(!NATURAL(b))continue;
+      let air=0;if(w[nk+1]===0)air++;if(w[nk-1]===0)air++;if(w[nk+W]===0)air++;if(w[nk-W]===0)air++;if(w[nk+WD]===0)air++;if(w[nk-WD]===0)air++;
+      if(air>=5){w[nk]=0;pushC(nk)}
+    }
+  }
+  // 3b) väikesed suletud õhutaskud (augud seintes) täidetakse kiviga
+  {
+    const bits=new Uint8Array((w.length>>3)+1),tst=k=>bits[k>>3]&(1<<(k&7)),set=k=>{bits[k>>3]|=1<<(k&7)};
+    for(let i=0;i<nCarved;i++){
+      const k0=carved[i];if(w[k0]!==0||tst(k0))continue;
+      const q=[k0];set(k0);let h=0,bad=false,big=false;
+      while(h<q.length&&q.length<48){
+        const k=q[h++];
+        for(let f=0;f<6;f++){const nk=k+(f===0?1:f===1?-1:f===2?W:f===3?-W:f===4?WD:-WD),b=w[nk];
+          if(b===0){if(tst(nk))big=true;else{set(nk);q.push(nk)}}else if(b===31||b===38)bad=true}
+      }
+      if(q.length<48&&!bad&&!big)for(const k of q)w[k]=3;
+    }
+  }
+  // 3c) kitsad püstised praod (1 ploki laiused, 4+ kõrged) täidetakse kiviga, need nägid välja nagu mustad jooned seintes
+  for(let i=0;i<nCarved;i++){
+    const k0=carved[i];if(w[k0]!==0)continue;
+    for(let ax=0;ax<2;ax++){
+      const a=ax?W:1;
+      const side=k=>{const p=w[k+a],q=w[k-a];return p!==0&&q!==0&&p!==31&&q!==31&&p!==38&&q!==38};
+      if(!side(k0))continue;
+      let run=0,k=k0;while(run<8&&w[k]===0&&side(k)){run++;k+=WD}
+      let kb=k0-WD;while(run<16&&w[kb]===0&&side(kb)){run++;kb-=WD}
+      if(run>=4){for(let q=kb+WD;q<k;q+=WD)w[q]=3;break}
+    }
+  }
+  // 3d) vaiksed 1 ploki kõrgused horisontaalsed praod (lae/põranda "riiulid") täidetakse – need nägid välja nagu mustad triibud seintel
+  for(let pass=0;pass<2;pass++)for(let i=0;i<nCarved;i++){
+    const k=carved[i];if(w[k]!==0)continue;
+    const up=w[k+WD],dn=w[k-WD];
+    if(up!==0&&dn!==0&&up!==31&&dn!==31&&up!==38&&dn!==38)w[k]=3;
+  }
+  // 4) kivimoodustised, kruus, muld, maagid
+  for(let i=0;i<nCarved;i++){
+    const k=carved[i];if(w[k]!==0)continue;
+    const below=w[k-WD],above=w[k+WD];
+    const x=k%W,z=((k/W)|0)%D,y=(k/WD)|0;
+    if(below===3){
+      const g=nz3(32768,x*.11,y*.11,z*.11);
+      if(g>.72){w[k-WD]=GRAVEL;continue}
+      if(g<.2&&nz3(65536,x*.2,y*.2,z*.2)<.4){w[k-WD]=2;continue}
+    }
+    const r=CR();
+    if(r<.014&&below===3&&w[k+1]===0&&w[k-1]===0&&w[k+W]===0&&w[k-W]===0){               // stalagmiit
+      const h=1+((CR()*3)|0);let ok=true;for(let j=0;j<=h;j++)if(w[k+j*WD]!==0){ok=false;break}
+      if(ok&&w[k+(h+1)*WD]===0)for(let j=0;j<h;j++)w[k+j*WD]=3;
+    }else if(r<.026&&NATURAL(above)&&w[k+1]===0&&w[k-1]===0&&w[k+W]===0&&w[k-W]===0){      // stalaktiit
+      const h=1+((CR()*3)|0);let ok=true;for(let j=0;j<=h;j++)if(w[k-j*WD]!==0){ok=false;break}
+      if(ok&&w[k-(h+1)*WD]===0)for(let j=0;j<h;j++)w[k-j*WD]=3;
+    }else if(r<.0295&&below===3){                                                        // sammas põrandast laeni (ainult avaral alal)
+      let j=1;while(j<10&&w[k+j*WD]===0)j++;
+      if(j>=3&&j<=9&&NATURAL(w[k+j*WD])){let open=true;for(let m=1;m<j&&open;m++){const q=k+m*WD;if(w[q+1]||w[q-1]||w[q+W]||w[q-W]||w[q+1+W]||w[q-1+W]||w[q+1-W]||w[q-1-W])open=false}
+        if(open)for(let m=0;m<j;m++)w[k+m*WD]=3}
+    }
+    if(CR()<.02){                                                                         // paljandunud maak seinas
+      const dirs=[1,-1,W,-W,WD,-WD],nk=k+dirs[(CR()*6)|0];
+      if(w[nk]===3){const q=CR();w[nk]=q<.5?34:q<.75&&y<=56?44:q<.82&&y<=24?45:q<.85&&y<=13?46:34}
+    }
+  }
+  // 5) maa-alused veekogud (väikesed loigud ja suured järved) + laavalombid sügaval – ujutame ainult suletud nõgusid
+  const fillBasin=(k0,L,cap,id)=>{
+    const seen=new Set([k0]),q=[k0];let h=0;
+    while(h<q.length){
+      if(q.length>cap)return false;
+      const k=q[h++],y=(k/WD)|0,rem=k-y*WD,z=(rem/W)|0,x=rem-z*W;
+      if(terrainTop[x*D+z]-y<4)return false;
+      const ns=[k+1,k-1,k+W,k-W,k-WD];if(y+1<=L)ns.push(k+WD);
+      for(const nk of ns){const b=w[nk];if(b===31||b===38)return false;if(b===0&&!seen.has(nk)){seen.add(nk);q.push(nk)}}
+    }
+    for(const k of q){w[k]=id;if(id===31)waterLevels[k]=8}
+    return true;
+  };
+  const floorOf=(x,y,z)=>{x|=0;z|=0;y|=0;if(!inb(x,y,z)||w[idx(x,y,z)]!==0)return -1;while(y>2&&w[idx(x,y-1,z)]===0)y--;return y>2&&w[idx(x,y-1,z)]!==0?y:-1};
+  const tryFill=(x,z,fy,lvlMin,lvlMax,cap,id)=>{
+    for(let L=fy+lvlMax;L>=fy+lvlMin;L--)if(fillBasin(idx(x|0,fy,z|0),L,cap,id))return true;
+    return false;
+  };
+  for(const c of chambers){
+    const fy=floorOf(c.x,c.y,c.z);if(fy<0)continue;
+    const r=CR();
+    if(fy<=8&&r<.55)tryFill(c.x,c.z,fy,0,1,400,38);                               // laavalomp sügaval
+    else if(c.mega&&r<.9)tryFill(c.x,c.z,fy,1,5,18000,31);                         // suur maa-alune järv
+    else if(r<.4)tryFill(c.x,c.z,fy,0,2,2500,31);                                  // väiksem tiik
+  }
+  for(const p of puddles){const fy=floorOf(p.x,p.y,p.z);if(fy>=0)tryFill(p.x,p.z,fy,0,0,160,31)}  // väikesed veeloigud tunnelites
+
+  // --- Maagid: kivisüsi, raud, kuld, teemant (veenidena, ainult kivi ON) ---
   const OR=mb32(sd*104729+99);
-  const vein=(id,n,ymin,ymax,size)=>{
+  // Igal maagil oma kõrgus (y) nagu Minecraftis: kivisüsi kõikjal, raud keskmisel, kuld madalal, teemant kõige sügavamal
+  const vein=(id,n,ymin,ymax,size,mode)=>{
     for(let i=0;i<n;i++){
       let x=(2+OR()*(W-4))|0,z=(2+OR()*(D-4))|0;
       const top=terrainTop[x*D+z],hi=Math.min(ymax,top-3);
       if(hi<ymin)continue;
-      let y=ymin+((OR()*(hi-ymin+1))|0);
+      const r=mode===1?(OR()+OR())/2:mode===2?Math.min(OR(),OR()):OR();   // 1 = tipp keskel, 2 = kallutatud madalale
+      let y=ymin+((r*(hi-ymin+1))|0);
       for(let q=0;q<size;q++){
         if(x>1&&z>1&&x<W-2&&z<D-2&&y>=1&&y<H){const k=idx(x,y,z);if(w[k]==3)w[k]=id}
         const a=(OR()*3)|0,sg=OR()<.5?-1:1;if(a==0)x+=sg;else if(a==1)y+=sg;else z+=sg;
       }
     }
   };
-  vein(34,Math.round(6144*W*D/262144),1,60,5);   // kivisüsi
-  vein(44,Math.round(5120*W*D/262144),1,50,4);   // raud
-  vein(45,Math.round(1536*W*D/262144),1,26,4);   // kuld (sügavamal)
-  vein(46,Math.round(820*W*D/262144),1,14,3);    // teemant (kõige sügavamal)
-  // Smaragdimaak: üksikud plokid, mis paljastuvad koobastes (kivi kõrval õhk)
+  vein(34,Math.round(7000*W*D/262144),4,76,6,0);    // kivisüsi: y 4-76, igal pool
+  vein(44,Math.round(5200*W*D/262144),4,56,4,1);    // raud: y 4-56, tipp ~30
+  vein(45,Math.round(1500*W*D/262144),3,24,4,1);    // kuld: y 3-24, tipp ~13
+  vein(46,Math.round(900*W*D/262144),2,13,3,2);     // teemant: y 2-13, enamasti kõige põhjas
+  // Emeraldimaak: üksikud plokid, mis paljastuvad koobastes (kivi kõrval õhk)
   {
     const ER=mb32(sd*7919+1234);
     let placed=0;const target=Math.round(110*W*D/262144);
     for(let n=0;n<400000&&placed<target;n++){
-      const x=(2+ER()*(W-4))|0,z=(2+ER()*(D-4))|0,y=(6+ER()*40)|0;
-      if(y>=terrainTop[x*D+z]-3)continue;
+      const x=(2+ER()*(W-4))|0,z=(2+ER()*(D-4))|0,y=(30+ER()*42)|0;
+      if(terrainTop[x*D+z]<48||y>=terrainTop[x*D+z]-3)continue;   // smaragd ainult mägedes, y 30+
       const k=idx(x,y,z);if(w[k]!==3)continue;
       if(!(w[k+1]===0||w[k-1]===0||w[k+W]===0||w[k-W]===0||w[k+W*D]===0||w[k-W*D]===0))continue;
       w[k]=68;placed++;
@@ -1044,7 +1208,7 @@ let renderScale=Math.min(window.devicePixelRatio||1,.9);rd.setPixelRatio(renderS
 addEventListener("resize",()=>{rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();handCam.aspect=cam.aspect;handCam.updateProjectionMatrix()});
 
 const sunGeo = new THREE.PlaneGeometry(66, 66);
-const sunMat = new THREE.MeshBasicMaterial({color: 0xfff4b8,fog:false,side:THREE.DoubleSide});
+const sunMat = new THREE.MeshBasicMaterial({color: 0xfff9ef,fog:false,side:THREE.DoubleSide});
 const sunMesh = new THREE.Mesh(sunGeo, sunMat);
 sunMesh.position.set(W*.5+55, 90, D*.5-95);
 scene.add(sunMesh);
@@ -1101,13 +1265,13 @@ function updateDayCycle(dt){
   worldMat.color.setRGB(.36+.50*light,.40+.47*light,.54+.32*light);
 }
 
-const TS=32,NT=93,tiles=[];
+const TS=32,NT=94,tiles=[];
 const NB=[
-  ["Kuldplokk",[246,208,60],"m"],["Rauaplokk",[216,216,220],"m"],["Teemantplokk",[93,236,245],"m"],["Smaragdiplokk",[60,210,100],"m"],
+  ["Kuldplokk",[246,208,60],"m"],["Rauaplokk",[216,216,220],"m"],["Teemantplokk",[93,236,245],"m"],["Emeraldiplokk",[60,210,100],"m"],
   ["Obsidiaan",[24,16,40],"o"],["Valge vill",[235,235,235],"w"],["Punane vill",[176,46,38],"w"],["Sinine vill",[50,70,170],"w"],
   ["Roheline vill",[84,110,28],"w"],["Kollane vill",[250,200,40],"w"],["Must vill",[28,28,32],"w"],["Lumi",[248,252,252],"n"],
   ["Jää",[150,190,240],"n"],["Kivitellis",[122,122,124],"b"],["Savitellis",[200,110,60],"n"],["Kvarts",[236,230,224],"n"],
-  ["Netherrack",[110,40,40],"n"],["Hõõgkivi",[250,210,120],"g"],["Töölaud",[160,110,60],"b"]
+  ["Netherrack",[110,40,40],"n"],["Hõõgkivi",[250,210,120],"g"],["Crafting Table",[160,110,60],"b"]
 ];
 NB.forEach((b,i)=>{NAMES[12+i]=b[0];COL[12+i]=b[1].map(v=>v/255)});
 const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
@@ -1166,7 +1330,7 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
     const HX=h=>[(h>>16)&255,(h>>8)&255,h&255];
     const band=(arr,t)=>HX(arr[Math.max(0,Math.min(arr.length-1,Math.floor(t*arr.length)))]);
     const tt=(x,y,j)=>Math.max(0,Math.min(.999,(nz(x,y)-.2)*1.45+(rnd()-.5)*(j||.35)));
-    const GRASS=[0x2f5f22,0x37692a,0x3f742c,0x477e32,0x4f8837,0x58923d];
+    const GRASS=[0x3a542e,0x405d32,0x476636,0x4e6f3b,0x56783f,0x5e8145]; // rahulikum, vähem küllastunud rohupalet
     const DIRT=[0x593d29,0x664631,0x73503a,0x7f5a40,0x8c654a,0x6a4a35];
     const STONE=[0x666666,0x707070,0x7a7a7a,0x858585,0x8f8f8f];
     const SAND=[0xd0c68e,0xd8cf9b,0xdfd6a6,0xe4dcb2,0xd5cb95];
@@ -1255,11 +1419,11 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
       }
       tiles[65]=mk((x,y)=>{const c=px[y>>1][x>>1];if(!c)return[0,0,0,0];const r=HXs(c);return[r[0],r[1],r[2],255]});
     }
-    tiles[66]=flower([ "................",".....rrrrr......","....rRRRRRr.....","....rRRkRRr.....","....rRRRRRr.....",".....rRRRr......","......rrr......."],{r:0x8e1616,R:0xd42a26,k:0x2a0a0a});
-    tiles[67]=flower([ "................","................","......yyy.......",".....yYYYy......",".....yYhYy......","......yyy.......","................"],{y:0xc99a08,Y:0xf6cf1a,h:0xffee74});
-    tiles[68]=flower([ "................",".....w.w.w......","......www.......",".....wwyww......","......www.......",".....w.w.w......","................"],{w:0xf2f2ea,y:0xe8b816});
-    tiles[69]=flower([ "................","................","......b.b.......",".....bBbBb......","......BBB.......",".....bBbBb......","......b.b......."],{b:0x3b52b8,B:0x5f7be6});
-    tiles[70]=flower([ "................",".....p.p.p......",".....pPpPp......",".....pPPPp......","......pPp.......","................","................"],{p:0xc2478a,P:0xf07cb8});
+    tiles[66]=spr(["................","................","......rrrr......","....rRRRRRRr....","...rRLRRRRLRr...","...RRRRkkRRRR...","...rRRRkkRRRr...","....rRLRRRRr....",".....rRRRRr.....",".......g........","....G..g........",".....GGg........",".......g..G.....",".......gGGG.....",".......g........",".......g........"],{r:0x8e1616,R:0xd42a26,L:0xe8453f,k:0x241010,g:0x2f7a28,G:0x4b9433});
+    tiles[67]=spr(["................","................","................","......yYYy......",".....yYhYYy.....",".....YYYhYY.....","......yYYy......",".......yy.......",".......g........","....G..g........",".....GGg........",".......g..G.....",".......gGGG.....",".......g........",".......g........",".......g........"],{y:0xc99a08,Y:0xf6cf1a,h:0xffee74,g:0x2f7a28,G:0x4b9433});
+    tiles[68]=spr(["................","................",".....w..w.w.....","......wwww......",".....wwyyww.....","....wwyYYyww....",".....wwyyww.....","......wwww......",".....w..w.w.....",".......g........","....G..g........",".....GGg........",".......g..G.....",".......gGGG.....",".......g........",".......g........"],{w:0xf2f2ea,y:0xe8b816,Y:0xf6cf1a,g:0x2f7a28,G:0x4b9433});
+    tiles[69]=spr(["................","................","......b..b......",".....bBbbBb.....","......BBBB......",".....bBbbBb.....","......b..b......",".......g........",".......g........","....G..g........",".....GGg........",".......g..G.....",".......gGGG.....",".......g........",".......g........",".......g........"],{b:0x3b52b8,B:0x5f7be6,g:0x2f7a28,G:0x4b9433});
+    tiles[70]=spr(["................","................",".....pP..Pp.....",".....pPPPPp.....",".....pPPPPp.....","......PPPP......","......pPPp......",".......g........",".......g........","...GG..g..GG....","....GGGgGGG.....",".....GGgGG......",".......g........",".......g........",".......g........",".......g........"],{p:0xc2478a,P:0xf07cb8,g:0x2f7a28,G:0x4b9433});
 
     {const G=plankGrid(PLANK_PAL.oak,1);
      {const pc=document.createElement("canvas");pc.width=pc.height=TS;const pg=pc.getContext("2d"),pim=pg.createImageData(TS,TS);
@@ -1381,6 +1545,11 @@ const atlas=document.createElement("canvas");atlas.width=TS*NT;atlas.height=TS;
       return stone(x,y,ST2);
     });
   }
+  /* Kruus (230): 16x16 tekstuur otse kasutaja pildilt */
+  {const c=document.createElement("canvas");c.width=c.height=TS;const g=c.getContext("2d"),im=g.createImageData(TS,TS);
+   const GD="4d4441857e7d9b9495695e5d5b59589ea19f777a799c9f9c605c5b828080636161797577777876a3a5a67f7e7f5e595a9c9d9e7c7a7d7f7d7d655e5a7f7a777a7877847b79695f5e7c7b7a685c5e4d44457d7b7a877e7d847e7a85827da1a29f797b7c7a7b79665e5a4a42418e8582635b5a8a7d79877e7c9f9f9e7c7a7d7c7876857b7ca19f9e665f5b827e7c9fa2a27d7b7c7c7d7a878080807d80877d7c7f7b77655e5ba3a4a47a7a7c7d7d7fa3a1a4695e5d7f7d7a887e7f7c7a797c7b7d685f5b847d7a7f7879c5b5b79f9693665c5a665c5a7c7b7c7a7a7c7d7d7f615c5e4d48447a7a799c9d9c8482807d7b7d5045457c7a7c655c5a9e96964f4444685f5b87807c85807c9f9d9f7d7b7fc3c3c59e9f9ca1a1a27c7a7c7f7879635c5d807876685f5b5044429c94917a78797a7776c5c3c0a39d9c635f5b9e9c9b9c9d9b887e7c4d4245615e5d7f7b7a7f78799ea2a2a1a19f857d777d7d799f9f9e857d79a39f9f7f7e807c7a79857d7a665c5a65595b7c7a79777a779f9d9b807b799c9c9b87807da3a19f7f7b7a6b5f61807d7a797b7d877d7a877d77665c584f40427f7b7d9e9f9cc6c6c56b67687d7d7a807d7f88807d685c5e615658cec7c89ea19e7a7b7965595b9b999c7f7b7c8a807d7c7d7a807d7f6e61638a827d7d7b7c605c5e7d7a7787837d9f9f9c9c9f9b807a7763585a504545797a799ea19f7f7b7c655e5a847b7a7978799c9c995248457f7d7f7f7b7aa39f9e84807a85807ca3a2a1c2bcc07c7a7a635c5a665f5d847e7c7c7a7a7a7a7a9ca29f7c7a7d6055577c7877615b58847d7c7d7b7c7d7b7a7a7a7c7d7a7f9e9f9c858077bdaeb09c8f905e5b5b9f9fa19f9fa17c7b7da6a1a1857e7c887e7c665b584a423f7c7a7aa3a2a67d7b7c827e797a7a799e939882787a807d7c7c7b7c66615e9c9d9e8585878b83839fa29f857d7d807b7c877e7c857d7a655f5e665e5b7f7b7f9b9390887e7c88807d685e5e504544888380989999655c5d807b7ac8b3b89e9495655e5a807b7c7d7b7d827b7985807d7c787a87807c7d7a7765595b7977766b5f5e8a8683";
+   for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){const p=((y>>1)*16+(x>>1))*6,o=(y*TS+x)*4;im.data[o]=parseInt(GD.substr(p,2),16);im.data[o+1]=parseInt(GD.substr(p+2,2),16);im.data[o+2]=parseInt(GD.substr(p+4,2),16);im.data[o+3]=255}
+   g.putImageData(im,0,0);tiles[93]=c}
   tiles.forEach((c,i)=>{if(c)atlas.getContext("2d").drawImage(c,i*TS,0)});
 })();
 const atlasTex=new THREE.CanvasTexture(atlas);atlasTex.magFilter=THREE.NearestFilter;atlasTex.minFilter=THREE.NearestMipmapNearestFilter;atlasTex.generateMipmaps=false;
@@ -1415,7 +1584,7 @@ const FC=[[[1,0,1],[1,0,0],[1,1,0],[1,1,1]],[[0,0,0],[0,0,1],[0,1,1],[0,1,0]],[[
 const OCC=new Uint8Array(256).fill(1);for(const q of [0,10,31,32,35,36,37,38,41,42,43,65,51,52,53,54,69,70,71,72,73,74,75,76,118,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117])OCC[q]=0;
 const AOB=[.42,.62,.81,1];
 const CUT={118:1,102:1,103:1,104:1,105:1,106:1,107:1,108:1,109:1,110:1,111:1,112:1,113:1,114:1,115:1,116:1,117:1,72:1,73:1,74:1,75:1,76:1,56:1,61:1,9:1,10:1,31:1,32:1,35:1,36:1,41:1,43:1,65:1},TT=[0,0,2,3,4,5,6,8,9,11,12,13];
-NB.forEach((_,i)=>{TT[12+i]=14+i});
+NB.forEach((_,i)=>{TT[12+i]=14+i});TT[230]=93;COL[230]=[.52,.5,.47];NAMES[230]="Kruus";
 TT[44]=40;TT[45]=41;TT[46]=42;TT[47]=43;TT[48]=44;TT[49]=45;TT[50]=46;TT[51]=TT[52]=TT[53]=TT[54]=39;
 const tileNew=(b,f)=>{switch(b){case 55:return(f==2||f==3)?49:48;case 56:return 50;case 57:return(f==2||f==3)?52:51;case 58:return(f==2||f==3)?54:53;case 59:return 55;case 60:return(f==2||f==3)?57:56;case 61:return 58;case 62:return 59;case 63:return 60;case 64:return 61;case 65:return 3;case 66:return 62;case 67:return 63;case 68:return 64}return 0};
 const tileOf=(b,f)=>(b===100||b===101)?(f==2?71+(b-100):2):(b>=55&&b<=68)?tileNew(b,f):b==30?(f==2?36:f==4?37:38):b==1?(f==2?0:f==3?2:1):b==6?((f==2||f==3)?7:6):b==8?((f==2||f==3)?10:9):b==32?4:b==33?(f==2?35:34):b==34?33:isDoorB(b)?3:b==97?89:b==98?90:b==38?47:b==39?5:b==40?31:TT[b];
@@ -1925,7 +2094,7 @@ for(let t=0;t<4;t++)for(let sl=0;sl<4;sl++)NAMES[120+t*4+sl]=TIERS[t].n+" "+ASLO
 SWORDS.forEach((q,i)=>NAMES[140+i]=q.n);
 AXES.forEach((q,i)=>NAMES[145+i]=q.n);
 PICKS.forEach((q,i)=>NAMES[180+i]=q.n);
-NAMES[190]="Kepp"; NAMES[32]="Kirst"; NAMES[33]="Ahi"; NAMES[34]="Kivisöe maak";COL[33]=[.5,.5,.5];COL[34]=[.22,.22,.23]; NAMES[185]="Vibu"; NAMES[186]="Nool"; NAMES[187]="Paat"; NAMES[188]="Ämber"; NAMES[189]="Veeämber"; NAMES[191]="Rauakang"; NAMES[30]="Töölaud";NAMES[31]="Vesi";COL[31]=[.12,.48,.68];
+NAMES[190]="Kepp"; NAMES[32]="Kirst"; NAMES[33]="Ahi"; NAMES[34]="Kivisöe maak";COL[33]=[.5,.5,.5];COL[34]=[.22,.22,.23]; NAMES[185]="Vibu"; NAMES[186]="Nool"; NAMES[187]="Paat"; NAMES[188]="Ämber"; NAMES[189]="Veeämber"; NAMES[191]="Rauakang"; NAMES[30]="Crafting Table";NAMES[31]="Vesi";COL[31]=[.12,.48,.68];
 NAMES[200]="Kivisüsi";NAMES[201]="Toores loomaliha";NAMES[202]="Küps loomaliha";NAMES[203]="Toores sealiha";NAMES[204]="Küps sealiha";NAMES[205]="Toores lambaliha";NAMES[206]="Küps lambaliha";NAMES[207]="Nahk";NAMES[208]="Valge vill";NAMES[209]="Must vill";NAMES[210]="Hall vill";NAMES[211]="Pruun vill";NAMES[212]="Beež vill";NAMES[213]="Roosa vill";
 ["Kiiver","Rinnakaitse","Säärekaitsed","Saapad"].forEach((n,i)=>NAMES[214+i]="Nahast "+n);
 NAMES[163]="Villager spawn egg";NAMES[164]="Iron golem spawn egg";NAMES[165]="Sheep spawn egg";NAMES[166]="Cow spawn egg";NAMES[167]="Pig spawn egg";NAMES[168]="Piglin spawn egg";NAMES[169]="Chicken spawn egg";
@@ -2256,7 +2425,7 @@ function updHeld(){
     }
   }
   if(heldMesh)handG.add(heldMesh);updOff();
-  $("iname").textContent=it==0?"Käsi":it==-1?"Tulekivi ja teras":NAMES[it];
+  $("iname").textContent=it==0?"Hand":it==-1?"Flint and Steel":NAMES[it];
 }
 
 let equip=0,bobA=0,lagY=0,lagP=0,eatOffTmp=null;
@@ -2333,8 +2502,8 @@ function updateWaterHud(dt){
   if(show){let html="";for(let i=0;i<10;i++)html+='<span class="'+(i<Math.ceil(air)?"full":"empty")+'">◉</span>';meter.innerHTML=html}
 }
 
-function dismountBoat(jump=true){if(!boatMounted)return;if(boatMesh){scene.remove(boatMesh);boatMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});boatMesh=null}boatMounted=false;if(survival){inv[187]=(inv[187]||0)+1;autoSlot(187);refreshBar()}if(jump){p.y+=.08;vy=4.5;ground=false}lastSpaceTap=0;addChat("Tulid paadist välja.","sys")}
-function mountBoat(r){const top=waterTopAt(r.x+.5,r.z+.5);if(top===null)return false;if(boatMounted)dismountBoat(false);boatMesh=boatModel();scene.add(boatMesh);boatMounted=true;p.x=r.x+.5;p.z=r.z+.5;p.y=top+1.12;vx=vz=vy=0;ground=false;flying=false;lastSpaceTap=0;boatMesh.position.set(p.x,p.y-.82,p.z);boatMesh.rotation.y=p.yaw;if(survival)useItem(187);addChat("Paat kasutusel. WASD = sõida, Space = välju.","sys");return true}
+function dismountBoat(jump=true){if(!boatMounted)return;if(boatMesh){scene.remove(boatMesh);boatMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});boatMesh=null}boatMounted=false;if(survival){inv[187]=(inv[187]||0)+1;autoSlot(187);refreshBar()}if(jump){p.y+=.08;vy=4.5;ground=false}lastSpaceTap=0;addChat("You got out of the boat.","sys")}
+function mountBoat(r){const top=waterTopAt(r.x+.5,r.z+.5);if(top===null)return false;if(boatMounted)dismountBoat(false);boatMesh=boatModel();scene.add(boatMesh);boatMounted=true;p.x=r.x+.5;p.z=r.z+.5;p.y=top+1.12;vx=vz=vy=0;ground=false;flying=false;lastSpaceTap=0;boatMesh.position.set(p.x,p.y-.82,p.z);boatMesh.rotation.y=p.yaw;if(survival)useItem(187);addChat("Boat boarded. WASD = steer, Space = exit.","sys");return true}
 
 function spawn(){
   if(survival&&bedSpawnPoint&&worldDimension==="overworld"&&!hit(bedSpawnPoint.x,bedSpawnPoint.y,bedSpawnPoint.z)){p.x=bedSpawnPoint.x;p.y=bedSpawnPoint.y;p.z=bedSpawnPoint.z;vx=vz=vy=0;ground=false;airTop=p.y;return;}
@@ -2371,7 +2540,7 @@ function activatePortalFrame(r){
     if(!ok)continue;
     for(let x=x0+1;x<=x0+2;x++)for(let y=y0+1;y<=y0+3;y++){setBlock(x,y,r.z,37,true);portalFaces.set(portalKey(x,y,r.z),"x");}
     const ck=Math.floor(r.z/CS)*NCX+Math.floor(r.x/CS);if(chunkBuilt[ck])buildChunk(ck%NCX,Math.floor(ck/NCX));
-    sfxPortal(r.x,r.y,r.z);addChat("Nether portal süttis! Astu sisse, et Netherisse minna.","sys");return true;
+    sfxPortal(r.x,r.y,r.z);addChat("The Nether Portal is active! Step inside to enter the Nether.","sys");return true;
   }
   for(let y0=r.y-4;y0<=r.y;y0++)for(let z0=r.z-3;z0<=r.z;z0++){
     if(!frameExistsZ(r.x,y0,z0))continue;
@@ -2379,7 +2548,7 @@ function activatePortalFrame(r){
     if(!ok)continue;
     for(let z=z0+1;z<=z0+2;z++)for(let y=y0+1;y<=y0+3;y++){setBlock(r.x,y,z,37,true);portalFaces.set(portalKey(r.x,y,z),"z");}
     const ck=Math.floor(r.z/CS)*NCX+Math.floor(r.x/CS);if(chunkBuilt[ck])buildChunk(ck%NCX,Math.floor(ck/CS));
-    sfxPortal(r.x,r.y,r.z);addChat("Nether portal süttis! Astu sisse, et Netherisse minna.","sys");return true;
+    sfxPortal(r.x,r.y,r.z);addChat("The Nether Portal is active! Step inside to enter the Nether.","sys");return true;
   }
   return false;
 }
@@ -2452,14 +2621,14 @@ function enterNether(){
       if(get(x,y+1,z)==0&&get(x,y+2,z)==0)spawnMob("p",x+.5,y+1,z+.5,p.x,p.z);
     }
   }
-  sfxDimension();addChat("Sisenesid Netherisse. Leia tagasitee portaal üles!","sys");
+  sfxDimension();addChat("You entered the Nether. Find a Portal to return to the Overworld!","sys");
 }
 function exitNether(){
   if(worldDimension!=="nether"||!overworldSnapshot||performance.now()-lastPortalTouch<3000)return;
   lastPortalTouch=performance.now();netherSnapshot=captureDimensionState();worldDimension="overworld";scene.background.setHex(0x9bd8ed);sunMesh.visible=true;cloudGroup.visible=true;
   restoreDimensionState(overworldSnapshot);
   if(returnFromNether){p.x=returnFromNether.x;p.y=returnFromNether.y;p.z=returnFromNether.z+2.2;p.yaw=returnFromNether.yaw;p.pitch=returnFromNether.pitch;vx=vz=vy=0;}
-  sfxDimension();addChat("Naasid tagasi Overworldi.","sys");
+  sfxDimension();addChat("You returned to the Overworld.","sys");
 }
 function checkPortalTouch(){
   if(performance.now()-lastPortalTouch<3000)return;
@@ -2475,7 +2644,7 @@ let hotbar=[1,2,3,4,6,-1,8,10,0], store=new Array(27).fill(0);
 let craftGrid = new Array(9).fill(0), craftQty = new Array(9).fill(0), craftIsTable = false;
 let invTab="inv",held=0,heldCre=false,heldCount=0;
 let cur=0,ui=null,hoverItem=null,survInit=false;
-const nameOf=it=>it==0?"Käsi":it==-1?"Tulekivi ja teras":NAMES[it];
+const nameOf=it=>it==0?"Hand":it==-1?"Flint and Steel":NAMES[it];
 const locked=()=>document.pointerLockElement===rd.domElement;
 const chatIn=$("chatIn"),chatLog=$("chatlog"),chatHist=[];let hi=-1;
 
@@ -2487,12 +2656,12 @@ function openChest(x,y,z){
   const key=chestKey(x,y,z);
   if(!chestData.has(key))chestData.set(key,{items:new Array(9).fill(0),counts:new Array(9).fill(0)});
   chestOpenKey=key;openInv(false);
-  addChat("Leidsid kirstu. Võta saak klõpsates esemetel.","sys");
+  addChat("You found a Chest. Click items to take them.","sys");
 }
 function openFurnace(x,y,z){
   furnaceOpenKey=chestKey(x,y,z);
   if(!furnaceData.has(furnaceOpenKey))furnaceData.set(furnaceOpenKey,{items:[0,0,0],counts:[0,0,0],burn:0,cook:0});
-  openInv(false);addChat("Ahi avatud. Lisa sisendisse toores liha/maak ja kütusesse kivisüsi või puit (palk, laud, kepp).","sys");
+  openInv(false);addChat("Furnace opened. Add raw food or ore to the input slot and Coal or wood (Log, Planks, or Stick) as fuel.","sys");
 }
 const FUEL_T={200:8,8:5,55:5,60:5,4:3,30:3,35:3,187:3,190:1};
 function furnaceClick(slot){
@@ -2504,7 +2673,7 @@ function furnaceClick(slot){
     inv[it]=(inv[it]||0)+take;d.counts[2]-=take;if(d.counts[2]<=0){d.counts[2]=0;d.items[2]=0;}autoSlot(it);refreshBar();
   }else if(held){
     const valid=slot===0?[201,203,205,219,222,223].includes(held):(FUEL_T[held]!==undefined);
-    if(!valid){addChat(slot===0?"Ahi sisendisse sobib toores liha, toores raud ja toores kuld.":"Kütuseks sobib kivisüsi, palk (tamm, kask, kuusk), laud, töölaud, uks, paat või kepp.","err");return;}
+    if(!valid){addChat(slot===0?"The Furnace input accepts Raw Beef, Raw Porkchop, Raw Mutton, Raw Chicken, Raw Iron, and Raw Gold.":"Fuel can be Coal, Logs, Planks, a Crafting Table, a Door, a Boat, or a Stick.","err");return;}
     if(d.items[slot]&&d.items[slot]!==held)return;
     const amount=survival?Math.min(64,heldCount||inv[held]||1):64;
     d.items[slot]=held;d.counts[slot]=Math.min(64,(d.counts[slot]||0)+amount);
@@ -2520,10 +2689,10 @@ function renderFurnace(){
   const area=$("furnaceArea");area.style.display=furnaceOpenKey?"block":"none";if(!furnaceOpenKey)return;
   const d=furnaceData.get(furnaceOpenKey);if(!d)return;
   [["furnaceInput",0],["furnaceFuel",1],["furnaceOutput",2]].forEach(([id,i])=>{
-    const host=$(id);host.textContent="";const it=d.items[i]||0,s=mkSlot(it,"",d.counts[i]||0);s.title=it?nameOf(it)+" ×"+(d.counts[i]||0):"Tühi";s.onclick=()=>furnaceClick(i);host.appendChild(s);
+    const host=$(id);host.textContent="";const it=d.items[i]||0,s=mkSlot(it,"",d.counts[i]||0);s.title=it?nameOf(it)+" ×"+(d.counts[i]||0):"Empty";s.onclick=()=>furnaceClick(i);host.appendChild(s);
   });
   const active=d.items[0]&&d.items[1]&&d.burn>0;
-  $("furnaceProgress").textContent=active?"Küpsetamine: "+Math.min(100,Math.floor(d.cook/4*100))+"% · kütust: "+Math.ceil(d.burn)+" s":"Lisa sisendisse toores toit/maak ja kütusesse kivisüsi või puit (palk, laud, kepp).";
+  $("furnaceProgress").textContent=active?"Smelting: "+Math.min(100,Math.floor(d.cook/4*100))+"% · fuel: "+Math.ceil(d.burn)+" s":"Add raw food or ore to the input slot and Coal or wood (Log, Planks, or Stick) as fuel.";
 }
 let furnaceTick=0;
 function furnaceStep(dt){
@@ -2548,16 +2717,16 @@ function renderChest(){
   const data=chestData.get(chestOpenKey);if(!data)return;
   for(let i=0;i<9;i++){
     const it=data.items[i]||0,count=data.counts[i]||0,s=mkSlot(it,"",count);
-    s.title=it?nameOf(it)+" ×"+count:"Tühi";
+    s.title=it?nameOf(it)+" ×"+count:"Empty";
     s.onclick=()=>{
       if(!it||held)return;
       const have=inv[it]||0,room=Math.max(0,64-have),take=Math.min(count,room);
-      if(take<=0){addChat("Selle eseme stack on täis.","err");return;}
+      if(take<=0){addChat("That item stack is full.","err");return;}
       inv[it]=have+take;data.counts[i]-=take;
       if(data.counts[i]<=0){data.counts[i]=0;data.items[i]=0;}
       autoSlot(it);refreshBar();
       send({t:"chestSet",k:chestOpenKey,s:i,id:data.items[i],count:data.counts[i]});
-      renderInv();addChat("Võtsid kirstust: "+nameOf(it)+" ×"+take,"sys");
+      renderInv();addChat("Took from Chest: "+nameOf(it)+" ×"+take,"sys");
     };
     grid.appendChild(s);
   }
@@ -2591,8 +2760,8 @@ addEventListener("keydown",e=>{
       if(lastSpaceTap&&now-lastSpaceTap<=330){
         flying=!flying;
         lastSpaceTap=0;
-        if(flying){ground=false;vy=0;addChat("Lendamine sisse. Space = üles, Shift = alla.","sys")}
-        else{vy=Math.min(vy,0);addChat("Lendamine välja. Gravitatsioon töötab jälle.","sys")}
+        if(flying){ground=false;vy=0;addChat("Flight enabled. Space = up, Shift = down.","sys")}
+        else{vy=Math.min(vy,0);addChat("Flight disabled. Gravity is enabled again.","sys")}
       }else lastSpaceTap=now;
     }
   }
@@ -2854,10 +3023,10 @@ function renderInv(){
   $("tabCre").style.display=survival?"none":"inline-block";
   $("tabInv").className=invTab=="inv"?"on":"";
   $("tabCre").className=invTab=="cre"?"on":"";
-  $("invT").textContent=cre?"Loomingu menüü":craftIsTable?"Töölaud (3x3 meisterdamine)":"Inventar";
+  $("invT").textContent=cre?"Creative Inventory":craftIsTable?"Crafting Table (3x3 Crafting)":"Inventory";
   $("creativeItems").style.display=cre?"block":"none";
   $("creativeSearch").value=creativeSearchText;
-  $("storageLabel").textContent=cre?"SINU INVENTAR · 27 LAHTRIT":"INVENTAR";
+  $("storageLabel").textContent=cre?"SINU INVENTORY · 27 LAHTRIT":"INVENTORY";
   $("craftArea").style.display=cre&&!craftIsTable?"none":"flex";
   $("invLeft").style.display=craftIsTable?"none":"flex";
   $("rbPanel").style.display=(rbOpen&&!(cre&&!craftIsTable))?"flex":"none";
@@ -2867,7 +3036,7 @@ function renderInv(){
   
   const cG = $("cGrid"); cG.textContent = "";
   cG.className = "cgrid " + (craftIsTable ? "g3" : "g2");
-  $("craftTitle").textContent = craftIsTable ? "Meisterdamine" : "Meisterdamine";
+  $("craftTitle").textContent = craftIsTable ? "Crafting" : "Crafting";
   const size = craftIsTable ? 9 : 4;
 
   for(let i=0; i<size; i++) {
@@ -2974,7 +3143,7 @@ function renderInv(){
     }
     hov(q,it); q.onclick=()=>clickSlot(slotArm(sl)); eq.appendChild(q);
   });
-  {const oh=$("offHost");oh.textContent="";const q=mkSlot(off,"");q.title="Vasak käsi (offhand)";
+  {const oh=$("offHost");oh.textContent="";const q=mkSlot(off,"");q.title="Offhand";
     if(!off){q.style.opacity=.55;const ic=document.createElement("div");ic.textContent="🛡️";ic.style.cssText="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:0.35;pointer-events:none;";q.appendChild(ic)}
     hov(q,off);q.onclick=()=>clickSlot(slotOff);oh.appendChild(q)}
   drawPlayerPrev();renderRecipeBook();
@@ -3021,7 +3190,7 @@ function renderRecipeBook(){
     list.push({r,can});
   }
   list.sort((a,b)=>(b.can-a.can));
-  if(!list.length){const e=document.createElement("div");e.className="rbEmpty";e.textContent="Retsepte ei leitud.";grid.appendChild(e);return}
+  if(!list.length){const e=document.createElement("div");e.className="rbEmpty";e.textContent="No recipes found.";grid.appendChild(e);return}
   for(const {r,can} of list){
     const s=mkSlot(r.out,"",r.qty>1?r.qty:0);
     s.classList.add("rbItem");s.style.opacity="";if(!can)s.classList.add("no");
@@ -3035,7 +3204,7 @@ function renderRecipeBook(){
 $("rbBtn").onclick=()=>{rbOpen=!rbOpen;renderInv()};
 $("rbSearch").addEventListener("input",e=>{rbQ=e.target.value;renderInv();});
 
-/* ===== Mängija eelvaade inventaris (nagu päris Minecraftis) ===== */
+/* ===== Playja eelvaade inventaris (nagu päris Minecraftis) ===== */
 function drawPlayerPrev(){
   const c=$("playerPrev");if(!c)return;const g=c.getContext("2d");g.clearRect(0,0,16,32);
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -3231,14 +3400,14 @@ function applyName(n){playerName=n;try{localStorage.setItem("mc_name",n)}catch(e
 $("nameIn").value=playerName;$("nameMenu").value=playerName;
 function confirmName(){
   const n=cleanName($("nameIn").value);
-  if(n.length<2){$("nameErr").textContent="Nimi peab olema vähemalt 2 märki (tähed, numbrid, tühik, _ ja -).";return}
-  applyName(n);$("nameGate").style.display="none";addChat("Tere, "+n+"! Teised mängijad näevad sinu nime oma pea kohal.","sys");
+  if(n.length<2){$("nameErr").textContent="Player name must be at least 2 characters (letters, numbers, spaces, _ and -).";return}
+  applyName(n);$("nameGate").style.display="none";addChat("Hello, "+n+"! Other players will see your name above your head.","sys");
 }
 $("nameOk").onclick=confirmName;
 $("nameIn").addEventListener("keydown",e=>{if(e.key==="Enter")confirmName()});
 $("nameMenu").addEventListener("change",()=>{const n=cleanName($("nameMenu").value);if(n.length>=2)applyName(n);else $("nameMenu").value=playerName});
 setTimeout(()=>{try{$("nameIn").focus();$("nameIn").select()}catch(e){}},50);
-const myName=()=>playerName||(srv?"Mängija "+myId:isHost?"Host":hostCh?"Mängija "+myId:"Sina");
+const myName=()=>playerName||(srv?"Playja "+myId:isHost?"Host":hostCh?"Playja "+myId:"You");
 function makeNameTag(name){
   const c=document.createElement("canvas");c.width=256;c.height=48;const g=c.getContext("2d");
   g.font="bold 26px Minecraftia, monospace";const w=Math.min(250,g.measureText(name).width+24);
@@ -3254,23 +3423,23 @@ const GM={survival:1,s:1,"0":1,creative:0,c:0,"1":0,looming:0};
 const CMDS={
   gamemode:{use:"/gamemode <survival|creative>",run(a){
     const v=(a[0]||"").toLowerCase();
-    if(!has(GM,v)){addChat("Kasutus: /gamemode <survival|creative>   (praegu: "+(survival?"survival":"creative")+")","err");return}
-    if(GM[v]&&!survival){switchToSurvival(()=>addChat("Mänguviis: survival (ellujäämine)","sys"));return}
+    if(!has(GM,v)){addChat("Usage: /gamemode <survival|creative> (currently: "+(survival?"survival":"creative")+")","err");return}
+    if(GM[v]&&!survival){switchToSurvival(()=>addChat("Game Mode: Survival","sys"));return}
     setMode(!!GM[v]);
-    addChat("Mänguviis: "+(survival?"survival (ellujäämine)":"creative (looming)"),"sys");
+    addChat("Game Mode: "+(survival?"Survival":"Creative"),"sys");
   }},
   time:{use:"/time set <day|night>",run(a){
     const v=(a[1]||a[0]||"").toLowerCase();
-    if(v!=="day"&&v!=="night"){addChat("Kasutus: /time set <day|night>","err");return}
+    if(v!=="day"&&v!=="night"){addChat("Usage: /time set <day|night>","err");return}
     dayTime=v==="day"?.25:.75;updateDayCycle(0);send({t:"time",v:dayTime});
-    addChat(v==="day"?"Aeg muudeti päevaks.":"Aeg muudeti ööks.","sys");
+    addChat(v==="day"?"Time set to day.":"Time set to night.","sys");
   }},
-  help:{use:"/help",run(){addChat("Käsud:","sys");Object.keys(CMDS).forEach(k=>addChat("  "+CMDS[k].use,"sys"))}}
+  help:{use:"/help",run(){addChat("Commands:","sys");Object.keys(CMDS).forEach(k=>addChat("  "+CMDS[k].use,"sys"))}}
 };
 function runCmd(line){
   const a=line.slice(1).trim().split(/\s+/);let c=(a.shift()||"").toLowerCase();
   if(has(ALIAS,c))c=ALIAS[c];
-  if(!has(CMDS,c)){addChat("Tundmatu käsk: /"+c+" (proovi /help)","err");return}
+  if(!has(CMDS,c)){addChat("Unknown command: /"+c+" (try /help)","err");return}
   CMDS[c].run(a);
 }
 function submitChat(v){
@@ -3346,7 +3515,7 @@ document.addEventListener("pointerlockchange",()=>{
 });
 document.addEventListener("pointerlockerror",()=>{if(!locked()&&!ui&&!dead)$("menu").style.display="flex"});
 let mouseSensitivity=.0022;
-function applyRenderDistance(v){renderDistance=Math.max(48,Math.min(240,Number(v)||112));RENDER_DISTANCE_SQ=renderDistance*renderDistance;cam.far=Math.max(300,renderDistance+100);scene.fog.near=renderDistance*.55;scene.fog.far=renderDistance*.92;cam.updateProjectionMatrix();$("renderValue").textContent=renderDistance+" plokki";updateChunkVisibility();}
+function applyRenderDistance(v){renderDistance=Math.max(48,Math.min(240,Number(v)||112));RENDER_DISTANCE_SQ=renderDistance*renderDistance;cam.far=Math.max(300,renderDistance+100);scene.fog.near=renderDistance*.55;scene.fog.far=renderDistance*.92;cam.updateProjectionMatrix();$("renderValue").textContent=renderDistance+" blocks";updateChunkVisibility();}
 $("settingsBtn").onclick=()=>{$("menu").style.display="none";$("settingsPanel").style.display="flex"};
 $("settingsBack").onclick=()=>{$("settingsPanel").style.display="none";$("menu").style.display="flex"};
 $("sensitivityRange").oninput=e=>{mouseSensitivity=Number(e.target.value);$("sensitivityValue").textContent=mouseSensitivity.toFixed(4)};
@@ -3354,16 +3523,11 @@ $("renderRange").oninput=e=>applyRenderDistance(e.target.value);
 // ===== MUUSIKA =====
 // Mp3-failid peavad asuma samas kaustas mänguga (või muuda src teed siin).
 // gain = selle loo oma helitugevuse korrektsioon (0..1), et valjud lood ei karjuks teistest üle.
+// Helifaile ei olnud üleslaetud mängufailis kaasas. Tühjad loendid väldivad
+// kümneid ERR_FILE_NOT_FOUND päringuid; lugusid saab hiljem lisada nt music/ kaustast.
 const MUSIC_CFG={
-  overworld:[
-    {src:"mineraft1.mp3",gain:1},
-    {src:"mineraft2.mp3",gain:1},
-    {src:"mineraft3.mp3",gain:1},
-    {src:"mineraft5.mp3",gain:1}
-  ],
-  nether:[
-    {src:"mineraft4.mp3",gain:.5}
-  ]
+  overworld:[], // {src:"music/overworld1.mp3",gain:1}
+  nether:[]     // {src:"music/nether1.mp3",gain:.5}
 };
 const Music=(()=>{
   const FADE_SEC=1.2;
@@ -3406,13 +3570,19 @@ const Music=(()=>{
   function onFail(){
     failStreak++;
     const n=(MUSIC_CFG[curDim]||[]).length;
-    if(failStreak>n){const e=document.getElementById("musicNow");if(e)e.textContent="⚠ muusikafaile ei leitud (pane mp3 mänguga samasse kausta)";return}
+    if(failStreak>n){const e=document.getElementById("musicNow");if(e)e.textContent="⚠ No music files found (place MP3 files in the game folder).";return}
     setTimeout(()=>playTrack(curDim||wantDim()),300);
   }
   function probeAll(){
     if(probeAll.done)return;probeAll.done=true;
-    const bad=[],all=[...MUSIC_CFG.overworld,...MUSIC_CFG.nether];let left=all.length;
-    const fin=()=>{if(--left>0)return;if(bad.length){const m="Muusikafailid puuduvad või ei mängi: "+bad.join(", ")+" (pane mp3-failid index.html-iga samasse kausta või kausta music/; otsisin ka nime minecraft1.mp3 ja .ogg)";console.warn(m);try{const e=document.getElementById("musicNow");if(e)e.textContent="muusikafaile pole (pane mp3-d mänguga samasse kausta või music/ kausta)"}catch(e){}}};
+    const bad=[],all=[...MUSIC_CFG.overworld,...MUSIC_CFG.nether];
+    if(!all.length){
+      const e=document.getElementById("musicNow");
+      if(e)e.textContent="No music files found (add tracks to the music/ folder)";
+      return;
+    }
+    let left=all.length;
+    const fin=()=>{if(--left>0)return;if(bad.length){const m="Music files are missing or could not be played: "+bad.join(", ")+" (place MP3 files next to index.html or in the music/ folder; minecraft1.mp3 and .ogg files are also supported)";console.warn(m);try{const e=document.getElementById("musicNow");if(e)e.textContent="No music files found (place MP3 files in the game folder or music/ folder)."}catch(e){}}};
     const cands=src=>{const m=src.match(/^(.*?)(\.[a-z0-9]+)$/i),base=m?m[1]:src,names=[base];if(/mineraft/i.test(base))names.push(base.replace(/mineraft/i,"minecraft"));const out=[];for(const f of ["","music/","muusika/"])for(const n of names)for(const e of [".mp3",".ogg"])out.push(f+n+e);return out};
     for(const t of all){
       const list=cands(t.src);let idx=0,d=false;
@@ -3427,10 +3597,10 @@ const Music=(()=>{
   }
   function updLabel(){
     const e=document.getElementById("musicNow");if(!e)return;
-    e.textContent=curTrack?("♪ "+(curDim==="nether"?"Nether":"Overworld")+": "+curTrack.src):"";
+    e.textContent=curTrack?("♪ "+(curDim==="nether"?"Nether":"Overworld")+": "+curTrack.src):"No music files found (add tracks to the music/ folder)";
   }
   function updBtn(){
-    const b=document.getElementById("musicMuteBtn");if(b)b.textContent=mute?"🔇 Muusika: vaigistatud":"🔊 Muusika: sees";
+    const b=document.getElementById("musicMuteBtn");if(b)b.textContent=mute?"🔇 Music: OFF":"🔊 Music: ON";
     const r=document.getElementById("musicRange"),v=document.getElementById("musicValue");
     if(r)r.value=Math.round(vol*100);if(v)v.textContent=Math.round(vol*100)+"%";
   }
@@ -3551,19 +3721,19 @@ addEventListener("mousedown",e=>{
     }
     if(it==188&&get(r.x,r.y,r.z)==31){
       const amount=waterLevels[idx(r.x,r.y,r.z)]||8;
-      if(amount>=8){setWaterVolume(r.x,r.y,r.z,0,true);activateWaterAround(r.x,r.y,r.z);changeBucket(188,189);addChat("Vesi võetud ämbrisse. Ümbritsev vesi voolab auku.","sys");}
+      if(amount>=8){setWaterVolume(r.x,r.y,r.z,0,true);activateWaterAround(r.x,r.y,r.z);changeBucket(188,189);addChat("Water collected in the Bucket. Nearby water flows into the gap.","sys");}
       return;
     }
     if(it==189){
       const place=findBucketPlace(r);
-      if(place){setWaterVolume(place.x,place.y,place.z,8,true);activateWaterAround(place.x,place.y,place.z);if(survival)changeBucket(189,188);else{swing=1;updHeld()}addChat("Valasid vee maha.","sys");}
+      if(place){setWaterVolume(place.x,place.y,place.z,8,true);activateWaterAround(place.x,place.y,place.z);if(survival)changeBucket(189,188);else{swing=1;updHeld()}addChat("You placed the water.","sys");}
       return;
     }
     if(r && (get(r.x,r.y,r.z)==41||get(r.x,r.y,r.z)==43)){
       bedSpawnPoint={x:r.x+.5,y:r.y+1.1,z:r.z+.5};bedSpawnKey=r.x+","+r.y+","+r.z;
       const night=Math.sin(dayTime*Math.PI*2)<-.12;
-      if(night&&worldDimension==="overworld"){dayTime=.25;updateDayCycle(0);sfxEquip();addChat("Magasid. Hommik käes! Respawn-punkt salvestatud.","sys");}
-      else addChat("Respawn-punkt salvestatud. Magada saab öösel.","sys");
+      if(night&&worldDimension==="overworld"){dayTime=.25;updateDayCycle(0);sfxEquip();addChat("You slept. Good morning! Spawn point set.","sys");}
+      else addChat("Spawn point set. You can only sleep at night.","sys");
       return;
     }
     if(r && get(r.x,r.y,r.z)==32) { openChest(r.x,r.y,r.z); return; }
@@ -3578,7 +3748,7 @@ addEventListener("mousedown",e=>{
         const fx=-Math.sin(p.yaw),fz=-Math.cos(p.yaw),pref=Math.abs(fx)>Math.abs(fz)?(fx>0?[1,0]:[-1,0]):(fz>0?[0,1]:[0,-1]);
         const dirs=[pref,...BED_DIRS.filter(d=>d[0]!==pref[0]||d[1]!==pref[1])];
         const ok=dirs.find(d=>{const X=r.px+d[0],Z=r.pz+d[1];return inb(X,r.py,Z)&&get(X,r.py,Z)==0&&(Math.floor(p.x)!==X||Math.floor(p.z)!==Z||Math.floor(p.y)>r.py+1||Math.floor(p.y)+1<r.py)});
-        if(!ok){addChat("Voodi jaoks on vaja 2 vaba plokki.","err");return}
+        if(!ok){addChat("You need 2 blocks of free space to place a Bed.","err");return}
         setBlock(r.px,r.py,r.pz,41,true);setBlock(r.px+ok[0],r.py,r.pz+ok[1],43,true);sfxEquip();swing=1;if(survival)useItem(it);
       }
     }
@@ -3608,7 +3778,7 @@ addEventListener("mouseup",e=>{
 
 const MC_PICK_BLOCKS=new Set([3,7,11,12,13,14,15,26,28,33,34,40,44,45,46]);
 function mcNeedsPick(b){return MC_PICK_BLOCKS.has(b)}
-let _pickHintAt=0;function mcPickHint(){const n=performance.now();if(n-_pickHintAt>4000){_pickHintAt=n;try{addChat("Seda plokki ei saa käega lõhkuda, sul on vaja kirka!","err")}catch(e){}}}
+let _pickHintAt=0;function mcPickHint(){const n=performance.now();if(n-_pickHintAt>4000){_pickHintAt=n;try{addChat("You need a Pickaxe to mine this block!","err")}catch(e){}}}
 const HARD = {1:0.6, 2:0.5, 3:1.5, 4:2, 5:0.5, 6:0, 7:2, 8:2.5, 9:0.2, 10:0.3, 11:2, 24:0.4, 30:2,31:.12,32:2,33:3,34:3,35:1,36:1,38:.1,39:.6,40:3};
 function getMiningTime(b, tool) {
   if(!survival) return 0.15;
@@ -3677,7 +3847,7 @@ function setBlock(x,y,z,b,net){
   const k=idx(x,y,z),old=w[k],key=x+","+y+","+z,ck=Math.floor(z/CS)*NCX+Math.floor(x/CS);
   w[k]=b;waterLevels[k]=b==31?8:0;
   if((old==41||old==43)&&b==0){const pr=bedPartner(x,y,z,old);if(pr)setBlock(pr[0],pr[1],pr[2],0,net)}
-  if((old==41||old==43)&&b==0&&bedSpawnKey===key){bedSpawnPoint=null;bedSpawnKey=null;addChat("Voodi hävitati. Respawn-punkt eemaldati.","sys");}
+  if((old==41||old==43)&&b==0&&bedSpawnKey===key){bedSpawnPoint=null;bedSpawnKey=null;addChat("Bed destroyed. Spawn point removed.","sys");}
   if(old==37)portalFaces.delete(key);
   if(b==37&&!portalFaces.has(key))portalFaces.set(key,"x");
   if(isDoorB(old)){
@@ -3786,7 +3956,7 @@ function checkHouseTrap(){
   const x=Math.floor(p.x),y=Math.floor(p.y-.12),z=Math.floor(p.z),key=chestKey(x,y,z),trap=houseTraps.get(key);
   if(!trap||trap.used||triggeredTraps.has(key))return;
   trap.used=true;triggeredTraps.add(key);
-  addChat("LÕKS! Põrand andis järele!","err");
+  addChat("TRAP! The floor gave way!","err");
   setBlock(x,y,z,0,true);
   hurt(4,{x:x+.5,z:z+.5});
   vy=-2.5;ground=false;
@@ -3835,7 +4005,7 @@ function sparkle(x,y,z){for(let i=0;i<40;i++){const m=new THREE.Mesh(pG,new THRE
 function totemSave(){
   if(!(inv[150]>0&&(off==150||hotbar[cur]==150)))return false;
   useItem(150);sfxTotem();hp=4;food=Math.max(food,6);updStats();
-  sparkle(p.x,p.y+1,p.z);addChat("Surematuse totem päästis su elu!","sys");
+  sparkle(p.x,p.y+1,p.z);addChat("The Totem of Undying saved your life!","sys");
   const h=$("hurt");h.style.transition="none";h.style.background="#fc0";h.style.opacity=.6;h.offsetWidth;h.style.transition="opacity .8s";h.style.opacity=0;setTimeout(()=>{h.style.background="#f00"},900);
   return true;
 }
@@ -3915,7 +4085,7 @@ function dropHeld(all){
 }
 function drop(b,x,y,z){
   if(b==31||b==37||b==38||isDoorTopB(b))return;
-  if((b>=44&&b<=46)||b==68){const tl=hotbar[cur]||0,lv=isPick(tl)?[0,1,0,2,3][tl-180]:-1;if(lv<(b==44?1:2)){addChat(b==44?"Rauamaagi saab kätte kivikirka või paremaga.":"Seda maaki saab kätte raudkirka või paremaga.","err");return}}
+  if((b>=44&&b<=46)||b==68){const tl=hotbar[cur]||0,lv=isPick(tl)?[0,1,0,2,3][tl-180]:-1;if(lv<(b==44?1:2)){addChat(b==44?"Iron Ore can be mined with a Stone Pickaxe or better.":"This ore requires an Iron Pickaxe or better.","err");return}}
   const it=isTorchB(b)?42:b==44?222:b==45?223:b==46?224:(b==41||b==43)?218:b==1?2:b==3?11:(b==9||b==56||b==61)?(Math.random()<.15?99:0):b==10?0:b==34?200:b==68?227:b==40?40:b;
   if(it)spawnItemDrop(it,1,x??(p.x+(Math.random()-.5)*.6),y??(p.y+.7),z??(p.z+(Math.random()-.5)*.6));
 }
@@ -3984,7 +4154,7 @@ function setMode(sv){
   if(sv&&!survInit)initSurv();
   $("stats").style.display=sv?"flex":"none";
   $("mCre").style.background=sv?"#2e7dd1":"#4caf50";$("mSur").style.background=sv?"#4caf50":"#2e7dd1";
-  $("modeTxt").textContent=sv?"Ellujäämine: alustad tühja inventariga. Kogu puid, meisterda tööriistu, otsi toitu ja ehita voodi":"Looming: piiramatud plokid (max 64 stack), elusid pole. Topelt-Space = lendamine.";
+  $("modeTxt").textContent=sv?"Survival: Start with an empty inventory. Gather wood, craft tools, find food, and build a Bed.":"Creative: Unlimited blocks (64 per stack), no health or hunger limits. Double-tap Space to fly.";
   renderBar();updHeld();updStats();
 }
 /* ===== LOOMING -> ELLUJÄÄMINE KÜSIMINE (v19) ===== */
@@ -4495,7 +4665,7 @@ function updMobs(dt){
 
 let isHost=false,myId=0,nextId=0,peers=[],hostCh=null,srv=false;
 const others=new Map();
-function netInfo(){$("net").textContent="Võrk: "+(srv?"ühendatud serveriga (mängija ID "+myId+")":isHost?"HOST, mängijaid ühendatud: "+peers.length:hostCh?"ühendatud hostiga (ID "+myId+")":"pole ühendatud")}
+function netInfo(){$("net").textContent="Network: "+(srv?"connected to server (Player ID "+myId+")":isHost?"HOST, connected players: "+peers.length:hostCh?"connected to host (ID "+myId+")":"not connected")}
 function send(m,except){const s=JSON.stringify(m);
   if(srv){if(myId)fetch("/send?id="+myId,{method:"POST",body:s}).catch(()=>{});return}if(isHost)peers.forEach(c=>c!==except&&c.readyState=="open"&&c.send(s));else if(hostCh&&hostCh.readyState=="open")hostCh.send(s)}
 function setupCh(ch){
@@ -4567,7 +4737,7 @@ function peerCh(conn){
   return ch;
 }
 const CODE_CH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-function needPeer(){if(typeof Peer=="undefined"){alert("PeerJS ei laadinud (internet puudub?). Kasuta server.js varianti.");return true}return false}
+function needPeer(){if(typeof Peer=="undefined"){alert("PeerJS failed to load (no Internet connection?). Use the server.js version.");return true}return false}
 $("hostBtn").onclick=()=>{
   if(needPeer())return;
   if(peer)peer.destroy();
@@ -4586,7 +4756,7 @@ $("joinBtn").onclick=()=>{
   isHost=false;
   peer=new Peer();
   peer.on("open",()=>{hostCh=peerCh(peer.connect("mcraft-"+code))});
-  peer.on("error",e=>{$("net").textContent="Võrk: viga ("+e.type+") – kontrolli koodi"});
+  peer.on("error",e=>{$("net").textContent="Network error ("+e.type+") – check the join code"});
 };
 
 function setSkin(i){skinIdx=i;const k=SKINS[i];sleeve.material.color.setHex(k.shirt);skin.material.color.setHex(k.skin);document.querySelectorAll("#skins button").forEach((b,j)=>b.classList.toggle("on",j==i))}
@@ -4599,15 +4769,15 @@ if(location.protocol!="file:"){
     const es=new EventSource("/events");
     es.onopen=()=>{srv=true;$("netset").style.display="none";netInfo()};
     es.onmessage=e=>onMsg(JSON.parse(e.data));
-    es.onerror=()=>{if(!srv){es.close();netInfo()}else $("net").textContent="Võrk: server ei vasta"};
+    es.onerror=()=>{if(!srv){es.close();netInfo()}else $("net").textContent="Network: server is not responding"};
   }catch(e){}
 }
 
 let last=performance.now(),fpsMark=performance.now(),fpsFrames=0,visClock=0;
 function voidCheck(){
   if(p.y>-18||dead)return;
-  if(survival){hp=0;updStats();sfxHurt();showDeath();addChat("Kukkusid tühjusse!","sys")}
-  else{spawn();addChat("Kukkusid tühjusse – tagasi spawni.","sys")}
+  if(survival){hp=0;updStats();sfxHurt();showDeath();addChat("You fell into the Void!","sys")}
+  else{spawn();addChat("You fell into the Void – returned to spawn.","sys")}
 }
 function loop(now){
   requestAnimationFrame(loop);
@@ -4690,7 +4860,7 @@ function loop(now){
     breakTime=0; breakBlock=null; crackMesh.visible=false;
   }
   
-  if((now-(window.__stT||0))>200){window.__stT=now;$("status").textContent="X "+p.x.toFixed(1)+" Y "+p.y.toFixed(1)+" Z "+p.z.toFixed(1)+(worldDimension==="overworld"?" | "+BIOME_NAMES[biomeMap[Math.max(0,Math.min(W-1,p.x|0))*D+Math.max(0,Math.min(D-1,p.z|0))]]:"")+(flying?" | LENDAMINE":"")+(boatMounted?" | PAAT":"")+(eyeUnderwater()?" | VEE ALL":"")+" | "+(worldDimension==="nether"?"NETHER":"OVERWORLD")+" | mängijaid: "+(others.size+1);}
+  if((now-(window.__stT||0))>200){window.__stT=now;$("status").textContent="X "+p.x.toFixed(1)+" Y "+p.y.toFixed(1)+" Z "+p.z.toFixed(1)+(worldDimension==="overworld"?" | "+BIOME_NAMES[biomeMap[Math.max(0,Math.min(W-1,p.x|0))*D+Math.max(0,Math.min(D-1,p.z|0))]]:"")+(flying?" | FLYING":"")+(boatMounted?" | BOAT":"")+(eyeUnderwater()?" | UNDERWATER":"")+" | "+(worldDimension==="nether"?"NETHER":"OVERWORLD")+" | players: "+(others.size+1);}
   updEat(dt);animHand(dt);
   if(window.mcRenderFrame)window.mcRenderFrame();else{rd.clear();rd.render(scene,cam);rd.clearDepth();rd.render(handScene,handCam)}
 }
@@ -4877,7 +5047,7 @@ window.mcBoot=function(sd){
     const oldSubmitChat=submitChat;
     submitChat=function(v){
       const m=v.match(/^\.\/time\s+set\s+(day|night)$/i);
-      if(m){dayTime=m[1].toLowerCase()==='day'?.25:.75;updateDayCycle(0);addChat(m[1].toLowerCase()==='day'?'Aeg muudeti päevaks.':'Aeg muudeti ööks.','sys');send({t:'time',v:dayTime});return}
+      if(m){dayTime=m[1].toLowerCase()==='day'?.25:.75;updateDayCycle(0);addChat(m[1].toLowerCase()==='day'?'Time set to day.':'Time set to night.','sys');send({t:'time',v:dayTime});return}
       oldSubmitChat(v);
     };
     const oldOnMsg=onMsg;
@@ -4949,14 +5119,14 @@ window.mcBoot=function(sd){
       '#menu .box>p:first-of-type button{font-size:27px;padding:12px 22px}#menu #net{display:block;margin-top:8px;color:#c9e7a7;font-size:20px}'+
       '#menu .box>small{display:block;margin:8px 0 14px;color:#d5dfd0}';
     document.head.appendChild(style);
-    document.title='MineCraft LAN V15';
-    const title=document.querySelector('#menu .box h1');if(title)title.textContent='⛏ MineCraft LAN · V15';
-    const legend=document.querySelector('#netset legend');if(legend)legend.textContent='Mitmikmäng (LAN / internet)';
-    const input=document.getElementById('chatIn');if(input)input.placeholder='Kirjuta sõnum või ./time set day / ./time set night (Enter saadab)';
-    addChat('V15 uuendus laaditud: tõrvik, valgus, portaal ja LAN-käteanimatsioonid.','sys');
+    document.title='Minecraft LAN V15';
+    const title=document.querySelector('#menu .box h1');if(title)title.textContent='⛏ Minecraft LAN · V15';
+    const legend=document.querySelector('#netset legend');if(legend)legend.textContent='Multiplayer (LAN / Internet)';
+    const input=document.getElementById('chatIn');if(input)input.placeholder='Type a message or ./time set day / ./time set night (press Enter to send)';
+    addChat('V15 update loaded: Torches, lighting, Nether Portals, and LAN hand animations.','sys');
   }catch(err){
     console.error('MineCraft V15 patch error:',err);
-    try{addChat('V15 uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('V15 update error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 
@@ -5054,13 +5224,13 @@ window.mcBoot=function(sd){
     if(typeof iconCache!=='undefined')delete iconCache[30];
     atlasTex.needsUpdate=true;
     worldMat.needsUpdate=true;
-    document.title='MineCraft LAN V16';
+    document.title='Minecraft LAN V16';
     const heading=document.querySelector('#menu .box h1');
-    if(heading)heading.textContent='⛏ MineCraft LAN · V16';
-    addChat('Töölaua uus tekstuur on laaditud.','sys');
+    if(heading)heading.textContent='⛏ Minecraft LAN · V16';
+    addChat('Crafting Table texture updated.','sys');
   }catch(err){
     console.error('MineCraft V16 workbench texture error:',err);
-    try{addChat('Töölaua tekstuuri viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('Crafting Table texture error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 
@@ -5278,13 +5448,13 @@ window.mcBoot=function(sd){
     };
     updHeld();
     renderBar();
-    document.title='MineCraft LAN V17';
+    document.title='Minecraft LAN V17';
     const heading=document.querySelector('#menu .box h1');
-    if(heading)heading.textContent='⛏ MineCraft LAN · V17';
-    addChat('V17: tuleefektid, noole füüsika, noolekorje ja vibu pööramine on lisatud.','sys');
+    if(heading)heading.textContent='⛏ Minecraft LAN · V17';
+    addChat('V17: fire effects, arrow physics and pickup, and bow rotation added.','sys');
   }catch(err){
     console.error('MineCraft V17 update error:',err);
-    try{addChat('V17 uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('V17 update error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 
@@ -5386,13 +5556,13 @@ window.mcBoot=function(sd){
     updHeld();
     renderBar();
 
-    document.title='MineCraft LAN V18';
+    document.title='Minecraft LAN V18';
     const heading=document.querySelector('#menu .box h1');
-    if(heading)heading.textContent='⛏ MineCraft LAN · V18';
-    addChat('V18: puude ja plokkide leegid on nüüd suuremad ja selgemad; vibu on diagonaalselt pööratud.','sys');
+    if(heading)heading.textContent='⛏ Minecraft LAN · V18';
+    addChat('V18: flames on trees and blocks are now larger and clearer; the Bow is angled diagonally.','sys');
   }catch(err){
     console.error('MineCraft V18 update error:',err);
-    try{addChat('V18 uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('V18 update error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 
@@ -5448,7 +5618,7 @@ window.mcBoot=function(sd){
     ICON[224]=mkIcon(px=>{px(5,7,'#33c9d6',6,5);px(4,8,'#5decf5',8,3);px(6,5,'#a8fbff',4,2);px(7,8,'#e8ffff',2,2);px(7,12,'#1e9aa6',2,2)});
     ICON[225]=mkIcon(px=>{px(3,8,'#c9a227',10,7);px(4,7,'#f6d03c',8,2);px(5,10,'#fff08a',5,2);px(4,15,'#8a6d12',8,1)});
 
-    /* ---- Loomingu kataloog: villa plokid, maagid, uued esemed ---- */
+    /* ---- Creativeu kataloog: villa plokid, maagid, uued esemed ---- */
     for(let i=ALL.length-1;i>=0;i--){if(ALL[i]>=208&&ALL[i]<=213)ALL.splice(i,1)}
     [44,45,46,47,48,49,50,222,223,224,225].forEach(id=>{if(!ALL.includes(id))ALL.push(id)});
     const oldSearch=itemSearchText;
@@ -5510,27 +5680,27 @@ window.mcBoot=function(sd){
     };
 
     /* ---- Käsud ---- */
-    CMDS.seed={use:'/seed',run(){addChat('Maailma seed: '+seed,'sys')}};
+    CMDS.seed={use:'/seed',run(){addChat('World Seed: '+seed,'sys')}};
     CMDS.village={use:'/village [tp]',run(a){
-      if(worldDimension!=='overworld'){addChat('Külad on ainult Overworldis.','err');return}
-      if(!villageCenters.length){addChat('Sellel kaardil külasid ei tekkinud.','err');return}
+      if(worldDimension!=='overworld'){addChat('Villages can only be found in the Overworld.','err');return}
+      if(!villageCenters.length){addChat('No villages generated in this world.','err');return}
       let best=null,bd=1e9;
       for(const v of villageCenters){const d=Math.hypot(v.x-p.x,v.z-p.z);if(d<bd){bd=d;best=v}}
-      addChat('Lähim küla: X '+Math.round(best.x)+' Z '+Math.round(best.z)+' ('+Math.round(bd)+' plokki eemal). Külasid kokku: '+villageCenters.length,'sys');
+      addChat('Nearest Village: X '+Math.round(best.x)+' Z '+Math.round(best.z)+' ('+Math.round(bd)+' blocks away). Total villages: '+villageCenters.length,'sys');
       if((a[0]||'').toLowerCase()==='tp'){
-        if(survival){addChat('Teleport töötab ainult creative-režiimis.','err');return}
+        if(survival){addChat('Teleporting is only available in Creative Mode.','err');return}
         p.x=best.x+.5;p.z=best.z+.5;p.y=best.y+3;vx=vz=vy=0;ground=false;airTop=p.y;
       }
     }};
 
-    document.title='MineCraft LAN V20';
+    document.title='Minecraft LAN V20';
     const heading=document.querySelector('#menu .box h1');
-    if(heading)heading.textContent='⛏ MineCraft LAN · V20';
-    addChat('V20: mäed, koopad, raud/kuld/teemant, void, kukkuv liiv, päris tõrvik ja villaplokid. Proovi /village ja /seed.','sys');
+    if(heading)heading.textContent='⛏ Minecraft LAN · V20';
+    addChat('V20: mountains, caves, Iron/Gold/Diamond Ore, the Void, falling Sand, Torches, and Wool. Try /village and /seed.','sys');
     renderBar();updHeld();
   }catch(err){
     console.error('MineCraft V20 update error:',err);
-    try{addChat('V20 uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('V20 update error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 
@@ -5662,9 +5832,9 @@ try{
   }
 
   /* ---- Ämblikumuna + niit ---- */
-  ICON[170]=mkEgg("#3b3028","#a02020");NAMES[170]="Spider spawn egg";
+  ICON[170]=mkEgg("#3b3028","#a02020");NAMES[170]="Spider Spawn Egg";
   if(!ALL.includes(170)){const i=ALL.indexOf(169);if(i>=0)ALL.splice(i+1,0,170);else ALL.push(170)}
-  NAMES[226]="Lõng";
+  NAMES[226]="String";
   ICON[226]=mkIcon(px=>{px(4,10,'#f2f2ee',8,2);px(6,7,'#e4e4de',2,6);px(9,6,'#f8f8f4',2,5);px(5,13,'#d6d6d0',7,1);px(7,4,'#f2f2ee',3,2)});
   if(!ALL.includes(226))ALL.push(226);
   const _mobDrop=mobDrop;
@@ -5687,7 +5857,7 @@ try{
     if(fromPlayer&&(t=="v"||t=="g")){
       let n=0;
       for(const q of mobs){if(q.type!=="g")continue;if(q===o||Math.hypot(q.x-o.x,q.z-o.z)<48){q.angryUntil=now+45;n++}}
-      if(n&&survival&&now-aggroMsgAt>15){aggroMsgAt=now;try{addChat("Raudgolem on vihane!","sys")}catch(e){}}
+      if(n&&survival&&now-aggroMsgAt>15){aggroMsgAt=now;try{addChat("The Iron Golem is angry!","sys")}catch(e){}}
     }
     _damageMob(o,dmg,fx,fz);
     if(!o.dead&&fromPlayer&&(isFarmType(t)||t=="v")){o.fleeT=5+Math.random()*2.5;o.fleeX=fx;o.fleeZ=fz}
@@ -5839,18 +6009,18 @@ try{
       const hrs=(((dayTime-.25)*24+12)%24+24)%24,hh=Math.floor(hrs),mm=Math.floor((hrs-hh)*60);
       const dt=((dayTime%1)+1)%1;
       let line;
-      if(dt>=NS&&dt<=NE)line="\u{1F319} Hommikuni "+fmt((NE-dt)*1200);
-      else line="\u2600 Ööni "+fmt((dt<NS?NS-dt:1-dt+NS)*1200);
+      if(dt>=NS&&dt<=NE)line="\u{1F319} Sunrise in "+fmt((NE-dt)*1200);
+      else line="\u2600 Nightfall in "+fmt((dt<NS?NS-dt:1-dt+NS)*1200);
       clk.innerHTML=f2(hh)+":"+f2(mm)+"<br><span style='font-weight:400;font-size:12px'>"+line+"</span>";
     }catch(e){}
   },250);
 
-  document.title="MineCraft LAN V21";
+  document.title="Minecraft LAN Edition";
   const h=document.querySelector("#menu .box h1");if(h)h.textContent="⛏ MineCraft LAN · V21";
-  addChat("V21: ämblikud (Spider spawn egg), parem pathfinding, loomad põgenevad, raudgolem kaitseb külaelanikke, kell paremas nurgas, tulekahju igal plokil.","sys");
+  addChat("V21: Spider Spawn Eggs, improved mob pathfinding, fleeing animals, Iron Golem village defense, an in-game clock, and fire on blocks.","sys");
 }catch(err){
   console.error("MineCraft V21 error:",err);
-  try{addChat("V21 uuenduse viga: "+String(err.message||err),"err")}catch(_e){}
+  try{addChat("V21 update error: "+String(err.message||err),"err")}catch(_e){}
 }
 })();
 
@@ -5930,6 +6100,7 @@ function TB(par,mats,key,w,h,d,x,y,z,f,P,j=14){
     const m=new THREE.MeshBasicMaterial({map:t});m.userData.base=0xffffff;mats.push(m);return m});
   const e=new THREE.Mesh(new THREE.BoxGeometry(w*P,h*P,d*P),ms);e.position.set(x*P,y*P,z*P);par.add(e);return e}
 const one=c=>()=>c;
+window.TB=TB;
 
 /* --- Creeper (8x8x8 pea, 8x12x4 keha, 4 jalga 4x6x4) --- */
 /* --- Iron golem (Minecrafti mõõtudes: 43 px kõrge, 18x12x11 torso, 4x30x6 käed) --- */
@@ -5996,7 +6167,8 @@ window.mkSpider=function(){
 
 /* --- Loomad: siga, lehm, lammas, kana --- */
 mkAnimal=function(type,color){
-  const mats=[],g=new THREE.Group(),dummy=()=>new THREE.Group();
+  // P peab olema deklareeritud enne kana haru: const-i TDZ põhjustas maailma genereerimise krahhi.
+  const P=.0625,mats=[],g=new THREE.Group(),dummy=()=>new THREE.Group();
   const limb=(key,P,w,h,d,x,y,z,f)=>{const q=new THREE.Group();q.position.set(x*P,y*P,z*P);g.add(q);TB(q,mats,key,w,h,d,0,-h/2,0,f,P);return q};
   const head=new THREE.Group();g.add(head);
   const ret=(a,b,c,d)=>({g,body:g,head,armL:c,armR:d,legL:a,legR:b,mats,ov:[[],[],[],[]],pal:{fwd:false,bow:false},ph:0,fl:false});
@@ -6029,6 +6201,9 @@ mkAnimal=function(type,color){
     TB(g,mats,"chW",1,4,6,-3.5,9,0,white,P,4);TB(g,mats,"chW",1,4,6,3.5,9,0,white,P,4);
     head.position.set(0,9*P,-4*P);
     TB(head,mats,"chH",4,6,3,0,3,-.5,HF,P,4);
+    /* Silmad asuvad kana pea külgedel, nagu Minecraftis; väikesed tumedad pikslid. */
+    TB(head,mats,"chEye",1,1,1,-2.5,4,-1,one(0x171717),P,4);
+    TB(head,mats,"chEye",1,1,1,2.5,4,-1,one(0x171717),P,4);
     TB(head,mats,"chK",4,2,2,0,3,-3,BILL,P,4);
     TB(head,mats,"chC",2,2,2,0,1,-2,one(0xd01010),P,4);
     const climb=x=>{
@@ -6038,7 +6213,6 @@ mkAnimal=function(type,color){
     };
     return ret(climb(-1.5),climb(1.5),dummy(),dummy());
   }
-  const P=.0625;
   if(type=="pig"){
     const PK=0xf0a8a6;
     TB(g,mats,"pgB",10,8,16,0,10,2,one(PK),P,14);
@@ -6128,10 +6302,10 @@ function mcRefreshMobModels(){
 mcRefreshMobModels();
 setInterval(mcRefreshMobModels,1000);
 
-document.title="MineCraft LAN V22";
+document.title="Minecraft LAN V22";
 const h=document.querySelector("#menu .box h1");if(h)h.textContent="⛏ MineCraft LAN · V22";
-addChat("V22: Minecrafti-laadsed mobid (zombie, skelett, creeper, ämblik, külaelanik, piglin, loomad), õiged kõrgused, mobid ei jää enam lehtedesse kinni.","sys");
-}catch(err){console.error("MineCraft V22 error:",err);try{addChat("V22 viga: "+String(err.message||err),"err")}catch(_e){}}
+addChat("V22: Minecraft-style mobs (Zombies, Skeletons, Creepers, Spiders, Villagers, Piglins, and animals), corrected model heights, and improved collisions with leaves.","sys");
+}catch(err){console.error("MineCraft V22 error:",err);try{addChat("V22 error: "+String(err.message||err),"err")}catch(_e){}}
 })();
 
 </script>
@@ -6176,7 +6350,7 @@ setWaterVolume=function(x,y,z,amount,net){
     const diff=window.mcDifficulty||"normal";
     const cap=window.mcMods.nightMobs===false?0:(CAPS[diff]===undefined?18:CAPS[diff]);
     const night=Math.sin(dayTime*Math.PI*2)<-.02;
-    const hostile=mobs.filter(m=>HOST.includes(m.type));
+    const hostile=mobs.filter(m=>HOST.includes(m.type)&&!(window.mcUG&&window.mcUG(m)));
     if(!night||cap===0){
       for(let i=hostile.length-1;i>=0;i--){const m=hostile[i];
         if(Math.hypot(m.x-p.x,m.z-p.z)>12&&(cap===0||Math.random()<.3))drop(m)}
@@ -6208,7 +6382,7 @@ try{
   };
   setInterval(()=>{if(isHost||(srv&&myId===1))send({t:'time',v:dayTime})},8000);
 }catch(e){console.warn('V23 lan',e)}
-try{addChat("V23: lava, obsidiaan, öised mobid, LAN-parandused.","sys")}catch(e){}
+try{addChat("V23: Lava, Obsidian, hostile night mobs, and LAN fixes.","sys")}catch(e){}
 /* ---- Pillager outpostide valvurid: spawnivad ka päeval ---- */
 setInterval(()=>{try{
   if(dead||worldDimension!=="overworld"||!window.mcWorldReady)return;
@@ -6291,30 +6465,30 @@ setInterval(()=>{try{
   const save=()=>{try{localStorage.setItem('mcAch',JSON.stringify(got))}catch(e){}};
   const queue=[];let showing=false;
   const A={
-    wood:['🪵','Puuhakkaja','Kogu esimene palk'],
-    planks:['🔨','Töölaud valmis','Tee laudu'],
-    pick:['⛏️','Aeg kaevata','Meisterda kirka'],
-    iron:['🔩','Rauaaeg','Sulata raudkangi'],
-    bucket:['🪣','Ämbritäis','Meisterda ämber'],
-    diamond:['💎','TEEMANDID!','Leia teemant'],
-    obsidian:['🟪','Jää ja tuli','Hangi obsidiaani'],
-    tntcraft:['🧨','Pommimees','Meisterda TNT'],
-    kamikaze:['💥','Kamikaze','Lase esimene TNT õhku'],
-    kill:['⚔️','Esimene veri','Tapa esimene mob'],
-    zombie:['🧟','Zombikütt','Tapa zombi'],
-    creeper:['🟢','Aww man','Tapa creeper'],
-    skeleton:['💀','Luukere','Tapa skelett'],
-    golem:['🗿','Vihane golem','Löö raudgolemit'],
-    duel:['🤺','Duellist','Löö teist mängijat'],
-    nether:['🔥','Põrgusse','Mine Netherisse'],
-    fly:['🕊️','Lendaja','Hakka lendama'],
-    died:['☠️','Hopsti','Sure ära'],
-    night:['🌙','Öövaht','Tapa mob öösel'],
+    wood:['🪵','Getting Wood','Collect your first Log'],
+    planks:['🔨','Benchmarking','Craft a Crafting Table'],
+    pick:['⛏️','Time to Mine!','Craft a Pickaxe'],
+    iron:['🔩','Acquire Hardware','Smelt an Iron Ingot'],
+    bucket:['🪣','Bucket List','Craft a Bucket'],
+    diamond:['💎','DIAMONDS!','Find a Diamond'],
+    obsidian:['🟪','We Need to Go Deeper','Obtain Obsidian'],
+    tntcraft:['🧨','Boom!','Craft TNT'],
+    kamikaze:['💥','KABOOM!','Set off your first TNT'],
+    kill:['⚔️','Monster Hunter','Defeat your first hostile mob'],
+    zombie:['🧟','Zombie Slayer','Defeat a Zombie'],
+    creeper:['🟢','Aww Man','Defeat a Creeper'],
+    skeleton:['💀','Bone Collector','Defeat a Skeleton'],
+    golem:['🗿','Not So Iron','Hit an Iron Golem'],
+    duel:['🤺','Duelist','Hit another player'],
+    nether:['🔥','Into the Nether','Enter the Nether'],
+    fly:['🕊️','Taking Flight','Start flying in Creative Mode'],
+    died:['☠️','That Was Unexpected','Die for the first time'],
+    night:['🌙','Night Hunter','Defeat a hostile mob at night'],
   };
   function show(){
     if(showing||!queue.length)return;showing=true;
     const [ic,t,d]=A[queue.shift()];
-    const e=document.createElement('div');e.className='ach';e.innerHTML='<i>'+ic+'</i><div><b>Saavutus!</b>'+t+'<br><span>'+d+'</span></div>';
+    const e=document.createElement('div');e.className='ach';e.innerHTML='<i>'+ic+'</i><div><b>Achievement Get!</b>'+t+'<br><span>'+d+'</span></div>';
     box.appendChild(e);requestAnimationFrame(()=>requestAnimationFrame(()=>e.classList.add('in')));
     try{sfxEquip()}catch(_){}
     setTimeout(()=>e.classList.add('out'),4200);
@@ -6322,8 +6496,8 @@ setInterval(()=>{try{
   }
   window.giveAch=function(k){
     if(got[k]||!A[k])return;got[k]=1;save();queue.push(k);show();
-    try{addChat('🏆 Sa said saavutuse: '+A[k][1],'sys')}catch(e){}
-    try{send({t:'chat',n:(typeof playerName==='string'&&playerName)||'Mängija',m:'🏆 sai saavutuse: '+A[k][1]})}catch(e){}
+    try{addChat('🏆 Achievement unlocked: '+A[k][1],'sys')}catch(e){}
+    try{send({t:'chat',n:(typeof playerName==='string'&&playerName)||'Playja',m:'🏆 unlocked an achievement: '+A[k][1]})}catch(e){}
   };
   const g=giveAch;
   setInterval(()=>{try{
@@ -6387,7 +6561,7 @@ setInterval(()=>{try{
 })();
 </script>
 <script>
-/* MineCraft_LAN_V23_REAL_FIRE: lõõmad plokkide pinnal (küljed + peal), mitte ploki sees. */
+/* MineCraft_LAN_V23_REAL_FIRE: lõõmad plokkide pinnal (küljed + peal), mitte ploki ON. */
 try{(function(){
   if(window.__mcRealFire)return;window.__mcRealFire=true;
   const NF=8,mats=[];
@@ -6509,7 +6683,7 @@ try{(function(){
     for(const m of fx.ms){m.material=mats[fl(performance.now()/90+m.userData.ph)%NF];}
     fx.grp.scale.y=sc;
   }
-  /* ---- Mängija ---- */
+  /* ---- Playja ---- */
   let burnT=0,burnDmg=0;
   function playerStep(dt){
     if(!survival||dead){burnT=0;burnDmg=0}
@@ -6712,9 +6886,9 @@ blockSfx=function(b,kind,x,y,z,stage){
 };
 if(typeof AC!=="undefined"&&AC)loadSamples();
 
-/* ---- Smaragd ---- */
+/* ---- Emerald ---- */
 const EM=227;
-NAMES[EM]="Smaragd";
+NAMES[EM]="Emerald";
 ICON[EM]=mkIcon(px=>{px(6,2,'#9dffc4',4,1);px(4,3,'#2ecc71',8,2);px(3,5,'#27ae60',10,3);px(4,8,'#1e8c4a',8,2);px(6,10,'#16703a',4,2);px(5,3,'#d6ffe8',2,1)});
 if(!ALL.includes(EM))ALL.push(EM);
 
@@ -6732,10 +6906,10 @@ function render(){
   const o=tMob;if(!o)return;
   box.textContent="";
   const tb=document.createElement("div");tb.className="tb";box.appendChild(tb);
-  const h=document.createElement("h3");h.textContent="Külaelanik · Kauplemine";tb.appendChild(h);
+  const h=document.createElement("h3");h.textContent="Villager · Trading";tb.appendChild(h);
   const em=document.createElement("div");em.className="em";
   em.appendChild(mkSlot(EM,"",survival?(inv[EM]||0):1));
-  const t=document.createElement("span");t.textContent=survival?("Sul on "+(inv[EM]||0)+" smaragdi"):"Loomingurežiim: kauplemine on tasuta";em.appendChild(t);tb.appendChild(em);
+  const t=document.createElement("span");t.textContent=survival?("You have "+(inv[EM]||0)+" Emeralds"):"Creative Mode: trading is free";em.appendChild(t);tb.appendChild(em);
   o.trades.forEach(tr=>{
     const [g,gn]=tr[0],[r,rn]=tr[1];
     const row=document.createElement("div");row.className="row";
@@ -6743,7 +6917,7 @@ function render(){
     const ar=document.createElement("span");ar.className="ar";ar.textContent="→";row.appendChild(ar);
     row.appendChild(mkSlot(r,"",rn));
     const nm=document.createElement("small");nm.style.opacity=".75";nm.textContent=nameOf(g)+" → "+nameOf(r);row.appendChild(nm);
-    const b=document.createElement("button");b.textContent="Vaheta";
+    const b=document.createElement("button");b.textContent="Trade";
     b.disabled=survival&&(inv[g]||0)<gn;
     b.onclick=()=>{
       if(survival&&(inv[g]||0)<gn)return;
@@ -6752,7 +6926,7 @@ function render(){
     };
     row.appendChild(b);tb.appendChild(row);
   });
-  const c=document.createElement("button");c.className="cl";c.textContent="Sulge (Esc)";c.onclick=closeTrade;tb.appendChild(c);
+  const c=document.createElement("button");c.className="cl";c.textContent="Close (Esc)";c.onclick=closeTrade;tb.appendChild(c);
   box.onclick=e=>{if(e.target===box)closeTrade()};
 }
 function openTrade(o){
@@ -6788,7 +6962,7 @@ addEventListener("mousedown",e=>{
   const o=aimVillager();if(!o)return;
   e.stopImmediatePropagation();e.preventDefault();openTrade(o);
 },true);
-try{addChat("V24: puud ei kattu enam, külaelanikel on voodid ja nad oskavad uksi avada, zombid ründavad väljas olevaid külaelanikke, parem klõps külaelanikul = kauplemine (smaragdid).","sys")}catch(e){}
+try{addChat("V24: trees no longer overlap, Villagers have Beds and can open Doors, Zombies attack Villagers outdoors, and right-clicking a Villager opens trading (Emeralds).","sys")}catch(e){}
 })();
 </script>
 <style id="mcUIcss">
@@ -6852,19 +7026,19 @@ try{addChat("V24: puud ei kattu enam, külaelanikel on voodid ja nad oskavad uks
 
   <div class="scr on" id="sTitle">
     <canvas id="mcPano"></canvas><div id="mcVig"></div>
-    <div class="logoWrap"><canvas id="mcLogo"></canvas><div class="logoSub">L A N &nbsp; E D I T I O N</div><div id="mcSplash">Tere tulemast!</div></div>
+    <div class="logoWrap"><canvas id="mcLogo"></canvas><div class="logoSub">L A N &nbsp; E D I T I O N</div><div id="mcSplash">Welcome!</div></div>
     <div class="btnCol">
       <button class="mb" id="mtSingle">Singleplayer</button>
       <button class="mb" id="mtMulti">Multiplayer</button>
       <button class="mb" id="mtMods">Mods</button>
       <div class="row2"><button class="mb" id="mtOpt">Options...</button><button class="mb" id="mtQuit">Quit Game</button></div>
     </div>
-    <div class="mcFoot"><span id="mcVer">MineCraft LAN V25</span><span>Tehtud brauseris · three.js</span></div>
+    <div class="mcFoot"><span id="mcVer">Minecraft LAN Edition</span><span>Made in browser · Three.js</span></div>
   </div>
 
   <div class="scr dirt" id="sSingle">
     <div class="scrTitle">Select World</div>
-    <div class="mcPanel list" id="mcWorldList"><div class="mcEmpty">Siin pole veel ühtegi maailma.<br><small style="font-size:20px;color:#888">Vajuta "Create New World", et alustada.</small></div></div>
+    <div class="mcPanel list" id="mcWorldList"><div class="mcEmpty">No worlds yet.<br><small style="font-size:20px;color:#888">Click "Create New World" to get started.</small></div></div>
     <button class="mb go" id="msCreate" style="margin-top:14px">Create New World</button>
     <button class="mb" id="msBack1">Cancel</button>
   </div>
@@ -6877,7 +7051,7 @@ try{addChat("V24: puud ei kattu enam, külaelanikel on voodid ja nad oskavad uks
     <button class="mb" id="mcDiff">Difficulty: Normal</button>
     <button class="mb" id="mcSkinB">Skin: -</button>
     <button class="mb" id="mcMore">More World Options...</button>
-    <div class="fld" id="mcMoreBox" style="display:none"><label for="mcSeed">Seed for the World Generator</label><input type="text" id="mcSeed" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Jäta tühjaks = juhuslik seed"></div>
+    <div class="fld" id="mcMoreBox" style="display:none"><label for="mcSeed">Seed for the World Generator</label><input type="text" id="mcSeed" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Leave blank for a random seed"></div>
     <div class="mcErr" id="mcCErr"></div>
     <div class="row2"><button class="mb go" id="mcMake">Create New World</button><button class="mb" id="mcCancelC">Cancel</button></div>
     <div class="mcHint" id="mcModeHint"></div>
@@ -6885,9 +7059,9 @@ try{addChat("V24: puud ei kattu enam, külaelanikel on voodid ja nad oskavad uks
 
   <div class="scr dirt" id="sMulti">
     <div class="scrTitle">Play Multiplayer</div>
-    <div class="mcPanel" style="text-align:center">Liitu sõbra maailmaga koodi abil.<br><small style="font-size:19px;color:#999">Oma maailma jagamiseks: alusta Singleplayer'is, vajuta Esc ja vali "Loo mäng" - kood ilmub sinna.</small></div>
+    <div class="mcPanel" style="text-align:center">Join a friend’s world using a join code.<br><small style="font-size:19px;color:#999">To share your world: start a Singleplayer world, press Esc, and choose "Host Game". A join code will appear there.</small></div>
     <div class="fld"><label for="mcPName2">Player Name</label><input type="text" id="mcPName2" maxlength="16" autocomplete="off" spellcheck="false"></div>
-    <div class="fld"><label for="mcJoin">Join Code</label><input type="text" id="mcJoin" maxlength="5" autocomplete="off" spellcheck="false" placeholder="5-kohaline kood" style="text-transform:uppercase"></div>
+    <div class="fld"><label for="mcJoin">Join Code</label><input type="text" id="mcJoin" maxlength="5" autocomplete="off" spellcheck="false" placeholder="5-character code" style="text-transform:uppercase"></div>
     <button class="mb go" id="mcJoinB" style="margin-top:14px">Join Server</button>
     <div class="mcErr" id="mcMErr" style="color:#cfe"></div>
     <button class="mb" id="mcBack2">Back</button>
@@ -6916,7 +7090,7 @@ var $=function(id){return document.getElementById(id)};
 var UI=$("mcUI");
 window.mcWorldReady=false;window.mcDifficulty="normal";window.mcMods=window.mcMods||{nightMobs:true};
 var creating=false;
-document.title="MineCraft LAN V25";
+document.title="Minecraft LAN Edition";
 
 /* --- klaviatuur ei lähe mängu, kuni maailm pole valmis --- */
 function stopKeys(e){
@@ -7016,8 +7190,8 @@ function renderWorldList(){
  try{worlds=api&&api.list?api.list():[]}catch(e){console.warn("Could not list saved worlds",e)}
  if(!worlds.length){
   var empty=document.createElement("div");empty.className="mcEmpty";
-  empty.appendChild(document.createTextNode("Siin pole veel ühtegi maailma."));
-  var hint=document.createElement("small");hint.style.cssText="display:block;font-size:20px;color:#888;margin-top:5px";hint.textContent='Vajuta "Create New World", et alustada.';
+  empty.appendChild(document.createTextNode("No worlds yet."));
+  var hint=document.createElement("small");hint.style.cssText="display:block;font-size:20px;color:#888;margin-top:5px";hint.textContent='Click "Create New World" to get started.';
   empty.appendChild(hint);box.appendChild(empty);return;
  }
  worlds.forEach(function(world){
@@ -7026,21 +7200,21 @@ function renderWorldList(){
   var name=document.createElement("b");name.textContent=world.name||"New World";
   var detail=document.createElement("small");
   var mode=world.sv?"Survival":"Creative",diff=world.diff||"Normal";
-  var stamp=world.ts?new Date(world.ts).toLocaleString():"Salvestatud";
+  var stamp=world.ts?new Date(world.ts).toLocaleString():"Saved";
   detail.textContent=mode+" · "+diff+" · Seed "+world.seed+" · "+stamp;
   info.appendChild(name);info.appendChild(detail);
   var actions=document.createElement("div");actions.className="mcWorldActions";
-  var play=document.createElement("button");play.className="mb go";play.textContent="Mängi";
+  var play=document.createElement("button");play.className="mb go";play.textContent="Play";
   play.addEventListener("click",function(){launchSavedWorld(world.id)});
-  var del=document.createElement("button");del.className="mb worldDelete";del.textContent="Kustuta";
+  var del=document.createElement("button");del.className="mb worldDelete";del.textContent="Delete";
   del.addEventListener("click",function(){
-   if(!confirm('Kas kustutada maailm "'+(world.name||"New World")+'"? Seda ei saa taastada.'))return;
-   try{api.remove(world.id);renderWorldList()}catch(e){console.error(e);toast("Maailma kustutamine ebaõnnestus.")}
+   if(!confirm('Delete world "'+(world.name||"New World")+'"? This cannot be undone.'))return;
+   try{api.remove(world.id);renderWorldList()}catch(e){console.error(e);toast("Could not delete the world.")}
   });
   actions.appendChild(play);actions.appendChild(del);card.appendChild(info);card.appendChild(actions);box.appendChild(card);
  });
 }
-var SPL=["Nüüd ka öösel zombidega!","100% kuubikuid!","Ära kaeva otse alla!","Creeper? Oh man.","Kõik moodulid sees!","Sisaldab ämblikke!","Tere, maailm!","Ehita, kaeva, ela üle!","LAN-valmis!","Ahjus on liha!","Hoia tõrvikut!","Pixel-täiuslik!"];
+var SPL=["Zombies now spawn at night!","100% blocky!","Never dig straight down!","Creeper? Oh man.","All systems ON!","Now with Spiders!","Hello, world!","Build, mine, survive!","LAN-ready!","There is food in the Furnace!","Keep your Torch close!","Pixel-perfect!"];
 function pickSplash(){$("mcSplash").textContent=SPL[Math.floor(Math.random()*SPL.length)]}
 
 /* --- sisendid: klahvid ei jõua mängu --- */
@@ -7056,8 +7230,8 @@ $("mcPName3").addEventListener("change",function(){saveName("mcPName3")});
 /* --- Create New World --- */
 var cfg={mode:"survival",diff:"normal"};
 var MODES=["survival","creative"],MN={survival:"Survival",creative:"Creative"},DIFFS=["peaceful","easy","normal","hard"],DN={peaceful:"Peaceful",easy:"Easy",normal:"Normal",hard:"Hard"};
-var HINT={survival:"Survival: tühi inventar, tervis ja nälg - kogu puid, meisterda, ela öö üle.",creative:"Creative: piiramatud plokid, surma pole, topelt-Space = lend."};
-var DHINT={peaceful:"Peaceful: vaenulikke mobe pole, nälg ei lange, elu taastub kiiresti.",easy:"Easy: vähem mobe, aeglasem nälg, kiirem regen, mobid löövad nõrgemini.",normal:"Normal: tavaline Minecrafti-tunne.",hard:"Hard: öösel palju rohkem mobe, kiirem nälg, aeglane regen, mobid löövad kõvasti ja nälg tapab."};
+var HINT={survival:"Survival: Start with an empty inventory. Gather wood, craft tools, find food, and survive the night.",creative:"Creative: Unlimited blocks, no damage, and double-tap Space to fly."};
+var DHINT={peaceful:"Peaceful: no hostile mobs, hunger does not decrease, and health regenerates quickly.",easy:"Easy: fewer mobs, slower hunger loss, faster regeneration, and weaker mob attacks.",normal:"Normal: the standard Minecraft experience.",hard:"Hard: more hostile mobs at night, faster hunger loss, slower regeneration, stronger mob attacks, and starvation can kill you."};
 function refreshCreate(){$("mcMode").textContent="Game Mode: "+MN[cfg.mode];$("mcDiff").textContent="Difficulty: "+DN[cfg.diff];$("mcModeHint").textContent=HINT[cfg.mode]+" "+DHINT[cfg.diff]}
 $("mcMode").onclick=function(){cfg.mode=MODES[(MODES.indexOf(cfg.mode)+1)%2];refreshCreate()};
 $("mcDiff").onclick=function(e){var d=e.shiftKey?-1:1;cfg.diff=DIFFS[(DIFFS.indexOf(cfg.diff)+d+4)%4];refreshCreate()};
@@ -7079,14 +7253,14 @@ function showLoad(name){
  var parts=ov.querySelectorAll(".gs span,.bar i");
  parts.forEach(function(p){p.style.animation="none"});void ov.offsetWidth;parts.forEach(function(p){p.style.animation=""});
  var b=ov.querySelector(".bar i");if(b)b.style.transform="";
- var t=ov.querySelector(".gt");if(t)t.textContent="Genereerin maailma"+(name?" \""+name+"\"":"");
+ var t=ov.querySelector(".gt");if(t)t.textContent="Generating World"+(name?" \""+name+"\"":"");
 }
 function startWorld(){
  var err=$("mcCErr");err.textContent="";
- if(!saveName("mcPName")){err.textContent="Mängijanimi peab olema vähemalt 2 märki (tähed, numbrid, tühik, _ ja -).";return}
+ if(!saveName("mcPName")){err.textContent="Player name must be at least 2 characters (letters, numbers, spaces, _ and -).";return}
  var wname=($("mcWName").value||"New World").trim().slice(0,30)||"New World";
  var seed=seedFrom($("mcSeed").value);
- if(typeof window.mcBoot!=="function"){err.textContent="Mängumootor ei laadinud (three.js vajab internetti).";return}
+ if(typeof window.mcBoot!=="function"){err.textContent="The game engine did not load (Three.js requires an Internet connection).";return}
  window.mcDifficulty=cfg.diff;
  UI.style.display="none";panoStop();showLoad(wname);
  try{audioInit();Music.start()}catch(e){}
@@ -7098,8 +7272,8 @@ function startWorld(){
    if(window.mcSaveApi&&window.mcSaveApi.create)window.mcSaveApi.create(wname,seed,cfg.mode,cfg.diff);
    window.mcWorldReady=true;
    try{if(window.mcSaveApi&&window.mcSaveApi.save)window.mcSaveApi.save()}catch(e){}
-   try{addChat("Maailm \""+wname+"\" · "+MN[cfg.mode]+" · "+DN[cfg.diff]+" · seed "+seed,"sys")}catch(e){}
-  }catch(e){ok=false;creating=false;console.error("World gen failed",e);try{alert("Maailma genereerimine ebaõnnestus: "+(e&&e.message||e))}catch(_){}}
+   try{addChat("World \""+wname+"\" · "+MN[cfg.mode]+" · "+DN[cfg.diff]+" · seed "+seed,"sys")}catch(e){}
+  }catch(e){ok=false;creating=false;console.error("World gen failed",e);try{alert("World generation failed: "+(e&&e.message||e))}catch(_){}}
   window.mcHideLoad();
   if(!ok){UI.style.display="block";go("sCreate");return}
   try{var r=rd.domElement.requestPointerLock();if(r&&r.catch)r.catch(function(){})}catch(e){}
@@ -7109,8 +7283,8 @@ function startWorld(){
 $("mcMake").onclick=startWorld;
 function launchSavedWorld(id){
  var api=window.mcSaveApi,d=api&&api.get?api.get(id):null;
- if(!d){toast("Salvestatud maailma ei leitud.");renderWorldList();return}
- if(typeof window.mcBoot!=="function"){toast("Mängumootor ei laadinud.");return}
+ if(!d){toast("Saved world not found.");renderWorldList();return}
+ if(typeof window.mcBoot!=="function"){toast("The game engine did not load.");return}
  try{api.setActive(id)}catch(e){}
  window.mcDifficulty=d.diff||"normal";
  UI.style.display="none";panoStop();showLoad(d.name||"(salvestatud)");
@@ -7120,8 +7294,8 @@ function launchSavedWorld(id){
   try{
    creating=true;window.mcBoot(d.seed);creating=false;
    api.apply(d);window.mcWorldReady=true;api.save();
-   try{addChat('Maailm "'+(d.name||"New World")+'" taastatud.',"sys")}catch(e){}
-  }catch(e){ok=false;creating=false;console.error("Restore failed",e);try{alert("Maailma taastamine ebaõnnestus: "+(e&&e.message||e))}catch(_){}}
+   try{addChat('World "'+(d.name||"New World")+'" restored.',"sys")}catch(e){}
+  }catch(e){ok=false;creating=false;console.error("Restore failed",e);try{alert("World restore failed: "+(e&&e.message||e))}catch(_){}}
   window.mcHideLoad();
   if(!ok){UI.style.display="block";go("sSingle");return}
   try{var r=rd.domElement.requestPointerLock();if(r&&r.catch)r.catch(function(){})}catch(e){}
@@ -7136,7 +7310,7 @@ $("mtSingle").onclick=function(){go("sSingle")};
 $("mtMulti").onclick=function(){go("sMulti")};
 $("mtMods").onclick=function(){go("sMods")};
 $("mtOpt").onclick=function(){go("sOpt")};
-$("mtQuit").onclick=function(){try{window.close()}catch(e){}toast("Brauser ei lase akent sulgeda - sulge see vahekaart käsitsi.")};
+$("mtQuit").onclick=function(){try{window.close()}catch(e){}toast("Your browser does not allow this window to close. Close this tab manually.")};
 $("msCreate").onclick=function(){refreshCreate();go("sCreate")};
 $("msBack1").onclick=function(){go("sTitle")};
 $("mcBack2").onclick=function(){go("sTitle")};
@@ -7146,13 +7320,13 @@ $("mcDone").onclick=function(){saveName("mcPName3");go("sTitle")};
 /* --- Multiplayer --- */
 $("mcJoinB").onclick=function(){
  var st=$("mcMErr");st.style.color="#ff8a80";
- if(!saveName("mcPName2")){st.textContent="Mängijanimi peab olema vähemalt 2 märki.";return}
+ if(!saveName("mcPName2")){st.textContent="Player name must be at least 2 characters.";return}
  var code=$("mcJoin").value.trim().toUpperCase();
- if(code.length<3){st.textContent="Sisesta liitumiskood.";return}
+ if(code.length<3){st.textContent="Enter a join code.";return}
  try{audioInit();Music.start()}catch(e){}
- $("joinCode").value=code;st.style.color="#cfe";st.textContent="Ühendan...";
+ $("joinCode").value=code;st.style.color="#cfe";st.textContent="Connecting...";
  $("joinBtn").click();
- var n=0,iv=setInterval(function(){n++;var t=$("net")?$("net").textContent:"";if(window.mcWorldReady||n>60){clearInterval(iv);if(!window.mcWorldReady){st.style.color="#ff8a80";st.textContent=t||"Ühendus ebaõnnestus."}return}if(t)st.textContent=t},500);
+ var n=0,iv=setInterval(function(){n++;var t=$("net")?$("net").textContent:"";if(window.mcWorldReady||n>60){clearInterval(iv);if(!window.mcWorldReady){st.style.color="#ff8a80";st.textContent=t||"Connection failed."}return}if(t)st.textContent=t},500);
 };
 $("mcJoin").addEventListener("keydown",function(e){if(e.key==="Enter")$("mcJoinB").click()});
 
@@ -7173,22 +7347,22 @@ function buildSliders(){
 }
 function syncOptions(){
  buildSliders();skinLabels();
- var m=$("musicMuteBtn");$("mcMute").textContent=m&&/sees/i.test(m.textContent)?"Music: ON":"Music: OFF";
+ var m=$("musicMuteBtn");$("mcMute").textContent=m&&/ON/i.test(m.textContent)?"Music: ON":"Music: OFF";
 }
 $("mcMute").onclick=function(){var m=$("musicMuteBtn");if(m){m.click();setTimeout(syncOptions,30)}};
 
 /* --- Mods --- */
 var MODS=[
- ["V15","Tõrvikud, valgus, portaal","Tõrvikud, nähtav valgus, Nether-portaal ja LAN-käteanimatsioonid."],
- ["V17","Tuleefektid ja vibu","Tuleefektid, noole füüsika, noolekorje ja vibu pööramine."],
- ["V18","Suuremad leegid","Puude ja plokkide leegid on suuremad ja selgemad."],
- ["V20","Mäed, koopad, maagid","Mäed, koopad, raud/kuld/teemant, void, kukkuv liiv, villaplokid; käsud /village ja /seed."],
- ["V21","Ämblikud ja AI","Ämblikud, parem pathfinding, loomad põgenevad, raudgolem, kell, tulekahju igal plokil."],
- ["V22","Minecrafti-laadsed mobid","Zombie, skelett, creeper, ämblik, külaelanik, piglin ja loomad."],
- ["V23","Lava, obsidiaan, öised mobid","Lava, obsidiaan, öised vaenulikud mobid, LAN-parandused."],
- ["V24","Külaelanikud","Voodid, uksed, zombid ründavad külaelanikke, kauplemine smaragdidega."],
- ["ACH","Saavutused","Saavutuste süsteem (salvestub brauserisse)."],
- ["V25","Peamenüü + öised mobid","Minecrafti-stiilis peamenüü, Create New World, uus öiste mobide süsteem."]
+ ["V15","Torches, Lighting & Portals","Torches emit visible light, Nether Portals, and LAN hand animations."],
+ ["V17","Fire Effects & Bow","Fire effects, arrow physics and pickup, and Bow rotation."],
+ ["V18","Improved Flames","Larger and clearer flames on trees and blocks."],
+ ["V20","Mountains, Caves & Ores","Mountains, caves, Iron/Gold/Diamond Ore, the Void, falling Sand, Wool blocks, and /village and /seed commands."],
+ ["V21","Spiders & AI","Spiders, improved pathfinding, fleeing animals, Iron Golem village defense, an in-game clock, and fire on blocks."],
+ ["V22","Minecraft-Style Mobs","Zombies, Skeletons, Creepers, Spiders, Villagers, Piglins, and animals."],
+ ["V23","Lava, Obsidian & Hostile Mobs","Lava, Obsidian, hostile night mobs, and LAN fixes."],
+ ["V24","Villagers & Trading","Beds, doors, Zombies attacking Villagers outdoors, and Emerald trading."],
+ ["ACH","Achievements","Achievements are saved in your browser."],
+ ["V25","Main Menu & Hostile Night Mobs","Minecraft-style main menu, Create New World, and a new hostile night mob system."]
 ];
 function syncMods(){
  var l=$("mcModList");l.innerHTML="";
@@ -7207,12 +7381,12 @@ try{
    try{if(typeof window.mcEnsureLoop==="function")window.mcEnsureLoop()}catch(e){}
    if(!creating&&!window.mcWorldReady){
     window.mcWorldReady=true;
-    setTimeout(function(){UI.style.display="none";panoStop();try{$("genLoad").style.display="none"}catch(e){}$("menu").style.display="flex";try{addChat("Liitusid maailmaga. Vajuta 'Mängi / jätka'.","sys")}catch(e){}},30);
+    setTimeout(function(){UI.style.display="none";panoStop();try{$("genLoad").style.display="none"}catch(e){}$("menu").style.display="flex";try{addChat("Joined the world. Press 'Play / Continue'.","sys")}catch(e){}},30);
    }
    return r;
   };
  }
-}catch(e){console.warn("gen wrap",e)}
+}catch(e){console.warn("world-generation wrapper",e)}
 
 /* --- pausimenüüsse nupp "Title Screen" --- */
 try{
@@ -7220,7 +7394,7 @@ try{
  if(play&&play.parentNode){
   var p=document.createElement("p");p.innerHTML='<button id="toTitle" class="alt">⏏ Title Screen</button>';
   play.parentNode.parentNode.insertBefore(p,play.parentNode.nextSibling);
-  $("toTitle").onclick=function(){if(confirm("Lahkud maailmast ja tuled tagasi peamenüüsse? Salvestamata edasiminek läheb kaotsi."))location.reload()};
+  $("toTitle").onclick=function(){if(confirm("Leave this world and return to the Title Screen? Unsaved progress will be lost."))location.reload()};
  }
 }catch(e){}
 
@@ -7230,7 +7404,7 @@ try{
   var dp=document.createElement("p");dp.innerHTML='<button id="toDiff" class="alt"></button>';
   pl.parentNode.parentNode.insertBefore(dp,pl.parentNode.nextSibling);
   var dl=function(){$("toDiff").textContent="Difficulty: "+DN[window.mcDifficulty||"normal"]};
-  $("toDiff").onclick=function(){var i=DIFFS.indexOf(window.mcDifficulty||"normal");window.mcDifficulty=DIFFS[(i+1)%4];dl();try{addChat("Raskusaste: "+DN[window.mcDifficulty]+". "+DHINT[window.mcDifficulty],"sys")}catch(e){}};
+  $("toDiff").onclick=function(){var i=DIFFS.indexOf(window.mcDifficulty||"normal");window.mcDifficulty=DIFFS[(i+1)%4];dl();try{addChat("Difficulty: "+DN[window.mcDifficulty]+". "+DHINT[window.mcDifficulty],"sys")}catch(e){}};
   dl();
  }
 }catch(e){}
@@ -7518,13 +7692,13 @@ try{
     if(isClient())clientStep(dt);else hostStep(dt);
   };
 
-  document.title='MineCraft LAN V26';
-  const v=document.getElementById('mcVer');if(v)v.textContent='MineCraft LAN V26';
-  const h=document.querySelector('#menu .box h1');if(h)h.textContent='⛏ MineCraft LAN · V26';
-  addChat('V26: skinnid ei värise, mobid on LANis sünkroonis (host juhib, kõik näevad sama), nooled nähtavad.','sys');
+  document.title='Minecraft LAN V26';
+  const v=document.getElementById('mcVer');if(v)v.textContent='Minecraft LAN V26';
+  const h=document.querySelector('#menu .box h1');if(h)h.textContent='⛏ Minecraft LAN · V26';
+  addChat('V26: skins no longer jitter, mobs are synchronized in LAN multiplayer (host-authoritative), and arrows are visible.','sys');
 }catch(err){
   console.error('V26 error:',err);
-  try{addChat('V26 viga: '+String(err.message||err),'err')}catch(_e){}
+  try{addChat('V26 error: '+String(err.message||err),'err')}catch(_e){}
 }
 })();
 
@@ -7565,7 +7739,7 @@ try{
   /* M klahv: ainult helid, muusika jääb mängima */
   window.mcToggleSfx=function(){
     S.sfx=!S.sfx;save();applySfx();refresh();
-    try{addChat('Helid: '+(S.sfx?'sees':'vaigistatud')+' (M) – muusika ei muutu','sys')}catch(e){}
+    try{addChat('Sound Effects: '+(S.sfx?'ON':'OFF')+' (M) – music is not affected','sys')}catch(e){}
   };
 
   /* ---- UI: sama definitsioon kahes kohas ---- */
@@ -7606,7 +7780,7 @@ try{
   if(sb){const box=document.createElement('div');sb.parentNode.insertBefore(box,sb);build(box,false);
     sb.parentNode.style.cssText+=';max-height:92vh;overflow:auto'}
   /* sOpt "Music: ON" nupp mõjutab ainult muusikat – täpsusta silti */
-  const mm=$('mcMute');if(mm)mm.title='Ainult muusika; helid eraldi allpool';
+  const mm=$('mcMute');if(mm)mm.title='Music only; sound effects are controlled separately below';
   refresh();applyAll();
 
   /* ---- raskusaste: ainult World loomisel ---- */
@@ -7625,12 +7799,12 @@ try{
     return _om.apply(this,arguments);
   };
 
-  const v=$('mcVer');if(v)v.textContent='MineCraft LAN V27';
-  document.title='MineCraft LAN V27';
-  const h=document.querySelector('#menu .box h1');if(h)h.textContent='⛏ MineCraft LAN · V27';
+  const v=$('mcVer');if(v)v.textContent='Minecraft LAN V27';
+  document.title='Minecraft LAN V27';
+  const h=document.querySelector('#menu .box h1');if(h)h.textContent='⛏ Minecraft LAN · V27';
 }catch(err){
   console.error('V27 error:',err);
-  try{addChat('V27 viga: '+String(err.message||err),'err')}catch(_e){}
+  try{addChat('V27 error: '+String(err.message||err),'err')}catch(_e){}
 }
 })();
 
@@ -7737,7 +7911,7 @@ function save(){
     writeIndex(items);localStorage.setItem(ACTIVE_KEY,activeWorldId);
     lastSavedPayload=fingerprint;
     return true;
-  }catch(e){console.warn("World save failed",e);try{toast("Salvestamine ebaõnnestus: brauseri salvestusruum võib olla täis.")}catch(_){}return false}
+  }catch(e){console.warn("World save failed",e);try{toast("Saving failed: your browser storage may be full.")}catch(_){}return false}
 }
 function peek(){
   try{
@@ -8088,8 +8262,8 @@ try{
 }catch(e){console.warn('cloud merge',e)}
 
 updHeld();
-try{addChat('V29: uus pillager (mudel, tekstuur, varvasvibu + laadimine), parem vibu tõmme ja teiste mängijate vibuga sihtimine, FPS-i optimeerimine.','sys')}catch(e){}
-}catch(err){console.error('V29 viga:',err);try{addChat('V29 viga: '+String(err.message||err),'err')}catch(_e){}}
+try{addChat('V29: new Pillager model and texture, Crossbow with loading animation, improved Bow draw, aiming with other players’ Bows, and FPS optimizations.','sys')}catch(e){}
+}catch(err){console.error('V29 viga:',err);try{addChat('V29 error: '+String(err.message||err),'err')}catch(_e){}}
 })();
 </script>
 
@@ -8135,7 +8309,7 @@ try{
       }
     }
   }catch(e){}},80);
-  try{addChat("V30: kõrbetemplid (saladuslik kamber, TNT + surveplaat), rohkem pillagere outpostide ümber, jooksmine ja hüppamine kulutavad nälga.","sys")}catch(e){}
+  try{addChat("V30: Desert Temples (secret chamber, TNT and Pressure Plate), more Pillagers around Outposts, and sprinting and jumping consume hunger.","sys")}catch(e){}
 }catch(err){console.error("V30 viga:",err)}
 })();
 </script>
@@ -8359,16 +8533,64 @@ updMobs=function(dt){
   try{remoteCbStep(dt)}catch(e){}
 };
 updHeld();
-try{addChat('V31: nooled ja varvasvibu PvP LAN-is, varvasvibu ese (meisterda või pillageri drop).','sys')}catch(e){}
-}catch(err){console.error('V31 viga:',err);try{addChat('V31 viga: '+String(err.message||err),'err')}catch(_e){}}
+try{addChat('V31: arrows and Crossbows work in LAN PvP; Crossbows can be crafted or dropped by Pillagers.','sys')}catch(e){}
+}catch(err){console.error('V31 viga:',err);try{addChat('V31 error: '+String(err.message||err),'err')}catch(_e){}}
 })();
 </script>
 
 <script>
-/* V32: smaragdimaak + Netheri mobide pidev spawn */
+/* V33: kruus (230) + uus koobaste süsteem */
+(function(){try{HARD[230]=.6;if(!ALL.includes(230))ALL.push(230)}catch(e){console.error("kruus",e)}})();
+</script>
+
+<script>
+/* V34: koobaste mobid (päeval ja öösel, raskusastme järgi) + pime koobaveri */
+(function(){
+  const HOST=["z","s","c","sp"],CAP={easy:4,normal:8,hard:14},PER={easy:1,normal:1,hard:2};
+  window.mcUG=function(m){const x=m.x|0,z=m.z|0;if(x<0||z<0||x>=W||z>=D)return false;return m.y<terrainTop[x*D+z]-3};
+  const nearTorch=(x,y,z)=>{for(let dx=-5;dx<=5;dx++)for(let dy=-3;dy<=4;dy++)for(let dz=-5;dz<=5;dz++){if(isTorchB(get(x+dx,y+dy,z+dz)))return true}return false};
+  function pick(depthY){
+    const r=Math.random();
+    if(depthY<22)return r<.3?"s":r<.52?"z":r<.76?"c":"sp";    // sügaval rohkem skelette ja creepereid
+    return r<.38?"z":r<.62?"s":r<.8?"sp":"c";
+  }
+  setInterval(()=>{try{
+    if(dead||worldDimension!=="overworld"||!window.mcWorldReady||!survival)return;
+    const diff=window.mcDifficulty||"normal";if(diff==="peaceful")return;
+    if(typeof isClient==="function"&&isClient())return;
+    const cap=CAP[diff]||8,ug=mobs.filter(m=>HOST.includes(m.type)&&window.mcUG(m));
+    for(const m of ug)if(Math.hypot(m.x-p.x,m.z-p.z)>72&&Math.random()<.25){const k=mobs.indexOf(m);if(k>=0){try{scene.remove(m.m.g);m.m.mats.forEach(q=>q.dispose())}catch(e){}mobs.splice(k,1)}}
+    // mängija peab ise olema maa all, siis spawnivad koopamobid ümber teda
+    const px=Math.floor(p.x),pz=Math.floor(p.z);if(px<2||pz<2||px>=W-2||pz>=D-2)return;
+    if(p.y>terrainTop[px*D+pz]-3)return;
+    let need=Math.min(cap-ug.length,PER[diff]||1);
+    for(let tries=0;tries<30&&need>0;tries++){
+      const a=Math.random()*Math.PI*2,dist=10+Math.random()*24,x=Math.floor(p.x+Math.cos(a)*dist),z=Math.floor(p.z+Math.sin(a)*dist);
+      if(x<3||z<3||x>=W-3||z>=D-3)continue;
+      const ty=terrainTop[x*D+z],y0=Math.floor(p.y)+Math.floor(Math.random()*21)-10;
+      for(let y=Math.min(y0,ty-5);y>y0-16&&y>3;y--){
+        if(get(x,y,z)!==0||get(x,y+1,z)!==0)continue;
+        const b=get(x,y-1,z);if(b===0||b===31||b===38)continue;
+        if(ty-y<5||nearTorch(x,y,z))break;
+        const before=mobs.length;spawnMob(pick(y),x+.5,y,z+.5,x,z);
+        if(mobs.length>before)need--;break;
+      }
+    }
+  }catch(e){console.warn("cave spawn",e)}},1500);
+  // koobavesi pimedaks, kui mängija on maa all
+  setInterval(()=>{try{
+    const px=Math.floor(p.x),pz=Math.floor(p.z);if(px<0||pz<0||px>=W||pz>=D)return;
+    const ug=worldDimension==="overworld"&&p.y<terrainTop[px*D+pz]-3;
+    if(waterMat&&waterMat.color)waterMat.color.setHex(ug?0x0a2430:0x319bc7);
+  }catch(e){}},300);
+})();
+</script>
+
+<script>
+/* V32: Emeraldmaak + Netheri mobide pidev spawn */
 (function(){
 try{
-  NAMES[68]="Smaragdi maak";COL[68]=[.2,.7,.35];HARD[68]=3;
+  NAMES[68]="Emerald Ore";COL[68]=[.2,.7,.35];HARD[68]=3;
   try{MC_PICK_BLOCKS.add(68)}catch(e){}
   if(!ALL.includes(68))ALL.push(68);
 
@@ -8399,7 +8621,7 @@ try{
       if(mobs.length>before)need--;
     }
   }catch(e){console.warn("nether spawn",e)}},2500);
-  try{addChat("V32: smaragdimaak koobastes (kaubelda külaelanikega) ja Netherisse tekivad pidevalt vaenulikud mobid.","sys")}catch(e){}
+  try{addChat("V32: Emerald Ore in caves (trade with Villagers) and hostile mobs spawn continuously in the Nether.","sys")}catch(e){}
 }catch(err){console.error("V32 viga:",err)}
 })();
 </script>
@@ -8465,9 +8687,9 @@ function mount(host,done){const c=document.createElement('div');c.className='mcr
  const sc={
  main(){const f=slider('FOV',30,110,1,()=>X().fov||75,v=>{X().fov=v;cam.fov=v;cam.updateProjectionMatrix();sv27()},v=>v==70?'Normal':v==110?'Quake Pro':v);
   const d=btn('Difficulty: '+({peaceful:'Peaceful',easy:'Easy',normal:'Normal',hard:'Hard'}[window.mcDifficulty||'normal']),()=>{});d.disabled=true;
-  return[txt('Options','mct'),row(f,d),row(btn('Skin Customization...',()=>show('skin')),btn('Music & Sounds...',()=>show('snd'))),row(btn('Controls...',()=>show('ctl')),btn('Video Settings...',()=>show('vid'))),row(btn('Chat Settings...',()=>show('chat')),btn('Debug (F3): '+(O.dbg?'ON':'OFF'),b=>{O.dbg=!O.dbg;sv();b.textContent='Debug (F3): '+(O.dbg?'ON':'OFF')})),txt('Raskusastet saab muuta ainult maailma loomisel.'),dn()]},
+  return[txt('Options','mct'),row(f,d),row(btn('Skin Customization...',()=>show('skin')),btn('Music & Sounds...',()=>show('snd'))),row(btn('Controls...',()=>show('ctl')),btn('Video Settings...',()=>show('vid'))),row(btn('Chat Settings...',()=>show('chat')),btn('Debug (F3): '+(O.dbg?'ON':'OFF'),b=>{O.dbg=!O.dbg;sv();b.textContent='Debug (F3): '+(O.dbg?'ON':'OFF')})),txt('Difficulty can only be changed when creating a world.'),dn()]},
  skin(){const g=document.createElement('div');g.className='mcg';SKINS.forEach((k,i)=>g.append(btn(k.n+(typeof skinIdx!=='undefined'&&skinIdx===i?' ✔':''),()=>{setSkin(i);show('skin')})));return[txt('Skin Customization','mct'),g,dn()]},
- snd(){const m=()=>!/sees|ON/i.test(($('musicMuteBtn')||{}).textContent||'sees');
+ snd(){const m=()=>!/ON/i.test(($('musicMuteBtn')||{}).textContent||'ON');
   return[txt('Music & Sounds','mct'),slider('Music',0,100,1,()=>$('musicRange').value,v=>setOld('musicRange',v),v=>v?v+'%':'OFF'),slider('Sound Effects',0,100,5,()=>X().sfxVol??80,v=>{setOpt('sfxVol',v);const r=proxy('#settingsPanel .setting-row',/Sound Volume/);if(r){const i=r.querySelector('input');i.value=v;i.dispatchEvent(new Event('input'))}},v=>v?v+'%':'OFF'),tog('Music',()=>!m(),()=>{$('musicMuteBtn').click()}),tog('Sound Effects',()=>X().sfx!==false,v=>setOpt('sfx',v,'Sound Effects')),dn()]},
  vid(){return[txt('Video Settings','mct'),slider('Render Distance',48,240,16,()=>$('renderRange').value,v=>setOld('renderRange',v),v=>Math.round(v/16)+' chunks'),slider('Brightness',0,100,1,()=>O.bright,v=>{O.bright=v;sv();applyO()},v=>v==0?'Moody':v==50?'Default':v==100?'Bright':v+'%'),slider('GUI Scale',0,4,1,()=>O.gui,v=>{O.gui=v;sv();applyO()},v=>GN[v]),row(tog('Show FPS',()=>!!X().fps,v=>setOpt('fps',v,'Show FPS')),tog('View Bobbing',()=>X().shake!==false,v=>setOpt('shake',v,'Screen Shake'))),row(tog('Crosshair',()=>X().cross!==false,v=>setOpt('cross',v,'Crosshair')),tog('Fullscreen',()=>!!document.fullscreenElement,v=>{try{v?document.documentElement.requestFullscreen():document.exitFullscreen()}catch(e){}},['ON','OFF'])),row(tog('Motion Blur',()=>window.mcMotionBlur!==false,v=>{window.mcMotionBlur=v;try{localStorage.setItem('mcBlur',v?'1':'0')}catch(e){}}),tog('Menu Animations',()=>!document.body.classList.contains('noMenuAnim'),v=>{document.body.classList.toggle('noMenuAnim',!v);try{localStorage.setItem('mcMenuAnim',v?'1':'0')}catch(e){}})),dn()]},
  ctl(){const keys=[['Forward / Back','W / S'],['Left / Right','A / D'],['Jump / Fly up','Space'],['Sneak / Fly down','Shift'],['Attack / Destroy','LMB'],['Use / Place','RMB'],['Inventory','E'],['Chat','T'],['Mute sounds','M'],['Debug screen','F3'],['Menu','Esc']];
@@ -8484,8 +8706,8 @@ if(to)new MutationObserver(()=>{if(to.classList.contains('on'))tc.show('main')})
 const menu=$('menu'),P=document.createElement('div');P.id='mcPause';P.className='mcr';menu.appendChild(P);
 function pause(){P.innerHTML='';const code=$('code').value,info=txt('');
  P.append(txt('Game Menu','mct'),btn('Back to Game',()=>$('play').click(),'sel'),
-  row(btn('Achievements',()=>{info.textContent='Saavutusi näed mängu sees teadetena.'}),btn('Dressing Room',()=>{$('settingsBtn').click();setTimeout(()=>pc.show('skin'),0)})),
-  row(btn('Feedback',()=>window.open('https://feedback.minecraft.net','_blank')),btn('List Players',()=>{let n=[playerName];try{others.forEach(o=>n.push(o.name||o.n||'?'))}catch(e){}info.textContent='Mängijad ('+n.length+'): '+n.join(', ')})),
+  row(btn('Achievements',()=>{info.textContent='Achievements appear as in-game notifications.'}),btn('Dressing Room',()=>{$('settingsBtn').click();setTimeout(()=>pc.show('skin'),0)})),
+  row(btn('Feedback',()=>window.open('https://feedback.minecraft.net','_blank')),btn('List Players',()=>{let n=[playerName];try{others.forEach(o=>n.push(o.name||o.n||'?'))}catch(e){}info.textContent='Players ('+n.length+'): '+n.join(', ')})),
   row(btn('Options...',()=>$('settingsBtn').click()),btn(code?'Code: '+code:'Invite to Game',()=>{$('hostBtn').click();setTimeout(pause,700)})),
   btn('Save and Quit to Title',()=>{try{window.mcSaveApi.save()}catch(e){}location.reload()}),info)}
 new MutationObserver(()=>{if(menu.style.display==='flex')pause()}).observe(menu,{attributes:true,attributeFilter:['style']});
@@ -8522,7 +8744,7 @@ applyO();addEventListener('load',applyO);
 <script id="mcCaveDark">
 (function(){try{
 const hm=new Uint8Array(W*D),tex=new THREE.DataTexture(hm,W,D,THREE.LuminanceFormat,THREE.UnsignedByteType);
-tex.magFilter=tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;tex.needsUpdate=true;
+tex.magFilter=tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;tex.needsUpdate=true;
 const opaque=b=>b>0&&!CUT[b]&&b!==31&&b!==38&&!isTorchB(b);
 function colH(x,z){for(let y=H-1;y>=0;y--)if(opaque(w[x+W*z+W*D*y]))return y;return 0}
 function recompute(){for(let z=0;z<D;z++)for(let x=0;x<W;x++)hm[z*W+x]=colH(x,z);tex.needsUpdate=true}
@@ -8532,11 +8754,11 @@ const oS=setBlock;setBlock=function(x,y,z,b,net){const r=oS.apply(this,arguments
 const oC=worldMat.onBeforeCompile;
 worldMat.onBeforeCompile=function(sh){oC.call(this,sh);
  sh.uniforms.uMCHM={value:tex};sh.uniforms.uMCWD={value:new THREE.Vector2(W,D)};sh.uniforms.uMCDark={value:1};
- sh.fragmentShader=sh.fragmentShader.replace('uniform float uMCLightCount;','uniform float uMCLightCount;\nuniform sampler2D uMCHM;uniform vec2 uMCWD;uniform float uMCDark;\nfloat mcH(vec2 q){return texture2D(uMCHM,(floor(q)+.5)/uMCWD).r*255.0;}');
+ sh.fragmentShader=sh.fragmentShader.replace('uniform float uMCLightCount;','uniform float uMCLightCount;\nuniform sampler2D uMCHM;uniform vec2 uMCWD;uniform float uMCDark;\nfloat mcH(vec2 q){return texture2D(uMCHM,q/uMCWD).r*255.0;}');
  const a='diffuseColor.rgb=min(vec3(1.0),diffuseColor.rgb*(1.0+mcGlow*0.82)';
- const dark='vec2 mq=vMCWorldPos.xz;float yy=vMCWorldPos.y;float s1=min(min(mcH(mq+vec2(.55,.55)),mcH(mq+vec2(-.55,.55))),min(mcH(mq+vec2(.55,-.55)),mcH(mq+vec2(-.55,-.55))));float mcSky=1.0-smoothstep(1.5,8.0,s1-yy);float s2=min(min(mcH(mq+vec2(4.5,0.)),mcH(mq+vec2(-4.5,0.))),min(mcH(mq+vec2(0.,4.5)),mcH(mq+vec2(0.,-4.5))));float s3=min(min(mcH(mq+vec2(9.,0.)),mcH(mq+vec2(-9.,0.))),min(mcH(mq+vec2(0.,9.)),mcH(mq+vec2(0.,-9.))));mcSky=max(mcSky,max((1.0-smoothstep(1.5,8.0,s2-yy))*0.72,(1.0-smoothstep(1.5,8.0,s3-yy))*0.5));float mcLit=max(mcSky,min(1.0,mcGlow*2.2));diffuseColor.rgb*=mix(1.0,mix(0.03,1.0,clamp(mcLit,0.0,1.0)),uMCDark);\n';
+ const dark='vec2 mq=vMCWorldPos.xz;float yy=vMCWorldPos.y;float s1=min(min(mcH(mq+vec2(.55,.55)),mcH(mq+vec2(-.55,.55))),min(mcH(mq+vec2(.55,-.55)),mcH(mq+vec2(-.55,-.55))));float mcSky=1.0-smoothstep(1.0,2.6,s1-yy);float mcLit=max(mcSky,min(1.0,mcGlow*2.2));diffuseColor.rgb*=mix(1.0,mix(0.16,1.0,clamp(mcLit,0.0,1.0)),uMCDark);\n';
  sh.fragmentShader=sh.fragmentShader.replace(a,dark+a);worldMat.userData.mcShader=sh};
-worldMat.customProgramCacheKey=function(){return 'MineCraft-local-lights-v15-dark'};worldMat.needsUpdate=true;
+worldMat.customProgramCacheKey=function(){return 'MineCraft-local-lights-v18-dark'};worldMat.needsUpdate=true;
 setInterval(()=>{const sh=worldMat.userData.mcShader;if(sh&&sh.uniforms.uMCDark)sh.uniforms.uMCDark.value=(worldDimension==='overworld')?1:0},250);
 recompute();
 }catch(e){console.error('mcCaveDark',e)}})();
@@ -8564,7 +8786,7 @@ const oD=drop;drop=function(b,x,y,z){if(b===9||b===56||b===61){const r=Math.rand
 /* istutamine */
 addEventListener('mousedown',e=>{if(e.button!==2||!locked()||ui||dead)return;const it=hotbar[cur]||0,i=ITEMS.indexOf(it);if(i<0)return;e.stopImmediatePropagation();if(survival&&!inv[it])return;
  const r=ray();if(!r||r.px===null||!inb(r.px,r.py,r.pz)||get(r.px,r.py,r.pz)!==0)return;
- const g=get(r.px,r.py-1,r.pz);if(g!==1&&g!==2&&g!==23){try{addChat('Istikut saab istutada ainult murule või mullale.','err')}catch(_){}return}
+ const g=get(r.px,r.py-1,r.pz);if(g!==1&&g!==2&&g!==23){try{addChat('Saplings can only be planted on Grass Blocks or Dirt.','err')}catch(_){}return}
  setBlock(r.px,r.py,r.pz,IDS[i],true);try{sfxEquip()}catch(_){}swing=1;if(survival)useItem(it)},true);
 /* käes hoitav istik */
 const oH=updHeld;updHeld=function(){oH.apply(this,arguments);const it=hotbar[cur]||0;if(ITEMS.includes(it)){if(heldMesh){handG.remove(heldMesh);heldMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});heldMesh=null}heldMesh=planeMesh(it,.5);heldMesh.position.set(.12,-.02,-.42);heldMesh.rotation.set(0,-.4,0);handG.add(heldMesh)}};
@@ -8787,7 +9009,7 @@ function players(){
   const l=[{self:true,name:playerName||myName(),get pos(){return{x:p.x,y:p.y,z:p.z}}}];
   for(const [id,o] of others){
     const g=o.mdl&&o.mdl.g&&o.mdl.g.position;if(!g)continue;
-    l.push({id,name:o.nm||('Mängija '+id),pos:{x:g.x,y:g.y,z:g.z}});
+    l.push({id,name:o.nm||('Playja '+id),pos:{x:g.x,y:g.y,z:g.z}});
   }
   return l;
 }
@@ -8810,15 +9032,15 @@ function tpSelf(x,y,z,remote){
   for(let n=0;n<150&&y<H+80&&hit(x,y,z);n++)y+=1;
   if(boatMounted)dismountBoat(false);
   p.x=x;p.y=y;p.z=z;vx=0;vz=0;vy=0;ground=false;airTop=p.y;
-  addChat((remote?'Sind teleporditi: ':'Teleporditud: ')+'X '+x.toFixed(1)+' Y '+y.toFixed(1)+' Z '+z.toFixed(1),'sys');
+  addChat((remote?'Teleported you to: ':'Teleported to: ')+'X '+x.toFixed(1)+' Y '+y.toFixed(1)+' Z '+z.toFixed(1),'sys');
 }
 function fmt(x,y,z){return 'X '+x.toFixed(1)+' Y '+(y===null?'pind':y.toFixed(1))+' Z '+z.toFixed(1)}
 function tpPos(who,x,y,z){
   if(who.self){tpSelf(x,y,z,false);return}
   send({t:'tp',to:who.id,x:+x.toFixed(2),y:y===null?null:+y.toFixed(2),z:+z.toFixed(2)});
-  addChat('Teleporditakse '+who.name+' -> '+fmt(x,y,z),'sys');
+  addChat('Teleporting '+who.name+' -> '+fmt(x,y,z),'sys');
 }
-function bad(){addChat('Kasutus: /tp <mängija>  |  /tp <x> <y> <z>  |  /tp <x> <z>  |  /tp <mängija> <x> <y> <z>  |  /tp <mängija1> <mängija2>   (~ = suhteline)','err')}
+function bad(){addChat('Usage: /tp <player> | /tp <x> <y> <z> | /tp <x> <z> | /tp <player> <x> <y> <z> | /tp <player1> <player2> (~ = relative)','err')}
 function go(who,c,base){
   const x=num(c[0],base.x),z=num(c[c.length-1],base.z),y=c.length===3?num(c[1],base.y):null;
   if(!isFinite(x)||!isFinite(z)||(y!==null&&!isFinite(y))){bad();return}
@@ -8830,7 +9052,7 @@ function run(a){
   if(a.every(isC)){if(n!==2&&n!==3){bad();return}go(me,a,me.pos);return}
   const whole=find(a.join(' '));
   if(whole){
-    if(whole.self){addChat('Sa oled juba iseenda juures.','err');return}
+    if(whole.self){addChat('You are already at your own location.','err');return}
     tpPos(me,whole.pos.x,whole.pos.y,whole.pos.z);return;
   }
   for(const k of [3,2]){
@@ -8842,13 +9064,13 @@ function run(a){
   for(let s=1;s<n;s++){
     const A=find(a.slice(0,s).join(' ')),B=find(a.slice(s).join(' '));
     if(A&&B){
-      if((A.self&&B.self)||(!A.self&&!B.self&&A.id===B.id)){addChat('Sama mängija mõlemal pool.','err');return}
+      if((A.self&&B.self)||(!A.self&&!B.self&&A.id===B.id)){addChat('The same player was selected on both sides.','err');return}
       tpPos(A,B.pos.x,B.pos.y,B.pos.z);return;
     }
   }
-  addChat('Mängijat ei leitud. Praegu mängus: '+players().map(q=>q.name).join(', '),'err');
+  addChat('Player not found. Players currently online: '+players().map(q=>q.name).join(', '),'err');
 }
-CMDS.tp={use:'/tp <mängija> | /tp <x> <y> <z> | /tp <mängija> <x> <y> <z> | /tp <m1> <m2>',run};
+CMDS.tp={use:'/tp <player> | /tp <x> <y> <z> | /tp <player> <x> <y> <z> | /tp <player1> <player2>',run};
 
 /* tab-täiendus mängijanimedele */
 const pn=()=>{
@@ -8875,12 +9097,12 @@ onMsg=function(m,ch){
   return _on.apply(this,arguments);
 };
 
-document.title='MineCraft LAN V33';
-const v=document.getElementById('mcVer');if(v)v.textContent='MineCraft LAN V33';
-addChat('V33: tööriistad/soomus/kilp/totem ei stackita, /tp töötab LANis, Steve inventaris ei kõõritse enam.','sys');
+document.title='Minecraft LAN Edition';
+const v=document.getElementById('mcVer');if(v)v.textContent='Minecraft LAN Edition';
+addChat('V33: tools, armor, shields, and Totems no longer stack; /tp works in LAN multiplayer; the Steve inventory preview is fixed.','sys');
 }catch(err){
   console.error('V33 viga:',err);
-  try{addChat('V33 viga: '+String(err.message||err),'err')}catch(_e){}
+  try{addChat('V33 error: '+String(err.message||err),'err')}catch(_e){}
 }
 })();
 
@@ -8915,7 +9137,7 @@ const oSet=setBlock;setBlock=function(x,y,z,b,net){
 /* istutamine (parem klahv) */
 addEventListener('mousedown',e=>{if(e.button!==2||!locked()||ui||dead)return;const it=hotbar[cur]||0,i=ITEMS.indexOf(it);if(i<0)return;e.stopImmediatePropagation();if(survival&&!inv[it])return;
  const r=ray();if(!r||r.px===null||!inb(r.px,r.py,r.pz)||get(r.px,r.py,r.pz)!==0)return;
- if(!okGround(get(r.px,r.py-1,r.pz))){try{addChat('Lille saab istutada ainult murule või mullale.','err')}catch(_){}return}
+ if(!okGround(get(r.px,r.py-1,r.pz))){try{addChat('Flowers can only be planted on Grass Blocks or Dirt.','err')}catch(_){}return}
  setBlock(r.px,r.py,r.pz,IDS[i],true);try{sfxEquip()}catch(_){}swing=1;if(survival)useItem(it)},true);
 /* käes hoitav lill */
 const oHeld=updHeld;updHeld=function(){oHeld.apply(this,arguments);const it=hotbar[cur]||0;if(ITEMS.includes(it)){if(heldMesh){handG.remove(heldMesh);heldMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});heldMesh=null}heldMesh=planeMesh(it,.5);heldMesh.position.set(.12,-.02,-.42);heldMesh.rotation.set(0,-.4,0);handG.add(heldMesh)}};
@@ -8952,9 +9174,9 @@ function weatherStep(dt){
   const over=worldDimension==='overworld';
   if(!over)target=0;
   else if(!forced){timer-=dt;if(timer<=0){if(target===0){target=.6+Math.random()*.4;timer=90+Math.random()*150}else{target=0;timer=240+Math.random()*420}}}
-  rain+=(target-rain)*Math.min(1,dt*(over?.3:2));if(rain<.003&&target===0)rain=0;
+  rain+=(target-rain)*Math.min(1,dt*(over?.3:2));if(rain<.003&&target===0)rain=0;window.__mcRain=rain;
   if(rain>0||gain)rainSound(dt);
-  if(rain<=0){rMesh.visible=false;if(fogMod){scene.fog.near=baseNear;scene.fog.far=baseFar;fogMod=false;cloudMat.color.setRGB(1,1,1);cloudMat.opacity=.86;sunMat.color.setRGB(1,.957,.722)}return}
+  if(rain<=0){rMesh.visible=false;if(fogMod){scene.fog.near=baseNear;scene.fog.far=baseFar;fogMod=false;cloudMat.color.setRGB(1,1,1);cloudMat.opacity=.86;sunMat.color.setRGB(1,.985,.94)}return}
   if(!fogMod){baseNear=scene.fog.near;baseFar=scene.fog.far;fogMod=true}
   /* taeva tumenemine */
   const light=Math.max(0,Math.min(1,(Math.sin(dayTime*Math.PI*2)+.12)/.38));
@@ -8962,7 +9184,7 @@ function weatherStep(dt){
   worldMat.color.multiplyScalar(1-.24*rain);
   scene.fog.near=baseNear*(1-.5*rain);scene.fog.far=baseFar*(1-.32*rain);
   const cd=1-.5*rain;cloudMat.color.setRGB(cd,cd*.99,cd*1.02);cloudMat.opacity=.86+.1*rain;
-  const sd=1-.8*rain;sunMat.color.setRGB(sd,sd*.957,sd*.722);
+  const sd=1-.8*rain;sunMat.color.setRGB(sd,sd*.985,sd*.94);
   /* sadu: lumi biomis 5 */
   const bx=Math.max(0,Math.min(W-1,p.x|0)),bz=Math.max(0,Math.min(D-1,p.z|0)),snow=biomeMap[bx*D+bz]===5;
   rMat.color.setHex(snow?0xffffff:0xa9c2ee);rMat.opacity=snow?.9:.35+.3*rain;
@@ -8978,13 +9200,13 @@ function weatherStep(dt){
 }
 const oUpd=updateDayCycle;updateDayCycle=function(dt){oUpd.apply(this,arguments);try{weatherStep(dt||0)}catch(e){console.error('ilm',e)}};
 const setWeather=(a)=>{const v=(a[0]||'').toLowerCase();
-  if(v==='rain'||v==='vihm'){forced=false;target=.6+Math.random()*.4;timer=120+Math.random()*120;addChat('Hakkas sadama.','sys')}
-  else if(v==='clear'||v==='selge'){forced=false;target=0;timer=300+Math.random()*300;addChat('Ilm selgines.','sys')}
-  else addChat('Kasutus: /weather <rain|clear>','err')};
+  if(v==='rain'||v==='vihm'){forced=false;target=.6+Math.random()*.4;timer=120+Math.random()*120;addChat('It started raining.','sys')}
+  else if(v==='clear'||v==='selge'){forced=false;target=0;timer=300+Math.random()*300;addChat('The weather cleared.','sys')}
+  else addChat('Usage: /weather <rain|clear>','err')};
 CMDS.weather={use:'/weather <rain|clear>',run:setWeather};
 CMDS.rain={use:'/rain',run(){setWeather(['rain'])}};
 ALIAS.ilm='weather';
-}catch(err){console.error('Lilled/ilm viga:',err);try{addChat('Lilled/ilm viga: '+String(err.message||err),'err')}catch(_e){}}
+}catch(err){console.error('Flowers/weather error:',err);try{addChat('Flowers/weather error: '+String(err.message||err),'err')}catch(_e){}}
 })();
 </script>
 <style id="minecraftFontEverywhere">
@@ -9291,10 +9513,10 @@ try{
   if(typeof renderCreativeCatalog==='function'&&typeof invTab!=='undefined'){
     try{if(invTab==='cre')renderCreativeCatalog()}catch(e){}
   }
-  try{addChat('Uued puidud: tamm, kask ja kuusk — plangud, trepid, plaadid ja aiad. Vee pind ja liiv said uue tekstuuri.','sys')}catch(e){}
+  try{addChat('New wood types: Oak, Birch, and Spruce — Planks, Stairs, Slabs, and Fences. Water and Sand have new textures.','sys')}catch(e){}
 }catch(err){
   console.error('Water/Wood update error:',err);
-  try{addChat('Vee/puidu uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+  try{addChat('Water/wood update error: '+String(err.message||err),'err')}catch(_e){}
 }
 })();
 </script>
@@ -9338,7 +9560,7 @@ try{
         const rgb=n=>[(n>>16)&255,(n>>8)&255,n&255];
         const skinRGB=rgb(skin.skin||0xc8946a),shirtRGB=rgb(skin.shirt||0x1fa8b0);
         let seed=0x2f6e2b;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
-        const px=(x,y,col)=>{const k=1;g.fillStyle='rgb('+Math.min(255,col[0]*k|0)+','+Math.min(255,col[1]*k|0)+','+Math.min(255,col[2]*k|0)+')';g.fillRect(x,y,1,1)};
+        const px=(x,y,col)=>{const k=1,lum=col[0]*.30+col[1]*.59+col[2]*.11,s=.76;const muted=col.map(v=>(lum+(v-lum)*s)*k*.98);g.fillStyle='rgb('+muted.map(v=>Math.max(0,Math.min(255,v|0))).join(',')+')';g.fillRect(x,y,1,1)};
         const arm=(ox,oy)=>{
           const longFaces=[[ox+d+w,oy+d,d],[ox,oy+d,d],[ox+d,oy+d,w],[ox+d+w+d,oy+d,w]];
           for(const f of longFaces)for(let yy=0;yy<h;yy++)for(let xx=0;xx<f[2];xx++){
@@ -9414,8 +9636,21 @@ try{
     function mcBuildArm(group,skin,isLeft){
       mcClearArm(group);
       const width=skin.thin?3:4;
-      const baseTex=skin.tex||skin.__mcFpBase||(skin.__mcFpBase=mcFallbackArmTexture(skin,false));
-      const overTex=skin.tex||skin.__mcFpOver||(skin.__mcFpOver=mcFallbackArmTexture(skin,true));
+      const mcMutedSkinTexture=src=>{
+        if(!src||!src.image)return src;
+        if(src.userData&&src.userData.mcMutedArm)return src.userData.mcMutedArm;
+        try{
+          const im=src.image,c=document.createElement('canvas');c.width=im.naturalWidth||im.videoWidth||im.width;c.height=im.naturalHeight||im.videoHeight||im.height;
+          if(!c.width||!c.height)return src;
+          const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(im,0,0,c.width,c.height);
+          const data=cx.getImageData(0,0,c.width,c.height),a=data.data;
+          for(let i=0;i<a.length;i+=4){const l=a[i]*.30+a[i+1]*.59+a[i+2]*.11;for(let j=0;j<3;j++)a[i+j]=Math.max(0,Math.min(255,(l+(a[i+j]-l)*.78)*.98));}
+          cx.putImageData(data,0,0);const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;
+          src.userData=src.userData||{};src.userData.mcMutedArm=t;return t;
+        }catch(_){return src;}
+      };
+      const baseTex=skin.tex?mcMutedSkinTexture(skin.tex):(skin.__mcFpBase||(skin.__mcFpBase=mcFallbackArmTexture(skin,false)));
+      const overTex=skin.tex?baseTex:(skin.__mcFpOver||(skin.__mcFpOver=mcFallbackArmTexture(skin,true)));
       /* Java skin UVs: right base (40,16), right sleeve (40,32),
          left base (32,48), left sleeve (48,48). Legacy skins reuse right UVs. */
       const modernLeft=isLeft&&!skin.legacy;
@@ -9635,10 +9870,10 @@ try{
 
     /* Keep the textured arm visible after item swaps and all existing animation wrappers. */
     arm.visible=false;mcFpRight.visible=((hotbar[cur]||0)===0);mcFpLeft.visible=false;
-    try{addChat('Esimese isiku käsi kasutab nüüd valitud skinni; kaevamisel, asetamisel ja kasutamisel on eraldi animatsioonid.','sys')}catch(e){}
+    try{addChat('The first-person hand now uses the selected skin, with separate animations for mining, placing, and using items.','sys')}catch(e){}
   }catch(err){
     console.error('First-person hand upgrade failed:',err);
-    try{addChat('Käeanimatsiooni uuenduse viga: '+String(err.message||err),'err')}catch(_e){}
+    try{addChat('Hand animation update error: '+String(err.message||err),'err')}catch(_e){}
   }
 })();
 </script>
@@ -9820,7 +10055,7 @@ addEventListener('mousedown',e=>{
 
 /* käes hoitav ese */
 const oHeld=updHeld;updHeld=function(){oHeld.apply(this,arguments);const it=hotbar[cur]||0;if(ITEMS.includes(it)){if(heldMesh){handG.remove(heldMesh);heldMesh.traverse(o=>{if(o.geometry)o.geometry.dispose()});heldMesh=null}heldMesh=planeMesh(it,.5);heldMesh.position.set(.12,-.02,-.42);heldMesh.rotation.set(0,-.4,0);handG.add(heldMesh)}};
-}catch(err){console.error('Viljad:',err);try{addChat('Viljade viga: '+String(err.message||err),'err')}catch(_e){}}})();
+}catch(err){console.error('Crops:',err);try{addChat('Crops error: '+String(err.message||err),'err')}catch(_e){}}})();
 </script>
 <script>
 /* Cactus damage: touching a cactus (id 58) hurts every 0.5 s in survival */
@@ -9985,7 +10220,7 @@ try{
       const dx=pos.x-p.x,dz=pos.z-p.z,dist=Math.hypot(dx,dz);
       let bearing=Math.atan2(dx*Math.cos(p.yaw)-dz*Math.sin(p.yaw),-dx*Math.sin(p.yaw)-dz*Math.cos(p.yaw));
       bearing=Math.atan2(Math.sin(bearing),Math.cos(bearing));
-      list.push({id,name:o.nm||('Mängija '+id),dist,bearing});
+      list.push({id,name:o.nm||('Playja '+id),dist,bearing});
     }
     if(!list.length){bar.style.display='none';bar.textContent='';return}
     list.sort((a,b)=>a.dist-b.dist);
@@ -9996,7 +10231,7 @@ try{
       const size=Math.max(3.5,Math.min(11.5,11.5-q.dist*.032));
       dot.style.left=(6+pos*88)+'%';dot.style.width=size+'px';dot.style.height=size+'px';
       dot.style.opacity=String(Math.max(.58,Math.min(1,1-q.dist/420)));
-      dot.title=q.name+' · '+Math.round(q.dist)+' plokki';
+      dot.title=q.name+' · '+Math.round(q.dist)+' blocks';
       bar.appendChild(dot);
     }
   }
@@ -10133,8 +10368,8 @@ animHuman=function(m,speed,dt){
   worldMat.customProgramCacheKey=function(){return 'MineCraft-local-lights-v15-lod2'};
   worldMat.needsUpdate=true;
 }
-try{addChat('V34: muru/plokkide tekstuurid teravamad, mobid nihkuvad aeglaselt kui neid lükata.','sys')}catch(e){}
-try{addChat('V33: mobide kokkupõrked, LAN locator, liigipõhised lehetekstuuri variandid ja kaugvaate virvenduse parandus.','sys')}catch(e){}
+try{addChat('V34: sharper Grass and block textures; mobs slowly move when pushed.','sys')}catch(e){}
+try{addChat('V33: mob collisions, LAN player locator, species-specific leaf texture variants, and a fix for distant-render flickering.','sys')}catch(e){}
 })();
 </script>
 
@@ -10308,7 +10543,7 @@ addEventListener('mousedown',e=>{
     if(!solid(X,Y-1,Z)||below===97||below===98)return;
     bot=it;top=TOP_OF[it];
   }else{
-    if(!(below===1||below===2||below===100||below===101)){try{addChat('Tall grass kasvab ainult murul või mullal.','err')}catch(_){}return}
+    if(!(below===1||below===2||below===100||below===101)){try{addChat('Tall Grass can only grow on Grass Blocks or Dirt.','err')}catch(_){}return}
     bot=97;top=98;
   }
   const i0=idx(X,Y,Z),i1=idx(X,Y+1,Z),o0=w[i0],o1=w[i1];
@@ -10348,7 +10583,7 @@ try{
   if(!has(35))RECIPES_ALL.push({out:35,qty:3,req:[4,4,4,4,4,4],_shape:[[4,4],[4,4],[4,4]]});
   RECIPES_ALL.push({out:136,qty:3,req:[78,78,78,78,78,78],_shape:[[78,78],[78,78],[78,78]]},{out:138,qty:3,req:[77,77,77,77,77,77],_shape:[[77,77],[77,77],[77,77]]});
 }catch(e){}
-}catch(err){console.error('Uksed ja pikk muru:',err);try{addChat('Uste/muru viga: '+String(err.message||err),'err')}catch(_e){}}})();
+}catch(err){console.error('Doors and Tall Grass:',err);try{addChat('Doors/Tall Grass error: '+String(err.message||err),'err')}catch(_e){}}})();
 </script>
 
 <script id="mcLogTextures">
@@ -10429,7 +10664,7 @@ try{
     ICON[145+n]=mk(TL.axe[n]);ICON[180+n]=mk(TL.pick[n]);
     try{delete iconCache[145+n];delete iconCache[180+n]}catch(e){}
   }
-}catch(err){console.error('Tööriistaikoonid:',err)}})();
+}catch(err){console.error('Tool icons:',err)}})();
 </script>
 
 
@@ -10442,7 +10677,7 @@ try{
 /* ===== Välimus nagu päris Minecraftis: gradient-taevas, kahvatum horisont, veidi tumedam maailm ===== */
 (function(){try{
   if(window.__MC_LOOK_V1)return;window.__MC_LOOK_V1=true;
-  daySky.setHex(0x74a0e6);                       /* sügavam vanilla-sinine taevas */
+  daySky.setHex(0x7baee4);                       /* sügavam vanilla-sinine taevas */
   const WHITE=new THREE.Color(1,1,1);
   const g=new THREE.SphereGeometry(1,24,16);
   const pos=g.attributes.position,colArr=new Float32Array(pos.count*3);
@@ -10450,7 +10685,7 @@ try{
   const dome=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false,depthTest:false}));
   dome.renderOrder=-1000;dome.frustumCulled=false;scene.add(dome);
   const hor=new THREE.Color(),top=new THREE.Color();let lightK=1;
-  const TINT=[.71,.835,.966];
+  const TINT=[.82,.91,.985];
   function syncDome(){
     const ow=(typeof worldDimension==='undefined')||worldDimension==='overworld';
     dome.visible=ow;if(!ow)return;
@@ -10470,7 +10705,7 @@ try{
     if(typeof worldDimension!=='undefined'&&worldDimension!=='overworld')return;
     const a=dayTime*Math.PI*2,sunH=Math.sin(a);
     lightK=Math.max(0,Math.min(1,(sunH+.12)/.38));
-    scene.background.lerp(WHITE,.34*lightK);      /* kahvatum horisont = udu värv */
+    scene.background.lerp(WHITE,.23*lightK);      /* kahvatum horisont = udu värv */
     worldMat.color.multiplyScalar(.9);             /* natuke tumedam maailm */
   };
   const _render=rd.render.bind(rd);
@@ -10482,6 +10717,19 @@ try{
 /* ===== Külaelanik: Minecrafti originaalmõõtudes (pea 8x10x8, nina 2x4x2, rüü 9x19x7, ristatud käed 3 kasti, jalad 4x12x4) ===== */
 (function(){try{
   if(window.__MC_VILLAGER_V1)return;window.__MC_VILLAGER_V1=true;
+  const SHD={px:.82,nx:.82,py:1.08,ny:.6,pz:.88,nz:1};
+  const hex2=(h,k)=>"rgb("+[h>>16&255,h>>8&255,h&255].map(v=>Math.max(0,Math.min(255,Math.round(v*k)))).join(",")+")";
+  const TCL={};
+  function TBL(par,mats,key,w,h,d,x,y,z,f,P){
+    const dm={px:[d,h],nx:[d,h],py:[w,d],ny:[w,d],pz:[w,h],nz:[w,h]};
+    const ms=["px","nx","py","ny","pz","nz"].map(k=>{
+      let t=TCL[key+k];
+      if(!t){const [W,H]=dm[k],c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+        for(let b=0;b<H;b++)for(let a=0;a<W;a++){const v=f(k,a,b,W,H);if(v!=null){g.fillStyle=hex2(v,SHD[k]);g.fillRect(a,b,1,1)}}
+        t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;TCL[key+k]=t}
+      const m=new THREE.MeshBasicMaterial({map:t});m.userData.base=0xffffff;mats.push(m);return m});
+    const e=new THREE.Mesh(new THREE.BoxGeometry(w*P,h*P,d*P),ms);e.position.set(x*P,y*P,z*P);par.add(e);return e;
+  }
   const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
   const fid=k=>k.charCodeAt(0)*5+k.charCodeAt(1);
   const pal4=(arr,k,x,y,s)=>arr[Math.floor((.5*HH(x,y,s+fid(k))+.5*HH(x>>1,y>>1,s+7+fid(k)))*arr.length)%arr.length];
@@ -10510,14 +10758,14 @@ try{
     const P=.05625,mats=[];
     const g=new THREE.Group(),body=new THREE.Group();g.add(body);
     const sc=(m,a,b,c)=>{m.scale.set(a,b,c);return m};
-    sc(TB(body,mats,"vR",8,18,6,0,15,0,RF,P,5),9/8,19/18,7/6);      /* rüü */
+    sc(TBL(body,mats,"vR",8,18,6,0,15,0,RF,P,5),9/8,19/18,7/6);      /* rüü */
     const head=new THREE.Group();head.position.set(0,24*P,0);body.add(head);
-    TB(head,mats,"vH",8,10,8,0,5,0,HF,P,5);
-    TB(head,mats,"vN",2,4,2,0,1,-5,NF,P,3);                         /* suur nina */
+    TBL(head,mats,"vH",8,10,8,0,5,0,HF,P,5);
+    TBL(head,mats,"vN",2,4,2,0,1,-5,NF,P,3);                         /* suur nina */
     const arms=new THREE.Group();arms.position.set(0,21*P,-1*P);arms.rotation.x=.75;body.add(arms);
-    TB(arms,mats,"vA1",4,8,4,-6,-2,0,AF,P,5);TB(arms,mats,"vA1",4,8,4,6,-2,0,AF,P,5);
-    TB(arms,mats,"vA2",8,4,4,0,-4,0,AF,P,5);                         /* ristatud käed */
-    const leg=x=>{const q=new THREE.Group();q.position.set(x*P,12*P,0);body.add(q);TB(q,mats,"vL",4,12,4,0,-6,0,LF,P,5);return q};
+    TBL(arms,mats,"vA1",4,8,4,-6,-2,0,AF,P,5);TBL(arms,mats,"vA1",4,8,4,6,-2,0,AF,P,5);
+    TBL(arms,mats,"vA2",8,4,4,0,-4,0,AF,P,5);                         /* ristatud käed */
+    const leg=x=>{const q=new THREE.Group();q.position.set(x*P,12*P,0);body.add(q);TBL(q,mats,"vL",4,12,4,0,-6,0,LF,P,5);return q};
     const legL=leg(2),legR=leg(-2);
     const armL=new THREE.Group(),armR=new THREE.Group();            /* nähtamatud tühjad käed (animatsioonikood ootab neid) */
     armL.visible=armR.visible=false;
@@ -10530,5 +10778,276 @@ try{
   };
 }catch(err){console.error("Külaelaniku mudel:",err)}})();
 </script>
+
+<script id="mcNaturalColorV1">
+/* Veidi loomulikum värv: vähendab liigset küllastust, säilitades plokkide värvid ja kontrasti. */
+(function(){try{
+  if(window.__MC_NATURAL_COLOR_V1)return;window.__MC_NATURAL_COLOR_V1=true;
+  if(rd&&rd.domElement){
+    rd.domElement.style.filter="saturate(.86) contrast(.98) brightness(.995)";
+  }
+  /* Päike olgu soe-valge, mitte tugevalt kollane. */
+  if(sunMat&&sunMat.color)sunMat.color.setHex(0xfff9ef);
+}catch(err){console.error("Loomulik värvirežiim:",err)}})();
+</script>
+
+<script id="mcArmorV1">
+/* ===== Armor nagu Minecraftis: päris soomustekstuurid (kiiver, rinnaplaat, retuusid, saapad), õiged paksendused, varjutatud tahud ===== */
+(function(){try{
+  if(window.__MC_ARMOR_V1)return;window.__MC_ARMOR_V1=true;
+  const U=SKIN_U;
+  const HH=(x,y,sd)=>{let h=Math.imul(((x*374761393)^(y*668265263)^(sd*2246822519))|0,1274126177);h^=h>>>13;h=Math.imul(h,1274126177);return((h^(h>>>16))>>>0)/4294967296};
+  const SHD={top:1.08,bottom:.6,right:.82,left:.82,front:1,back:.88};
+  const hex2=(h,k)=>"rgb("+[h>>16&255,h>>8&255,h&255].map(v=>Math.max(0,Math.min(255,Math.round(v*k)))).join(",")+")";
+  /* b=põhitoonid, l=heledam, d=tumedam, o=kontuur */
+  const PALS=[
+    {b:[0x7a5232,0x6f4a2a,0x835a37],l:0x9a6a40,d:0x55361f,o:0x3a2412},                 /* nahk */
+    {b:[0xe6c038,0xedc940,0xdfb62f],l:0xfbed7a,d:0xb4861a,o:0x7a5a10},                 /* kuld */
+    {b:[0xd4d4d4,0xdcdcdc,0xcbcbcb],l:0xf4f4f4,d:0x9a9a9a,o:0x636363},                 /* raud */
+    {b:[0x2b9cc4,0x2fa5cd,0x2793ba],l:0x7fd4ee,d:0x1a6a92,o:0x0d4260}                  /* teemant */
+  ];PALS[4]=PALS[0];
+  const texCache={};
+  function armTex(tier,layer){
+    const key=tier+"_"+layer;if(texCache[key])return texCache[key];
+    const P=PALS[tier]||PALS[0];
+    const c=document.createElement("canvas");c.width=c.height=64;const g=c.getContext("2d");
+    const draw=(ox,oy,w,h,d,fill)=>{
+      const F={top:[ox+d,oy,w,d],bottom:[ox+d+w,oy,w,d],right:[ox,oy+d,d,h],front:[ox+d,oy+d,w,h],left:[ox+d+w,oy+d,d,h],back:[ox+d+w+d,oy+d,w,h]};
+      for(const k in F){const [X,Y,W,H]=F[k];const m=[];
+        for(let y=0;y<H;y++){m[y]=[];for(let x=0;x<W;x++)m[y][x]=fill(k,x,y,W,H)}
+        for(let y=0;y<H;y++)for(let x=0;x<W;x++){const f=m[y][x];if(!f)continue;
+          let col=P.b[Math.floor(HH(x+X,y+Y,1)*P.b.length)%P.b.length];
+          const r=HH(x+X,y+Y,2);if(r<.1)col=P.d;else if(r>.93)col=P.l;
+          const eb=y<H-1&&!m[y+1][x],er=x<W-1&&!m[y][x+1],et=y>0&&!m[y-1][x],el=x>0&&!m[y][x-1];
+          if(eb||er)col=P.o;else if(y===H-1||x===W-1)col=P.d;else if(et||el)col=P.l;
+          if(f==="d")col=P.d;else if(f==="l")col=P.l;
+          g.fillStyle=hex2(col,SHD[k]);g.fillRect(X+x,Y+y,1,1);
+        }}
+    };
+    const helm=(k,x,y)=>k==="top"?1:k==="bottom"?0:k==="front"?(y<=1||((y===2||y===3)&&(x<=1||x>=6))):(y<=3);
+    const chest=(k,x,y)=>k==="top"?1:k==="bottom"?0:(k==="right"||k==="left")?(y<=4):(k==="back"?(y<=6):(y<=8&&!(x===0&&y>=6)&&!(x===7&&y>=6)));
+    const arm=(k,x,y)=>k==="top"?1:k==="bottom"?0:(y<=3);
+    const belt=(k,x,y)=>k==="bottom"?1:k==="top"?0:(y>=9);
+    const legs=(k,x,y)=>(k==="top"||k==="bottom")?0:(y<=5);
+    const boots=(k,x,y)=>k==="top"?0:k==="bottom"?1:(y>=9?(y===9?"l":1):0);
+    if(layer===1){draw(0,0,8,8,8,helm);draw(16,16,8,12,4,chest);draw(40,16,4,12,4,arm);draw(0,16,4,12,4,boots)}
+    else{draw(16,16,8,12,4,belt);draw(0,16,4,12,4,legs)}
+    const t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;
+    return texCache[key]=t;
+  }
+  const matCache={};
+  const amat=(tier,layer)=>{const k=tier+"_"+layer;return matCache[k]||(matCache[k]=new THREE.MeshBasicMaterial({map:armTex(tier,layer),alphaTest:.5}))};
+  function build(m,sl,tier){
+    const pl=m.pal||{},aw=pl.slim?3:(pl.aw||4),ad=aw===2?2:4;
+    const L1=amat(tier,1),L2=amat(tier,2),out=[];
+    const put=(geo,mt,x,y,z,par)=>{const e=new THREE.Mesh(geo,mt);e.position.set(x,y,z);par.add(e);out.push(e)};
+    if(sl===0)put(skinGeo(8,8,8,0,0,1.3*U),L1,0,.225,0,m.head);
+    else if(sl===1){
+      put(skinGeo(8,12,4,16,16,U),L1,0,1.0125,0,m.body);
+      put(skinGeo(aw,12,ad,40,16,U),L1,0,-.3375,0,m.armL);put(skinGeo(aw,12,ad,40,16,U),L1,0,-.3375,0,m.armR);
+    }else if(sl===2){
+      put(skinGeo(8,12,4,16,16,.75*U),L2,0,1.0125,0,m.body);
+      put(skinGeo(4,12,4,0,16,.75*U),L2,0,-.3375,0,m.legL);put(skinGeo(4,12,4,0,16,.75*U),L2,0,-.3375,0,m.legR);
+    }else{
+      put(skinGeo(4,12,4,0,16,.9*U),L1,0,-.3375,0,m.legL);put(skinGeo(4,12,4,0,16,.9*U),L1,0,-.3375,0,m.legR);
+    }
+    return out;
+  }
+  setArmorVis=function(m,arr){
+    if(!m.__arm)m.__arm={cur:[null,null,null,null],made:{}};
+    const A=m.__arm;
+    for(let sl=0;sl<4;sl++){
+      if(m.ov&&m.ov[sl])m.ov[sl].forEach(e=>{e.visible=false});     /* vanad kastid (teletubby) ei kuvata enam */
+      const id=arr[sl]|0;
+      if(A.cur[sl]){A.cur[sl].forEach(e=>{e.visible=false});A.cur[sl]=null}
+      if(id>0){
+        const tier=armTier(id),key=sl+"_"+tier;
+        if(!A.made[key])A.made[key]=build(m,sl,tier);
+        A.cur[sl]=A.made[key];A.cur[sl].forEach(e=>{e.visible=true});
+      }
+    }
+  };
+}catch(err){console.error("Armori plaaster:",err)}})();
+</script>
+
+<script id="mcOrbitalV1">
+/* ===== /orbitalstrike: taevast sajab TNT-d, mis teatud kõrgusel süttivad ja maapinna õhku lasevad ===== */
+(function(){try{
+  if(window.__MC_ORBITAL_V1)return;window.__MC_ORBITAL_V1=true;
+  const IGN_H=16;                                   /* süütekõrgus maapinnast (plokki) */
+  const strikes=[],falling=[];
+  const groundTop=(X,Z)=>{for(let y=H-1;y>=0;y--)if(solid(X,y,Z))return y+1;return 0};
+  const num=(t,base)=>{if(t==null)return NaN;if(t[0]==="~"){const o=t.length>1?parseFloat(t.slice(1)):0;return isNaN(o)?NaN:base+o}const v=parseFloat(t);return isNaN(v)?NaN:v};
+  const beamGeo=new THREE.CylinderGeometry(.18,.18,260,8);
+  function startStrike(cx,cz,R,count,safe){
+    const beam=new THREE.Mesh(beamGeo,new THREE.MeshBasicMaterial({color:0xff2a2a,transparent:true,opacity:.45,depthWrite:false}));
+    const gy0=groundTop(Math.floor(cx),Math.floor(cz));beam.position.set(cx,gy0+127,cz);scene.add(beam);   /* kiir algab maapinnast (gy0-3) ja ulatub 257 ploki kõrgusele */
+    strikes.push({cx,cz,R,left:count,t:0,gap:Math.max(.05,7/count),safe,first:true,beam,age:0});
+  }
+  function spawnOne(s){
+    let x=s.cx,z=s.cz;
+    if(!s.first){
+      for(let k=0;k<6;k++){
+        const a=Math.random()*6.2832,r=s.R*Math.sqrt(Math.random());
+        x=s.cx+Math.cos(a)*r;z=s.cz+Math.sin(a)*r;
+        if(!s.safe||Math.hypot(x-p.x,z-p.z)>5)break;
+      }
+      if(s.safe&&Math.hypot(x-p.x,z-p.z)<=5)return;
+    }
+    s.first=false;
+    const gy=groundTop(Math.floor(x),Math.floor(z));
+    const y0=Math.max(gy,p.y)+75+Math.random()*30;
+    const m=new THREE.Mesh(boxG,tntMat);m.position.set(x,y0,z);scene.add(m);
+    falling.push({m,x,z,y:y0,vy:-8,gy,rx:(Math.random()-.5)*3,rz:(Math.random()-.5)*3});
+  }
+  function startFuse(f){                           /* süttib kukkumise pealt: kiirus ja pöörlemine jäävad alles */
+    f.lit=true;f.lt=0;fuseSfx(f.x,f.y,f.z);
+    const h=Math.max(.6,f.y-f.gy-.5),v=Math.abs(f.vy),fuse=(-v+Math.sqrt(v*v+40*h))/20+.05;
+    send({t:"ignite",x:f.x,y:f.y,z:f.z,f:fuse});
+  }
+  function tick(dt){
+    for(let i=strikes.length-1;i>=0;i--){
+      const s=strikes[i];s.age+=dt;s.t+=dt;
+      s.beam.material.opacity=.3+Math.sin(s.age*14)*.15;
+      while(s.t>=s.gap&&s.left>0){s.t-=s.gap;s.left--;spawnOne(s)}
+      if(s.left<=0&&!falling.length){scene.remove(s.beam);s.beam.material.dispose();strikes.splice(i,1)}
+    }
+    for(let i=falling.length-1;i>=0;i--){
+      const f=falling[i];
+      f.vy=Math.max(-45,f.vy-20*dt);f.y+=f.vy*dt;
+      f.m.position.set(f.x,f.y,f.z);f.m.rotation.x+=f.rx*dt;f.m.rotation.z+=f.rz*dt;
+      if(!f.lit&&f.y-f.gy<=IGN_H)startFuse(f);
+      if(f.lit){
+        f.lt+=dt;f.m.material=Math.floor(f.lt*6)%2?whiteMat:tntMat;f.m.scale.setScalar(1+Math.sin(f.lt*12)*.05);
+        if(f.y<=f.gy+.5||f.lt>4){scene.remove(f.m);falling.splice(i,1);explode(f.x,Math.max(f.y,f.gy+.5),f.z,4)}
+      }
+    }
+  }
+  function stopAll(){
+    falling.splice(0).forEach(f=>scene.remove(f.m));
+    strikes.splice(0).forEach(s=>{scene.remove(s.beam);s.beam.material.dispose()});
+  }
+  const _updFx=updFx;
+  updFx=function(dt){_updFx.apply(this,arguments);if(strikes.length||falling.length)tick(Math.min(dt,.05))};
+  CMDS.orbitalstrike={use:"/orbitalstrike [<x> <z>] [raadius] [safe] | /orbitalstrike stop",run(a){
+    a=a.map(t=>t.toLowerCase());
+    if(a[0]==="stop"){stopAll();addChat("Orbital Strike stopped.","sys");return}
+    const safe=a.includes("safe");a=a.filter(t=>t!=="safe");
+    let cx=p.x,cz=p.z,R=14;
+    if(a.length>=2){const X=num(a[0],p.x),Z=num(a[1],p.z);if(isNaN(X)||isNaN(Z)){addChat("Usage: "+CMDS.orbitalstrike.use,"err");return}cx=X;cz=Z;if(a[2]!=null){const r=parseFloat(a[2]);if(!isNaN(r))R=r}}
+    else if(a.length===1){const r=parseFloat(a[0]);if(isNaN(r)){addChat("Usage: "+CMDS.orbitalstrike.use,"err");return}R=r}
+    R=Math.max(3,Math.min(40,R));
+    const count=Math.max(10,Math.min(160,Math.round(R*4.5)));
+    startStrike(cx,cz,R,count,safe);
+    addChat("🛰️ Orbital Strike started: coordinates "+Math.round(cx)+" "+Math.round(cz)+", radius "+Math.round(R)+", "+count+" TNT blocks."+(safe?" (safe: no TNT will fall within 5 blocks of you)":""),"sys");
+  }};
+  /* "./orbitalstrike" töötab samamoodi nagu "/orbitalstrike" */
+  const _sc=submitChat;
+  submitChat=function(v){if(typeof v==="string"&&v.startsWith("./"))v=v.slice(1);return _sc.call(this,v)};
+}catch(err){console.error("Orbitalstrike:",err)}})();
+</script>
+
+<script id="mcRainFireV1">
+/* ===== Vihm kustutab tuled kiiremini (leegid kahanevad, siis tuleb aur), katuse all põleb edasi ===== */
+(function(){try{
+  if(window.__MC_RAINFIRE_V1)return;window.__MC_RAINFIRE_V1=true;
+  const puffs=[];
+  function steam(x,y,z){
+    for(let i=0;i<12;i++){
+      const m=new THREE.Mesh(pG,new THREE.MeshBasicMaterial({color:0xe9eef2,transparent:true,opacity:.75,depthWrite:false}));
+      m.position.set(x+(Math.random()-.5)*.5,y+.1+Math.random()*.3,z+(Math.random()-.5)*.5);scene.add(m);
+      puffs.push({m,vx:(Math.random()-.5)*.6,vy:.9+Math.random()*1.2,vz:(Math.random()-.5)*.6,l:.8+Math.random()*.7,t:0});
+    }
+  }
+  const skyOpen=(x,y,z)=>{for(let yy=y+1;yy<H;yy++)if(solid(x,yy,z))return false;return true};
+  function putOut(key,f){scene.remove(f.g);burningBlocks.delete(key);steam(f.x+.5,f.y+.45,f.z+.5)}
+  function rainFires(dt){
+    const rn=window.__mcRain||0,wet=rn>.12&&(typeof worldDimension==="undefined"||worldDimension==="overworld");
+    if(!burningBlocks.size)return;
+    for(const [key,f] of [...burningBlocks]){
+      if(!wet){if(f.rt!=null){f.rt=null;f.g.scale.x=f.g.scale.z=1}continue}
+      f.sk=(f.sk||0)-dt;if(f.sk<=0){f.sk=.8;f.open=skyOpen(f.x,f.y,f.z)}
+      if(!f.open){if(f.rt!=null){f.rt=null;f.g.scale.x=f.g.scale.z=1}continue}
+      if(f.rt==null){f.rt0=f.rt=(.5+Math.random()*1.1)/Math.max(.4,rn)}
+      f.rt-=dt;
+      f.g.scale.x=f.g.scale.z=Math.max(.3,f.rt/f.rt0);                /* leek kahaneb */
+      if(f.rt<=0){putOut(key,f);send({t:"fireOut",x:f.x,y:f.y,z:f.z})}      /* LAN: teised mängijad kustutavad sama tule */
+    }
+  }
+  function puffStep(dt){
+    for(let i=puffs.length-1;i>=0;i--){
+      const q=puffs[i];q.t+=dt;const m=q.m;
+      m.position.x+=q.vx*dt;m.position.y+=q.vy*dt;m.position.z+=q.vz*dt;
+      m.scale.setScalar(1+q.t*1.6);m.material.opacity=.75*Math.max(0,1-q.t/q.l);
+      if(q.t>=q.l){scene.remove(m);m.material.dispose();puffs.splice(i,1)}
+    }
+  }
+  const _updFx=updFx;
+  updFx=function(dt){_updFx.apply(this,arguments);rainFires(Math.min(dt,.1));if(puffs.length)puffStep(Math.min(dt,.1))};
+  const _onMsg=onMsg;
+  onMsg=function(m,ch){
+    if(m&&m.t==="fireOut"){
+      const key=(m.x|0)+","+(m.y|0)+","+(m.z|0),f=burningBlocks.get(key);
+      if(f)putOut(key,f);
+      if(isHost)send(m,ch);
+      return;
+    }
+    return _onMsg.apply(this,arguments);
+  };
+}catch(err){console.error("Rain extinguishes fire:",err)}})();
+</script>
+<script id="mcEnglishLocale">
+(function(){
+  try {
+    document.documentElement.lang = 'en';
+    document.title = 'Minecraft LAN Edition';
+    const mainHeading = document.querySelector('#menu .box h1'); if (mainHeading) mainHeading.textContent = '⛏ Minecraft LAN Edition';
+    const itemNames = {
+      1:'Grass Block',2:'Dirt',3:'Stone',4:'Oak Planks',5:'Sand',6:'TNT',7:'Bricks',8:'Oak Log',9:'Oak Leaves',10:'Glass',11:'Cobblestone',
+      12:'Gold Block',13:'Iron Block',14:'Diamond Block',15:'Emerald Block',16:'Obsidian',17:'White Wool',18:'Red Wool',19:'Blue Wool',20:'Green Wool',21:'Yellow Wool',22:'Black Wool',23:'Snow Block',24:'Ice',25:'Stone Bricks',26:'Terracotta',27:'Block of Quartz',28:'Netherrack',29:'Glowstone',
+      30:'Crafting Table',31:'Water',32:'Chest',33:'Furnace',34:'Coal Ore',35:'Oak Door',36:'Oak Door',37:'Nether Portal',38:'Lava',39:'Soul Sand',40:'Nether Quartz Ore',41:'White Bed',42:'Torch',43:'White Bed',44:'Iron Ore',45:'Gold Ore',46:'Diamond Ore',47:'Gray Wool',48:'Brown Wool',49:'Light Gray Wool',50:'Pink Wool',51:'Torch',52:'Torch',53:'Torch',54:'Torch',
+      55:'Birch Log',56:'Birch Leaves',57:'Sandstone',58:'Cactus',59:'Red Sand',60:'Spruce Log',61:'Spruce Leaves',62:'Red Terracotta',63:'Yellow Terracotta',64:'White Terracotta',65:'Stone Pressure Plate',66:'Orange Terracotta',67:'Blue Terracotta',68:'Emerald Ore',69:'Oak Sapling',70:'Birch Sapling',71:'Spruce Sapling',72:'Poppy',73:'Dandelion',74:'Oxeye Daisy',75:'Cornflower',76:'Pink Tulip',77:'Birch Planks',78:'Spruce Planks',
+      79:'Oak Stairs',80:'Oak Stairs',81:'Oak Stairs',82:'Oak Stairs',83:'Birch Stairs',84:'Birch Stairs',85:'Birch Stairs',86:'Birch Stairs',87:'Spruce Stairs',88:'Spruce Stairs',89:'Spruce Stairs',90:'Spruce Stairs',91:'Oak Slab',92:'Birch Slab',93:'Spruce Slab',94:'Oak Fence',95:'Birch Fence',96:'Spruce Fence',97:'Tall Grass',98:'Tall Grass',99:'Apple',100:'Farmland',101:'Farmland',
+      102:'Wheat',103:'Wheat',104:'Wheat',105:'Wheat',106:'Carrots',107:'Carrots',108:'Carrots',109:'Carrots',110:'Potatoes',111:'Potatoes',112:'Potatoes',113:'Potatoes',114:'Beetroots',115:'Beetroots',116:'Beetroots',117:'Beetroots',118:'Tall Grass',
+      120:'Leather Helmet',121:'Leather Chestplate',122:'Leather Leggings',123:'Leather Boots',124:'Golden Helmet',125:'Golden Chestplate',126:'Golden Leggings',127:'Golden Boots',128:'Iron Helmet',129:'Iron Chestplate',130:'Iron Leggings',131:'Iron Boots',132:'Diamond Helmet',133:'Diamond Chestplate',134:'Diamond Leggings',135:'Diamond Boots',136:'Spruce Door',137:'Spruce Door',138:'Birch Door',139:'Birch Door',
+      140:'Wooden Sword',141:'Stone Sword',142:'Golden Sword',143:'Iron Sword',144:'Diamond Sword',145:'Wooden Axe',146:'Stone Axe',147:'Golden Axe',148:'Iron Axe',149:'Diamond Axe',150:'Totem of Undying',151:'Shield',160:'Zombie Spawn Egg',161:'Skeleton Spawn Egg',162:'Creeper Spawn Egg',163:'Villager Spawn Egg',164:'Iron Golem Spawn Egg',165:'Sheep Spawn Egg',166:'Cow Spawn Egg',167:'Pig Spawn Egg',168:'Piglin Spawn Egg',169:'Chicken Spawn Egg',170:'Spider Spawn Egg',
+      180:'Wooden Pickaxe',181:'Stone Pickaxe',182:'Golden Pickaxe',183:'Iron Pickaxe',184:'Diamond Pickaxe',185:'Bow',186:'Arrow',187:'Oak Boat',188:'Bucket',189:'Water Bucket',190:'Stick',191:'Iron Ingot',200:'Coal',201:'Raw Beef',202:'Steak',203:'Raw Porkchop',204:'Cooked Porkchop',205:'Raw Mutton',206:'Cooked Mutton',207:'Leather',208:'White Wool',209:'Black Wool',210:'Gray Wool',211:'Brown Wool',212:'Light Gray Wool',213:'Pink Wool',214:'Leather Helmet',215:'Leather Chestplate',216:'Leather Leggings',217:'Leather Boots',218:'White Bed',219:'Raw Chicken',220:'Cooked Chicken',221:'Feather',222:'Raw Iron',223:'Raw Gold',224:'Diamond',225:'Gold Ingot',226:'String',227:'Emerald',230:'Gravel',240:'Oak Sapling',241:'Birch Sapling',242:'Spruce Sapling',243:'Poppy',244:'Dandelion',245:'Oxeye Daisy',246:'Cornflower',247:'Pink Tulip',248:'Wheat Seeds',249:'Wheat',250:'Carrot',251:'Potato',252:'Beetroot Seeds',253:'Beetroot',254:'Wooden Hoe',255:'Bread'
+    };
+    if (typeof NAMES !== 'undefined') {
+      for (const [id,name] of Object.entries(itemNames)) NAMES[Number(id)] = name;
+      NAMES[-1] = 'Flint and Steel';
+    }
+    if (typeof BIOME_NAMES !== 'undefined') {
+      BIOME_NAMES[0]='Plains'; BIOME_NAMES[1]='Forest'; BIOME_NAMES[2]='Birch Forest';
+      BIOME_NAMES[3]='Desert'; BIOME_NAMES[4]='Badlands'; BIOME_NAMES[5]='Snowy Taiga';
+    }
+    const oldAddChat = window.addChat || (typeof addChat === 'function' ? addChat : null);
+    if (oldAddChat) {
+      const chatMap = [
+        ['Aeg muudeti päevaks.','Time set to day.'],['Aeg muudeti ööks.','Time set to night.'],
+        ['Smaragdi maak','Emerald Ore'],['Smaragd','Emerald'],['Külaelanik','Villager'],['Külaelanikud','Villagers'],
+        ['raudgolem','Iron Golem'],['Raudgolem','Iron Golem'],['tõrvik','Torch'],['tõrvikud','Torches'],['obsidiaan','Obsidian'],
+        ['kivikirka','Stone Pickaxe'],['raudkirka','Iron Pickaxe'],['kirka','Pickaxe'],['kivikirves','Stone Axe'],['raudkirves','Iron Axe'],
+        ['kivisüsi','Coal'],['kivisöe maak','Coal Ore'],['toores raud','Raw Iron'],['toores kuld','Raw Gold'],['teemandi maak','Diamond Ore'],
+        ['muld','Dirt'],['muru','Grass Block'],['munakivi','Cobblestone'],['liivakivi','Sandstone'],['kruus','Gravel'],['palk','Log'],['laud','Planks'],
+        ['ellujäämine','Survival'],['looming','Creative'],['Netherisse','the Nether'],['Overworldi','the Overworld']
+      ];
+      window.addChat = function(message, cls) {
+        let value = String(message);
+        if (cls === 'sys' || cls === 'err') {
+          for (const [a,b] of chatMap) value = value.split(a).join(b);
+        }
+        return oldAddChat(value, cls);
+      };
+    }
+    // Static strings used by dynamically-created menus and settings.
+    const setText = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+    setText('tabInv','🎒 Inventory'); setText('tabCre','✨ Creative'); setText('mcVer','Minecraft LAN Edition');
+    setText('musicMuteBtn','🔊 Music: ON');
+    const ci=document.getElementById('chatIn'); if(ci) ci.placeholder='Type a message or command (Enter to send, Esc to close)';
+  } catch (e) { console.error('English locale patch:', e); }
+})();
+</script>
+
 </body>
 </html>
