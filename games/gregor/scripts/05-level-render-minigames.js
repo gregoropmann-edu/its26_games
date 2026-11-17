@@ -175,7 +175,7 @@ function createBloodParticles(x, y, count = 12) {
     }
 }
 
-function createSlashEffect(x, y, angle, range) {
+function createSlashEffect(x, y, angle) {
     for (let i = 0; i < 18; i++) {
         const spread = (seededRandom() - 0.5) * 0.95;
         const pAngle = angle + spread;
@@ -520,9 +520,9 @@ function talkToMargus() {
     const editor = document.getElementById('margus-python-code');
     const output = document.getElementById('margus-python-output');
     const feedback = document.getElementById('code-feedback');
-    if (editor) editor.value = 'greeting = "Hello, Margus!"\nprint(greeting)';
+    if (editor) editor.value = 'name = "Margus"\ngreeting = ""\n\n# Margus wants to greet the visitor.\nif name == "Margus":\n    print(greeting)\n\ngreeting = "Hello, " + name';
     if (output) output.textContent = 'Program output will appear here…';
-    if (feedback) feedback.textContent = 'Edit the code if you like, then run it.';
+    if (feedback) feedback.textContent = 'Something is wrong with the order. Run it and inspect the output.';
     openMiniGame('modal-margus-code');
 }
 
@@ -538,17 +538,30 @@ function closeMiniGame(id) {
     if (gameState === 'MINIGAME') gameState = 'PLAYING';
 }
 
-// Load the real Python runtime only when Margus's challenge is first run.
+// Load and initialize the real Python runtime only when Margus's challenge is first run.
 function loadMargusPythonRuntime() {
-    if (window.loadPyodide) return Promise.resolve();
     if (pyodidePromise) return pyodidePromise;
+
+    const initializeRuntime = () => window.loadPyodide({
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
+    });
+
     pyodidePromise = new Promise((resolve, reject) => {
+        if (window.loadPyodide) {
+            Promise.resolve().then(initializeRuntime).then(resolve, reject);
+            return;
+        }
+
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js';
-        script.onload = resolve;
+        script.onload = () => Promise.resolve().then(initializeRuntime).then(resolve, reject);
         script.onerror = () => reject(new Error('Could not load the Python runtime. Check your internet connection and try again.'));
         document.head.appendChild(script);
+    }).catch(error => {
+        pyodidePromise = null;
+        throw error;
     });
+
     return pyodidePromise;
 }
 
@@ -558,13 +571,11 @@ async function runMargusPython() {
     const feedback = document.getElementById('code-feedback');
     const runButton = document.getElementById('btn-code-run');
     const source = editor?.value ?? '';
-    const expectedProgram = /^\s*greeting\s*=\s*(["'])Hello, Margus!\1\s*\r?\n\s*print\s*\(\s*greeting\s*\)\s*$/;
-
-    // Keep this tiny game exercise focused on assignment + print, while the
-    // accepted source is executed by CPython running in Pyodide in the browser.
-    if (!expectedProgram.test(source)) {
-        output.textContent = 'No output yet.';
-        feedback.textContent = 'Use two Python lines: assign "Hello, Margus!" to greeting, then print(greeting).';
+    // Execute the player's actual Python, rather than matching a prewritten answer.
+    // The challenge is solved by the program's behaviour: its output must greet Margus.
+    if (!source.trim()) {
+        output.textContent = '(no output)';
+        feedback.textContent = 'The program is empty. Add or fix some Python first.';
         return;
     }
 
@@ -572,10 +583,7 @@ async function runMargusPython() {
     runButton.textContent = 'Loading Python…';
     feedback.textContent = 'Starting the Python runtime…';
     try {
-        await loadMargusPythonRuntime();
-        const pyodide = await window.loadPyodide({
-            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'
-        });
+        const pyodide = await loadMargusPythonRuntime();
         let printed = '';
         pyodide.setStdout({ batched: (line) => { printed += `${line}\n`; } });
         await pyodide.runPythonAsync(source);

@@ -195,7 +195,7 @@ class Player {
 
         if (swordEquipped) {
             sfx.swordSwing();
-            createSlashEffect(this.x, this.y, this.angle, this.attackRange);
+            createSlashEffect(this.x, this.y, this.angle);
             emitNoise(this.x, this.y, 250);
 
             const hitTileX = Math.floor((this.x + Math.cos(this.angle) * 32) / TILE_SIZE);
@@ -218,7 +218,7 @@ class Player {
                     angleDiff = Math.abs(angleDiff);
 
                     if (angleDiff < this.attackArc / 2 + 0.35) {
-                        guard.takeDamage(45, this.x, this.y);
+                        guard.takeDamage(45);
                     }
                 }
             });

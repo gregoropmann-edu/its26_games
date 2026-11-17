@@ -252,7 +252,7 @@ class Guard {
         if (!checkTileCollision(this.x,nextY,this.radius)) this.y=nextY;
     }
 
-    takeDamage(amount, attackerX, attackerY) {
+    takeDamage(amount) {
         this.hp -= amount;
         sfx.guardHit();
         createBloodParticles(this.x, this.y);
